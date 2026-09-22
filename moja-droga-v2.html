@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Moja Droga</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── SECTION-SPECIFIC PALETTE (light) ── */
+#app[data-sect="islam"]{--bg:#F4EFE6;--bg-panel:#FDFAF5;--accent:#A9762F;--accent-soft:rgba(169,118,47,0.11);}
+#app[data-sect="eng"]  {--bg:#F5F8FD;--bg-panel:#FFFFFF;--accent:#3A6FC2;--accent-soft:rgba(58,111,194,0.11);--b2:#6B4AC2;--b2-soft:rgba(107,74,194,0.11);}
+/* ── SHARED LIGHT ── */
+:root{--text:#1A2820;--text-muted:#6B7A6F;--border:rgba(26,40,32,0.13);--scale:1;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+/* ── DARK SHARED ── */
+[data-theme="dark"]{--text:#EAE4D6;--text-muted:#8A9E94;--border:rgba(234,228,214,0.11);}
+/* ── DARK SECTION ── */
+[data-theme="dark"] #app[data-sect="islam"]{--bg:#0E1C18;--bg-panel:#142018;--accent:#C79A46;--accent-soft:rgba(199,154,70,0.14);}
+[data-theme="dark"] #app[data-sect="eng"]  {--bg:#0D1117;--bg-panel:#161B22;--accent:#6B9ED4;--accent-soft:rgba(107,158,212,0.16);--b2:#9F82D8;--b2-soft:rgba(159,130,216,0.16);}
+/* ── RESET ── */
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;overscroll-behavior:none;}
+#app{display:flex;flex-direction:column;height:100%;max-width:540px;margin:0 auto;background:var(--bg);}
+.view{display:none;flex:1;min-height:0;flex-direction:column;}.view.active{display:flex;}
+/* ── TOP BAR ── */
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:11px 16px 9px;gap:8px;border-bottom:1px solid var(--border);background:var(--bg-panel);flex-shrink:0;}
+.tb-title{font-size:calc(13px * var(--scale));font-weight:700;}
+.tb-right{display:flex;align-items:center;gap:5px;}
+.pill{display:flex;border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.pill button{background:none;border:none;border-right:1px solid var(--border);padding:5px 9px;cursor:pointer;color:var(--text-muted);font-family:'Inter',sans-serif;font-weight:600;font-size:11px;}
+.pill button:last-child{border-right:none;}
+.pill button.on{background:var(--accent-soft);color:var(--accent);}
+.sz-btn{font-weight:700!important;}
+.icon-btn{background:none;border:none;color:var(--text-muted);font-size:14px;padding:5px 6px;cursor:pointer;line-height:1;}
+.icon-btn:active{color:var(--accent);}
+/* ── HOME HEADER ── */
+.home-hdr{padding:14px 18px 6px;flex-shrink:0;}
+.home-title{font-size:calc(19px * var(--scale));font-weight:700;margin:0;letter-spacing:-0.02em;}
+.home-sub{font-size:calc(11px * var(--scale));color:var(--text-muted);margin:3px 0 0;}
+/* ── PRAYER WIDGET ── */
+.pw{margin:10px 18px 6px;padding:9px 11px 11px;background:var(--bg-panel);border:1px solid var(--border);border-radius:6px;flex-shrink:0;}
+.pw-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.pw-city{background:none;border:none;padding:0;cursor:pointer;color:var(--text);font-family:'Inter',sans-serif;font-size:calc(12px * var(--scale));font-weight:700;}
+.pw-city::after{content:' ›';color:var(--accent);}
+.pw-method{font-size:calc(9px * var(--scale));color:var(--text-muted);}
+.pw-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:2px;}
+.pw-cell{text-align:center;padding:3px 1px;border-radius:3px;}.pw-cell.on{background:var(--accent-soft);}.pw-cell.dim{opacity:0.4;}
+.pw-l{font-size:calc(8.5px * var(--scale));color:var(--text-muted);line-height:1;}.pw-cell.on .pw-l{color:var(--accent);font-weight:600;}
+.pw-v{font-size:calc(11.5px * var(--scale));font-weight:700;margin-top:3px;line-height:1;}.pw-cell.on .pw-v{color:var(--accent);}
+/* ── LIST HEADER ── */
+.list-hdr-row{display:flex;align-items:center;justify-content:space-between;padding:9px 18px 3px;flex-shrink:0;}
+.list-hdr-lbl{font-size:calc(9.5px * var(--scale));font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;}
+.sort-btn{background:none;border:1px solid var(--border);border-radius:4px;color:var(--text-muted);font-size:13px;padding:3px 7px;cursor:pointer;}
+/* ── ENTRY LIST ── */
+.entry-list{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.entry-row{display:flex;align-items:center;padding:11px 18px;border-bottom:1px solid var(--border);gap:11px;cursor:pointer;}
+.entry-row:active{background:var(--accent-soft);}
+.e-num{font-size:calc(10.5px * var(--scale));color:var(--accent);font-weight:700;min-width:18px;text-align:right;flex-shrink:0;}
+.e-ico{font-size:17px;width:22px;text-align:center;flex-shrink:0;}
+.e-body{flex:1;min-width:0;}
+.e-title{font-size:calc(13.5px * var(--scale));font-weight:600;line-height:1.2;}
+.e-sub{font-size:calc(11px * var(--scale));color:var(--text-muted);margin-top:1px;}
+.e-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;}
+.e-pct{font-size:calc(9.5px * var(--scale));color:var(--text-muted);}
+.prog-bar{width:36px;height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--accent);transition:width 0.2s;}
+.e-arr{color:var(--border);font-size:13px;}
+/* ── SUB-TOP ── */
+.sub-top{display:flex;align-items:center;gap:8px;padding:11px 16px 9px;border-bottom:1px solid var(--border);background:var(--bg-panel);flex-shrink:0;}
+.sub-ttl{flex:1;font-size:calc(13.5px * var(--scale));font-weight:600;}
+.back-btn{font-size:18px;color:var(--text-muted);background:none;border:none;padding:4px 6px;cursor:pointer;line-height:1;}
+.back-btn:active{color:var(--accent);}
+/* ── MINI BAR ── */
+.mini-bar{font-size:calc(10px * var(--scale));color:var(--text-muted);padding:5px 18px;border-bottom:1px solid var(--border);line-height:1.4;flex-shrink:0;}
+.mini-bar b{color:var(--accent);font-weight:600;}
+/* ── DETAIL SCROLL ── */
+.detail-scroll{flex:1;overflow-y:auto;padding:4px 18px 24px;-webkit-overflow-scrolling:touch;}
+.detail-title{font-size:calc(15px * var(--scale));font-weight:700;margin:10px 0 1px;}
+.detail-sub{font-size:calc(10.5px * var(--scale));color:var(--text-muted);margin:0 0 10px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.line-item{padding:7px 0;border-bottom:1px solid var(--border);font-size:calc(13.5px * var(--scale));line-height:1.5;}
+.line-item:last-child{border-bottom:none;}
+.li-num{color:var(--accent);font-size:calc(10px * var(--scale));margin-right:5px;opacity:0.75;}
+.li-hdr{font-weight:700;color:var(--accent);font-size:calc(10px * var(--scale));text-transform:uppercase;letter-spacing:0.04em;}
+.li-meaning{color:var(--text-muted);font-size:calc(11.5px * var(--scale));margin-left:16px;}
+/* ── ARABIC LETTERS ── */
+.letter-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);}
+.letter-row:last-child{border-bottom:none;}
+.letter-ar{font-family:'Amiri',serif;font-size:calc(21px * var(--scale));width:32px;text-align:center;flex-shrink:0;color:var(--accent);}
+.letter-lat{font-size:calc(13px * var(--scale));}
+/* ── PRAYER ── */
+.prayer-pills{display:flex;gap:6px;padding:7px 18px 5px;flex-shrink:0;}
+.prayer-pills button{flex:1;border:1px solid var(--border);background:none;color:var(--text-muted);font-family:'Inter',sans-serif;font-size:calc(10.5px * var(--scale));padding:5px 6px;border-radius:4px;cursor:pointer;}
+.prayer-pills button.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);}
+.pscroll{flex:1;overflow-y:auto;padding:4px 18px 24px;-webkit-overflow-scrolling:touch;}
+.sec-block{margin-bottom:4px;}.sec-block.hl{border-left:2px solid var(--accent);padding-left:10px;}
+.sec-head{font-size:calc(9px * var(--scale));font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;padding-top:7px;margin:0;}
+.sec-block .line-item{font-size:calc(13px * var(--scale));padding:4px 0;}
+/* ── ENGLISH — STATS BAR ── */
+.stats-bar{margin:10px 18px 2px;padding:9px 10px;background:var(--bg-panel);border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;flex-shrink:0;}
+.s-cell{flex:1;text-align:center;}
+.s-val{font-size:calc(14px * var(--scale));font-weight:700;line-height:1;color:var(--accent);}
+.s-lbl{font-size:calc(9px * var(--scale));color:var(--text-muted);margin-top:2px;}
+.s-div{width:1px;height:26px;background:var(--border);flex-shrink:0;}
+/* ── ENGLISH — B1/B2 TAB BAR ── */
+.tab-bar{display:flex;padding:8px 18px;border-bottom:1px solid var(--border);flex-shrink:0;gap:8px;}
+.tab-btn{flex:1;border:1px solid var(--border);background:none;cursor:pointer;font-family:'Inter',sans-serif;font-weight:700;font-size:calc(12.5px * var(--scale));color:var(--text-muted);padding:7px 12px;border-radius:5px;transition:all 0.15s;}
+.tab-btn.on{background:var(--accent-soft);color:var(--accent);border-color:var(--accent);}
+/* ── ENGLISH — SECTION HEADER ── */
+.topic-sec-hdr{font-size:calc(9px * var(--scale));font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);padding:10px 18px 2px;}
+/* ── ENGLISH — ITEM ROWS ── */
+.item-row{display:flex;align-items:flex-start;padding:10px 18px;border-bottom:1px solid var(--border);gap:10px;cursor:pointer;user-select:none;}
+.item-row:active{opacity:0.7;}
+.i-chk{flex-shrink:0;width:18px;height:18px;border:1.5px solid var(--border);border-radius:3px;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:transparent;transition:all 0.12s;}
+.i-chk.done{background:var(--accent);border-color:var(--accent);color:#fff;}
+.i-body{flex:1;min-width:0;}
+.i-ttl{font-size:calc(13px * var(--scale));font-weight:600;line-height:1.3;}
+.i-desc{font-size:calc(11.5px * var(--scale));color:var(--text-muted);margin-top:2px;line-height:1.45;}
+.i-arr{color:var(--border);font-size:12px;flex-shrink:0;margin-top:2px;}
+/* ── ENGLISH — ITEM DETAIL ── */
+.id-scroll{flex:1;overflow-y:auto;padding:0 18px 30px;-webkit-overflow-scrolling:touch;}
+.id-title{font-size:calc(17px * var(--scale));font-weight:700;margin:14px 0 6px;}
+.id-desc{font-size:calc(13px * var(--scale));line-height:1.65;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.id-shdr{font-size:calc(9px * var(--scale));font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin:14px 0 8px;}
+.id-ex{font-size:calc(13px * var(--scale));line-height:1.5;padding:7px 0 7px 12px;border-left:2px solid var(--accent-soft);margin-bottom:7px;}
+.id-ex strong{font-weight:600;}
+.id-ex em{color:var(--text-muted);font-size:calc(11.5px * var(--scale));font-style:normal;}
+.id-tip{background:var(--accent-soft);border-radius:6px;padding:10px 13px;margin-top:14px;font-size:calc(12px * var(--scale));line-height:1.55;color:var(--text);}
+.id-tip-hdr{font-size:calc(9px * var(--scale));font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent);margin-bottom:4px;}
+.id-done-row{display:flex;align-items:center;gap:10px;padding:16px 0 4px;border-top:1px solid var(--border);margin-top:14px;cursor:pointer;user-select:none;}
+.id-done-lbl{font-size:calc(13px * var(--scale));font-weight:600;}
+/* ── BOTTOM NAV ── */
+.bnav{display:flex;flex-shrink:0;background:var(--bg-panel);border-top:1px solid var(--border);height:calc(54px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);}
+.bnav-btn{flex:1;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--text-muted);font-family:'Inter',sans-serif;padding:6px 0;transition:color 0.15s;}
+.bnav-btn.on{color:var(--accent);}
+.bnav-ico{font-size:19px;line-height:1;}
+.bnav-lbl{font-size:calc(10px * var(--scale));font-weight:600;}
+/* ── CITY OVERLAY ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:none;z-index:20;}
+.overlay.open{display:block;}
+.overlay-panel{position:absolute;right:0;top:0;bottom:0;width:min(88vw,340px);background:var(--bg-panel);border-left:1px solid var(--border);display:flex;flex-direction:column;transform:translateX(100%);transition:transform 0.2s ease;}
+.overlay.open .overlay-panel{transform:translateX(0);}
+.overlay-head{padding:13px 16px 9px;font-weight:700;font-size:calc(13px * var(--scale));border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.city-inp{background:none;border:1px solid var(--border);border-radius:4px;padding:7px 10px;font-family:'Inter',sans-serif;font-size:13px;color:var(--text);margin:8px 16px 0;width:calc(100% - 32px);}
+.city-list-el{overflow-y:auto;flex:1;padding:4px 0;}
+.city-btn{width:100%;text-align:left;background:none;border:none;padding:9px 16px;font-family:'Inter',sans-serif;font-size:13px;color:var(--text);cursor:pointer;border-left:2px solid transparent;}
+.city-btn:active,.city-btn.on{color:var(--accent);border-left-color:var(--accent);background:var(--accent-soft);}
+</style>
+</head>
+<body>
+<div id="app" data-sect="islam">
+
+<!-- ════════════════════════════
+     ISLAM VIEWS
+════════════════════════════ -->
+<div class="view active" id="vi-home">
+  <div class="top-bar">
+    <div class="pill" id="iLangPill">
+      <button data-lang="pl">PL</button><button data-lang="en">EN</button>
+    </div>
+    <div class="tb-right">
+      <div class="pill" id="iSzPill">
+        <button class="sz-btn" data-sc="0.85">A</button>
+        <button class="sz-btn" data-sc="1">A</button>
+        <button class="sz-btn" data-sc="1.2">A</button>
+      </div>
+      <button class="icon-btn" id="iThemeBtn">🌓</button>
+    </div>
+  </div>
+  <div class="home-hdr">
+    <h1 class="home-title" id="i-appTitle"></h1>
+    <p class="home-sub" id="i-appSub"></p>
+  </div>
+  <div class="pw">
+    <div class="pw-head">
+      <button class="pw-city" id="pwCityBtn"></button>
+      <span class="pw-method" id="pwMethod"></span>
+    </div>
+    <div class="pw-grid" id="pwGrid"></div>
+  </div>
+  <div class="list-hdr-row">
+    <span class="list-hdr-lbl" id="i-listHdr"></span>
+    <button class="sort-btn" id="iSortBtn">↕</button>
+  </div>
+  <div class="entry-list" id="i-entryList"></div>
+</div>
+
+<div class="view" id="vi-list">
+  <div class="sub-top">
+    <button class="back-btn" id="iBackList">‹</button>
+    <span class="sub-ttl" id="i-listTopTtl"></span>
+  </div>
+  <div class="mini-bar" id="i-mbList"></div>
+  <div class="detail-scroll">
+    <h2 class="detail-title" id="i-listTitle"></h2>
+    <p class="detail-sub" id="i-listSub"></p>
+    <div id="i-listBody"></div>
+  </div>
+</div>
+
+<div class="view" id="vi-letters">
+  <div class="sub-top">
+    <button class="back-btn" id="iBackLetters">‹</button>
+    <span class="sub-ttl" id="i-lettersTopTtl"></span>
+  </div>
+  <div class="mini-bar" id="i-mbLetters"></div>
+  <div class="detail-scroll">
+    <h2 class="detail-title" id="i-lettersTitle"></h2>
+    <p class="detail-sub" id="i-lettersSub"></p>
+    <div id="i-lettersBody"></div>
+  </div>
+</div>
+
+<div class="view" id="vi-prayer">
+  <div class="sub-top">
+    <button class="back-btn" id="iBackPrayer">‹</button>
+    <span class="sub-ttl" id="i-prayerTopTtl"></span>
+  </div>
+  <div class="mini-bar" id="i-mbPrayer"></div>
+  <div class="prayer-pills">
+    <button id="pv2"></button><button id="pv3"></button><button id="pv4"></button>
+  </div>
+  <div class="pscroll" id="i-prayerScroll"></div>
+</div>
+
+<!-- ════════════════════════════
+     ENGLISH VIEWS
+════════════════════════════ -->
+<div class="view" id="ve-home">
+  <div class="top-bar">
+    <span class="tb-title">🇬🇧 Angielski</span>
+    <div class="tb-right">
+      <div class="pill" id="eLangPill">
+        <button data-lang="pl">PL</button><button data-lang="en">EN</button>
+      </div>
+      <div class="pill" id="eSzPill">
+        <button class="sz-btn" data-sc="0.85">A</button>
+        <button class="sz-btn" data-sc="1">A</button>
+        <button class="sz-btn" data-sc="1.2">A</button>
+      </div>
+      <button class="icon-btn" id="eThemeBtn">🌓</button>
+    </div>
+  </div>
+  <div class="home-hdr">
+    <h1 class="home-title">Moja Droga</h1>
+    <p class="home-sub" id="e-homeSub"></p>
+  </div>
+  <div class="stats-bar">
+    <div class="s-cell"><div class="s-val" id="eStB1">—</div><div class="s-lbl" id="eLblB1">—</div></div>
+    <div class="s-div"></div>
+    <div class="s-cell"><div class="s-val" id="eStB2">—</div><div class="s-lbl" id="eLblB2">—</div></div>
+    <div class="s-div"></div>
+    <div class="s-cell"><div class="s-val" id="eStAll">—</div><div class="s-lbl" id="eLblAll">—</div></div>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-btn on" id="tabB1">B1</button>
+    <button class="tab-btn" id="tabB2">B2</button>
+  </div>
+  <div class="entry-list" id="e-topicList"></div>
+</div>
+
+<div class="view" id="ve-topic">
+  <div class="sub-top">
+    <button class="back-btn" id="eBackTopic">‹</button>
+    <span class="sub-ttl" id="e-topicTitle"></span>
+  </div>
+  <div class="entry-list" id="e-itemList"></div>
+</div>
+
+<div class="view" id="ve-item">
+  <div class="sub-top">
+    <button class="back-btn" id="eBackItem">‹</button>
+    <span class="sub-ttl" id="e-itemTopTtl"></span>
+  </div>
+  <div class="id-scroll" id="e-itemScroll"></div>
+</div>
+
+<!-- ════════════════════════════
+     BOTTOM NAV
+════════════════════════════ -->
+<nav class="bnav">
+  <button class="bnav-btn on" id="bnIslam">
+    <span class="bnav-ico">☪️</span>
+    <span class="bnav-lbl">Islam</span>
+  </button>
+  <button class="bnav-btn" id="bnEng">
+    <span class="bnav-ico">🇬🇧</span>
+    <span class="bnav-lbl" id="bnEngLbl">Angielski</span>
+  </button>
+</nav>
+
+</div><!-- #app -->
+
+<!-- City overlay -->
+<div class="overlay" id="cityOv">
+  <div class="overlay-panel">
+    <div class="overlay-head">
+      <span id="cityOvTitle"></span>
+      <button class="icon-btn" id="closeCityBtn">✕</button>
+    </div>
+    <input type="text" class="city-inp" id="cityInp" autocomplete="off">
+    <div class="city-list-el" id="cityListEl"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ══════════════════════════════
+   STATE
+══════════════════════════════ */
+var ST={sect:'islam',lang:'pl',theme:'light',scale:'1',cityId:'krakow',sortReversed:false,engLevel:'b1',pvVer:'2',done:{}};
+try{var _s=localStorage.getItem('mdv3');if(_s)Object.assign(ST,JSON.parse(_s));}catch(e){}
+function save(){try{localStorage.setItem('mdv3',JSON.stringify(ST));}catch(e){}}
+
+var APP=document.getElementById('app');
+
+function applyTheme(){document.documentElement.setAttribute('data-theme',ST.theme);}
+applyTheme();
+
+function applyScale(){
+  document.documentElement.style.setProperty('--scale',ST.scale);
+  document.querySelectorAll('.sz-btn').forEach(function(b){
+    b.classList.toggle('on',b.dataset.sc===ST.scale);
+    b.style.fontSize=b.dataset.sc==='0.85'?'10px':b.dataset.sc==='1'?'12px':'14px';
+  });
+}
+applyScale();
+
+function applySect(){
+  APP.setAttribute('data-sect',ST.sect);
+  document.getElementById('bnIslam').classList.toggle('on',ST.sect==='islam');
+  document.getElementById('bnEng').classList.toggle('on',ST.sect==='eng');
+}
+applySect();
+
+var VIEWS=['vi-home','vi-list','vi-letters','vi-prayer','ve-home','ve-topic','ve-item'];
+function showV(id){VIEWS.forEach(function(v){document.getElementById(v).classList.toggle('active',v===id);});}
+
+/* ══════════════════════════════
+   ISLAM — TRANSLATIONS
+══════════════════════════════ */
+var IS={
+  pl:{appTitle:'Moja Droga',appSub:'Notatnik drogi w islamie',pv2:'2 rakaty',pv3:'3 rakaty',pv4:'4 rakaty',pwMethod:'MWL · przybliżone',changeCity:'Zmień miasto',searchCity:'Szukaj…',now:'Teraz',next:'Następna',between:'między modlitwami',listHeader:'Twój notatnik'},
+  en:{appTitle:'My Path',appSub:'Notebook of my journey in Islam',pv2:"2 rak'ahs",pv3:"3 rak'ahs",pv4:"4 rak'ahs",pwMethod:'MWL · approximate',changeCity:'Change city',searchCity:'Search…',now:'Now',next:'Next',between:'between prayers',listHeader:'Your notebook'}
+};
+var PL_N={fajr:{pl:'Fajr',en:'Fajr'},sunrise:{pl:'Wschód',en:'Sunrise'},dhuhr:{pl:'Dhuhr',en:'Dhuhr'},asr:{pl:'Asr',en:'Asr'},maghrib:{pl:'Maghrib',en:'Maghrib'},isha:{pl:'Isha',en:'Isha'}};
+function it(k){return IS[ST.lang][k]||k;}
+function rl(item){
+  if(typeof item==='string')return item;
+  if(item&&item.phrase!==undefined)return item.phrase+' '+item.note[ST.lang];
+  if(item&&item.pl!==undefined)return item[ST.lang];
+  return '';
+}
+
+/* ── ISLAM DATA ── */
+var fatiha=['Bismillah ir-Rahman ir-Rahim','Alhamdu lillahi Rabbil-\'alamin','Ar-Rahman ir-Rahim','Maliki yawmid-din','Iyyaka na\'budu wa iyyaka nasta\'in','Ihdinas-siratal-mustaqim','Siratal-ladhina an\'amta \'alayhim','Ghayril-maghdubi \'alayhim wa lad-dallin','Amin'];
+var ikhlas=['Qul huwa Allahu ahad','Allahu-s-Samad','Lam yalid wa lam yulad','Wa lam yakun lahu kufuwan ahad'];
+var wudu=[{pl:'Niyyah (intencja w sercu):',en:'Niyyah (intention in the heart):'},{pl:'Bismillah',en:'Bismillah'},{pl:'Mycie rąk 3x (do nadgarstka)',en:'Wash hands 3x (to wrist)'},{pl:'Płukanie ust 3x',en:'Rinse mouth 3x'},{pl:'Płukanie nosa 3x',en:'Rinse nose 3x'},{pl:'Mycie twarzy 3x',en:'Wash face 3x'},{pl:'Mycie prawego przedramienia 3x, potem lewego',en:'Wash right forearm 3x, then left'},{pl:'Przetarcie głowy (masah) — raz',en:'Wipe head (masah) — once'},{pl:'Przetarcie uszu — raz',en:'Wipe ears — once'},{pl:'Mycie prawej stopy 3x, potem lewej',en:'Wash right foot 3x, then left'},'Ash-hadu al la ilaha illallah, wa ash-hadu anna Muhammadan \'abduhu wa rasuluh'];
+var shahada=['Ash-hadu al la ilaha illallah','Wa ash-hadu anna Muhammadan rasulullah',{pl:'Znaczenie: Zaświadczam, że nie ma bóstwa oprócz Allaha, i że Muhammad jest Jego wysłannikiem.',en:'Meaning: I bear witness that there is no god but Allah, and that Muhammad is His messenger.'}];
+var arLetters=[{ar:'ا',l:{pl:'Alif',en:'Alif'}},{ar:'ب',l:{pl:'Ba',en:'Ba'}},{ar:'ت',l:{pl:'Ta',en:'Ta'}},{ar:'ث',l:{pl:'Tha',en:'Tha'}},{ar:'ج',l:{pl:'Dżim',en:'Jim'}},{ar:'ح',l:{pl:'Ha (twarde)',en:'Ha (heavy)'}},{ar:'خ',l:{pl:'Cha',en:'Kha'}},{ar:'د',l:{pl:'Dal',en:'Dal'}},{ar:'ذ',l:{pl:'Dzal',en:'Dhal'}},{ar:'ر',l:{pl:'Ra',en:'Ra'}},{ar:'ز',l:{pl:'Zaj',en:'Zay'}},{ar:'س',l:{pl:'Sin',en:'Sin'}},{ar:'ش',l:{pl:'Szin',en:'Shin'}},{ar:'ص',l:{pl:'Sad',en:'Sad'}},{ar:'ض',l:{pl:'Dad',en:'Dad'}},{ar:'ط',l:{pl:'Ta (twarde)',en:'Ta (heavy)'}},{ar:'ظ',l:{pl:'Za (twarde)',en:'Za (heavy)'}},{ar:'ع',l:{pl:'Ajn',en:"'Ayn"}},{ar:'غ',l:{pl:'Ghajn',en:'Ghayn'}},{ar:'ف',l:{pl:'Fa',en:'Fa'}},{ar:'ق',l:{pl:'Qaf',en:'Qaf'}},{ar:'ك',l:{pl:'Kaf',en:'Kaf'}},{ar:'ل',l:{pl:'Lam',en:'Lam'}},{ar:'م',l:{pl:'Mim',en:'Mim'}},{ar:'ن',l:{pl:'Nun',en:'Nun'}},{ar:'ه',l:{pl:'Ha (lekkie)',en:'Ha (light)'}},{ar:'و',l:{pl:'Waw',en:'Waw'}},{ar:'ي',l:{pl:'Ja',en:'Ya'}}];
+var istiftah=['Subhanaka Allahumma wa bihamdika','Wa tabarakasmuka wa ta\'ala jadduka','Wa la ilaha ghayruk'];
+var tahijjat=['At-tahiyyatu lillahi was-salawatu wat-tayyibatu','Assalamu \'alayka ayyuhan-Nabiyyu wa rahmatullahi wa barakatuh','Assalamu \'alayna wa \'ala \'ibadillahis-salihin','Ash-hadu al la ilaha illallah wa ash-hadu anna Muhammadan \'abduhu wa rasuluh'];
+var salawat=['Allahumma salli \'ala Muhammad wa \'ala aali Muhammad','Kama sallayta \'ala Ibrahima wa \'ala aali Ibrahim','Innaka Hamidun Majid','Allahumma barik \'ala Muhammad wa \'ala aali Muhammad','Kama barakta \'ala Ibrahima wa \'ala aali Ibrahim','Innaka Hamidun Majid'];
+var taslim=[{phrase:'Assalamu \'alaykum wa rahmatullah',note:{pl:'(w prawo)',en:'(right)'}},{phrase:'Assalamu \'alaykum wa rahmatullah',note:{pl:'(w lewo)',en:'(left)'}}];
+function psec(lp,le,lines,hl){return{lp:lp,le:le,lines:lines,hl:!!hl};}
+function pcycle(n,addSura){var s=[];s.push(psec('Rakat '+n+' — Al-Fatiha','Rak\'ah '+n+' — Al-Fatiha',fatiha));if(addSura)s.push(psec('Rakat '+n+' — sura','Rak\'ah '+n+' — surah',[{pl:'(dowolna krótka sura)',en:'(any short surah)'}]));s.push(psec('Rakat '+n+' — ruku','Rak\'ah '+n+' — ruku',['Allahu Akbar','Subhana Rabbiyal-\'Azim (x3)']));s.push(psec('Rakat '+n+' — powrót','Rak\'ah '+n+' — rising',['Sami\' Allahu liman hamidah','Rabbana wa lakal-hamd']));s.push(psec('Rakat '+n+' — sudżud 1','Rak\'ah '+n+' — sujud 1',['Allahu Akbar','Subhana Rabbiyal-A\'la (x3)']));s.push(psec('Rakat '+n+' — siad','Rak\'ah '+n+' — sitting',['Allahu Akbar','Rabbighfir li (x2)']));s.push(psec('Rakat '+n+' — sudżud 2','Rak\'ah '+n+' — sujud 2',['Allahu Akbar','Subhana Rabbiyal-A\'la (x3)']));return s;}
+function openBlock(){var s=[];s.push(psec('Takbiratul ihram','Takbiratul ihram',['Allahu Akbar']));s.push(psec('Dua otwierające (opcjonalnie)','Opening dua (optional)',istiftah));return s;}
+function pb2(){var s=openBlock();s=s.concat(pcycle(1,true));s.push(psec('Wstanie — rakat 2','Rising — rak\'ah 2',['Allahu Akbar']));s=s.concat(pcycle(2,true));s.push(psec('Siad końcowy — tashahhud','Final sitting — tashahhud',tahijjat,true));s.push(psec('Siad końcowy — salawat','Final sitting — salawat',salawat,true));s.push(psec('Taslim','Taslim',taslim));return s;}
+function pb3(){var s=openBlock();s=s.concat(pcycle(1,true));s.push(psec('Wstanie — rakat 2','Rising — rak\'ah 2',['Allahu Akbar']));s=s.concat(pcycle(2,true));s.push(psec('Siad pośredni — tashahhud','Middle sitting — tashahhud',tahijjat,true));s.push(psec('Wstanie — rakat 3','Rising — rak\'ah 3',['Allahu Akbar']));s=s.concat(pcycle(3,false));s.push(psec('Siad końcowy — tashahhud','Final sitting — tashahhud',tahijjat,true));s.push(psec('Siad końcowy — salawat','Final sitting — salawat',salawat,true));s.push(psec('Taslim','Taslim',taslim));return s;}
+function pb4(){var s=openBlock();s=s.concat(pcycle(1,true));s.push(psec('Wstanie — rakat 2','Rising — rak\'ah 2',['Allahu Akbar']));s=s.concat(pcycle(2,true));s.push(psec('Siad pośredni — tashahhud','Middle sitting — tashahhud',tahijjat,true));s.push(psec('Wstanie — rakat 3','Rising — rak\'ah 3',['Allahu Akbar']));s=s.concat(pcycle(3,false));s.push(psec('Wstanie — rakat 4','Rising — rak\'ah 4',['Allahu Akbar']));s=s.concat(pcycle(4,false));s.push(psec('Siad końcowy — tashahhud','Final sitting — tashahhud',tahijjat,true));s.push(psec('Siad końcowy — salawat','Final sitting — salawat',salawat,true));s.push(psec('Taslim','Taslim',taslim));return s;}
+var psets={'2':pb2(),'3':pb3(),'4':pb4()};
+var ENTRIES=[
+  {id:'al-fatiha',title:{pl:'Al-Fatiha',en:'Al-Fatiha'},sub:{pl:'1. sura Koranu',en:'1st chapter of the Qur\'an'},type:'list',lines:fatiha},
+  {id:'alfabet',title:{pl:'Alfabet arabski',en:'Arabic alphabet'},sub:{pl:'28 liter z transliteracją',en:'28 letters with transliteration'},type:'letters'},
+  {id:'wudu',title:{pl:'Wudu (ablucja)',en:'Wudu (ablution)'},sub:{pl:'Oczyszczenie przed modlitwą',en:'Purification before prayer'},type:'list',lines:wudu},
+  {id:'shahada',title:{pl:'Szahada',en:'Shahada'},sub:{pl:'Wyznanie wiary — 1. filar islamu',en:'Declaration of faith — 1st pillar'},type:'list',lines:shahada},
+  {id:'al-ikhlas',title:{pl:'Al-Ikhlas',en:'Al-Ikhlas'},sub:{pl:'112. sura Koranu',en:'112th chapter of the Qur\'an'},type:'list',lines:ikhlas},
+  {id:'modlitwa',title:{pl:'Modlitwa (Salat)',en:'Prayer (Salah)'},sub:{pl:'Pełny tekst — 2, 3 lub 4 rakaty',en:'Full text — 2, 3 or 4 rak\'ahs'},type:'prayer'}
+];
+function findEntry(id){return ENTRIES.find(function(x){return x.id===id;});}
+function canonNum(id){return ENTRIES.findIndex(function(e){return e.id===id;})+1;}
+
+/* ── CITIES ── */
+var CITIES=[{id:'krakow',name:'Kraków',lat:50.0647,lon:19.9450,tz:'Europe/Warsaw'},{id:'warszawa',name:'Warszawa',lat:52.2297,lon:21.0122,tz:'Europe/Warsaw'},{id:'gdansk',name:'Gdańsk',lat:54.3520,lon:18.6466,tz:'Europe/Warsaw'},{id:'wroclaw',name:'Wrocław',lat:51.1079,lon:17.0385,tz:'Europe/Warsaw'},{id:'poznan',name:'Poznań',lat:52.4064,lon:16.9252,tz:'Europe/Warsaw'},{id:'lodz',name:'Łódź',lat:51.7592,lon:19.4560,tz:'Europe/Warsaw'},{id:'london',name:'Londyn / London',lat:51.5072,lon:-0.1276,tz:'Europe/London'},{id:'paris',name:'Paryż / Paris',lat:48.8566,lon:2.3522,tz:'Europe/Paris'},{id:'berlin',name:'Berlin',lat:52.5200,lon:13.4050,tz:'Europe/Berlin'},{id:'amsterdam',name:'Amsterdam',lat:52.3676,lon:4.9041,tz:'Europe/Amsterdam'},{id:'istanbul',name:'Stambuł / Istanbul',lat:41.0082,lon:28.9784,tz:'Europe/Istanbul'},{id:'moscow',name:'Moskwa / Moscow',lat:55.7558,lon:37.6173,tz:'Europe/Moscow'},{id:'cairo',name:'Kair / Cairo',lat:30.0444,lon:31.2357,tz:'Africa/Cairo'},{id:'mecca',name:'Mekka / Mecca',lat:21.3891,lon:39.8579,tz:'Asia/Riyadh'},{id:'medina',name:'Medyna / Medina',lat:24.5247,lon:39.5692,tz:'Asia/Riyadh'},{id:'riyadh',name:'Rijad / Riyadh',lat:24.7136,lon:46.6753,tz:'Asia/Riyadh'},{id:'dubai',name:'Dubaj / Dubai',lat:25.2048,lon:55.2708,tz:'Asia/Dubai'},{id:'baghdad',name:'Bagdad / Baghdad',lat:33.3152,lon:44.3661,tz:'Asia/Baghdad'},{id:'karachi',name:'Karaczi / Karachi',lat:24.8607,lon:67.0011,tz:'Asia/Karachi'},{id:'jakarta',name:'Dżakarta / Jakarta',lat:-6.2088,lon:106.8456,tz:'Asia/Jakarta'},{id:'kuala',name:'Kuala Lumpur',lat:3.1390,lon:101.6869,tz:'Asia/Kuala_Lumpur'},{id:'ny',name:'Nowy Jork / New York',lat:40.7128,lon:-74.0060,tz:'America/New_York'},{id:'chicago',name:'Chicago',lat:41.8781,lon:-87.6298,tz:'America/Chicago'},{id:'la',name:'Los Angeles',lat:34.0522,lon:-118.2437,tz:'America/Los_Angeles'},{id:'toronto',name:'Toronto',lat:43.6532,lon:-79.3832,tz:'America/Toronto'},{id:'sydney',name:'Sydney',lat:-33.8688,lon:151.2093,tz:'Australia/Sydney'}];
+function getCity(){return CITIES.find(function(c){return c.id===ST.cityId;})||CITIES[0];}
+
+/* ── PRAYER ENGINE ── */
+function doy(y,m,d){return Math.round((Date.UTC(y,m-1,d)-Date.UTC(y,0,1))/86400000)+1;}
+function solCalc(y,m,d){var g=(2*Math.PI/365)*(doy(y,m,d)-1);return{eq:229.18*(0.000075+0.001868*Math.cos(g)-0.032077*Math.sin(g)-0.014615*Math.cos(2*g)-0.040849*Math.sin(2*g)),dc:0.006918-0.399912*Math.cos(g)+0.070257*Math.sin(g)-0.006758*Math.cos(2*g)+0.000907*Math.sin(2*g)-0.002697*Math.cos(3*g)+0.00148*Math.sin(3*g)};}
+function HA(lat,dc,alt){return Math.acos(Math.max(-1,Math.min(1,(Math.sin(alt*Math.PI/180)-Math.sin(lat*Math.PI/180)*Math.sin(dc))/(Math.cos(lat*Math.PI/180)*Math.cos(dc)))))*180/Math.PI/15;}
+function compUTC(y,m,d,lat,lon){var sc=solCalc(y,m,d),noon=12-lon/15-sc.eq/60,aAlt=Math.atan(1/(1+Math.tan(Math.abs(lat*Math.PI/180-sc.dc))))*180/Math.PI;return{fajr:noon-HA(lat,sc.dc,-18),sunrise:noon-HA(lat,sc.dc,-0.833),dhuhr:noon,asr:noon+HA(lat,sc.dc,aAlt),maghrib:noon+HA(lat,sc.dc,-0.833),isha:noon+HA(lat,sc.dc,-17)};}
+function lp(tz){var p=new Intl.DateTimeFormat('en-CA',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()).split('-');return{y:+p[0],m:+p[1],d:+p[2]};}
+function hToD(y,m,d,h){return new Date(Date.UTC(y,m-1,d)+h*3600000);}
+function fmtT(date,tz){return new Intl.DateTimeFormat('en-GB',{timeZone:tz,hour:'2-digit',minute:'2-digit',hour12:false}).format(date);}
+function getPD(){
+  var city=getCity(),p=lp(city.tz),raw=compUTC(p.y,p.m,p.d,city.lat,city.lon),times={};
+  ['fajr','sunrise','dhuhr','asr','maghrib','isha'].forEach(function(k){times[k]=hToD(p.y,p.m,p.d,raw[k]);});
+  var tmr=new Date(Date.UTC(p.y,p.m-1,p.d)+86400000),tp=new Intl.DateTimeFormat('en-CA',{timeZone:city.tz,year:'numeric',month:'2-digit',day:'2-digit'}).format(tmr).split('-'),r2=compUTC(+tp[0],+tp[1],+tp[2],city.lat,city.lon);
+  times.fajrTmr=hToD(+tp[0],+tp[1],+tp[2],r2.fajr);
+  var now=new Date(),cur=null;
+  if(now>=times.fajr&&now<times.sunrise)cur='fajr';else if(now>=times.dhuhr&&now<times.asr)cur='dhuhr';else if(now>=times.asr&&now<times.maghrib)cur='asr';else if(now>=times.maghrib&&now<times.isha)cur='maghrib';else if(now>=times.isha)cur='isha';
+  var prayers=['fajr','dhuhr','asr','maghrib','isha'],next=null,nextD=times.fajrTmr;
+  for(var j=0;j<prayers.length;j++){if(times[prayers[j]]>now){next=prayers[j];nextD=times[prayers[j]];break;}}
+  if(!next){next='fajr';nextD=times.fajrTmr;}
+  return{city:city,times:times,cur:cur,next:next,nextD:nextD};
+}
+function renderPW(){
+  var d=getPD();
+  document.getElementById('pwCityBtn').textContent=d.city.name;
+  document.getElementById('pwMethod').textContent=it('pwMethod');
+  var grid=document.getElementById('pwGrid');grid.innerHTML='';
+  ['fajr','sunrise','dhuhr','asr','maghrib','isha'].forEach(function(k){
+    var el=document.createElement('div');el.className='pw-cell'+(k!=='sunrise'&&k===d.cur?' on':'')+(k==='sunrise'?' dim':'');
+    el.innerHTML='<div class="pw-l">'+PL_N[k][ST.lang]+'</div><div class="pw-v">'+fmtT(d.times[k],d.city.tz)+'</div>';
+    grid.appendChild(el);
+  });
+  return d;
+}
+function miniH(d){var c=d.cur?PL_N[d.cur][ST.lang]:it('between');return it('now')+': <b>'+c+'</b> · '+it('next')+': <b>'+PL_N[d.next][ST.lang]+' '+fmtT(d.nextD,d.city.tz)+'</b>';}
+function refreshP(){var d=renderPW(),h=miniH(d);['i-mbList','i-mbLetters','i-mbPrayer'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=h;});}
+
+/* ── ISLAM RENDER MENU ── */
+function renderIslam(){
+  document.querySelectorAll('#iLangPill button').forEach(function(b){b.classList.toggle('on',b.dataset.lang===ST.lang);});
+  document.getElementById('i-appTitle').textContent=it('appTitle');
+  document.getElementById('i-appSub').textContent=it('appSub');
+  document.getElementById('i-listHdr').textContent=it('listHeader');
+  applyScale();
+  var d=renderPW(),h=miniH(d);
+  ['i-mbList','i-mbLetters','i-mbPrayer'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=h;});
+  var list=document.getElementById('i-entryList');list.innerHTML='';
+  var ordered=ST.sortReversed?ENTRIES.slice().reverse():ENTRIES.slice();
+  ordered.forEach(function(entry){
+    var row=document.createElement('div');row.className='entry-row';
+    var num=document.createElement('span');num.className='e-num';num.textContent=canonNum(entry.id);
+    var body=document.createElement('div');body.className='e-body';
+    var tt=document.createElement('div');tt.className='e-title';tt.textContent=entry.title[ST.lang];
+    var ss=document.createElement('div');ss.className='e-sub';ss.textContent=entry.sub[ST.lang];
+    body.appendChild(tt);body.appendChild(ss);
+    var arr=document.createElement('span');arr.className='e-arr';arr.textContent='›';
+    row.appendChild(num);row.appendChild(body);row.appendChild(arr);
+    row.addEventListener('click',function(){openIslamEntry(entry);});
+    list.appendChild(row);
+  });
+}
+function openIslamEntry(e){if(e.type==='list')openIslamList(e);else if(e.type==='letters')openIslamLetters();else if(e.type==='prayer')openIslamPrayer();}
+function openIslamList(entry){
+  document.getElementById('i-listTopTtl').textContent=entry.title[ST.lang];
+  document.getElementById('i-listTitle').textContent=entry.title[ST.lang];
+  document.getElementById('i-listSub').textContent=entry.sub[ST.lang];
+  var body=document.getElementById('i-listBody');body.innerHTML='';
+  entry.lines.forEach(function(line,i){
+    var row=document.createElement('div');row.className='line-item';
+    if(typeof line==='string'&&line.slice(-1)===':'){row.classList.add('li-hdr');row.textContent=line;}
+    else if(typeof line!=='string'&&line.pl!==undefined&&String(line.pl).slice(-1)===':'){row.classList.add('li-hdr');row.textContent=rl(line);}
+    else if(line&&line.phrase!==undefined){
+      var idx=document.createElement('span');idx.className='li-num';idx.textContent=(i+1)+'.';
+      row.appendChild(idx);row.appendChild(document.createTextNode(line.phrase));
+      var m=document.createElement('div');m.className='li-meaning';m.textContent=line.note[ST.lang];
+      row.appendChild(document.createElement('br'));row.appendChild(m);
+    }else{
+      var idx2=document.createElement('span');idx2.className='li-num';idx2.textContent=(i+1)+'.';
+      row.appendChild(idx2);row.appendChild(document.createTextNode(rl(line)));
+    }
+    body.appendChild(row);
+  });
+  showV('vi-list');
+}
+function openIslamLetters(){
+  var entry=findEntry('alfabet');
+  document.getElementById('i-lettersTopTtl').textContent=entry.title[ST.lang];
+  document.getElementById('i-lettersTitle').textContent=entry.title[ST.lang];
+  document.getElementById('i-lettersSub').textContent=entry.sub[ST.lang];
+  var body=document.getElementById('i-lettersBody');body.innerHTML='';
+  arLetters.forEach(function(lt){
+    var row=document.createElement('div');row.className='letter-row';
+    var ar=document.createElement('div');ar.className='letter-ar';ar.textContent=lt.ar;
+    var lat=document.createElement('div');lat.className='letter-lat';lat.textContent=lt.l[ST.lang];
+    row.appendChild(ar);row.appendChild(lat);body.appendChild(row);
+  });
+  showV('vi-letters');
+}
+function openIslamPrayer(){
+  var pe=findEntry('modlitwa');
+  document.getElementById('i-prayerTopTtl').textContent=pe.title[ST.lang];
+  ['pv2','pv3','pv4'].forEach(function(id){
+    var v=id.replace('pv','');
+    document.getElementById(id).textContent=it('pv'+v);
+    document.getElementById(id).classList.toggle('on',ST.pvVer===v);
+  });
+  renderPrayerBody();
+  showV('vi-prayer');
+}
+function renderPrayerBody(){
+  var scroll=document.getElementById('i-prayerScroll');scroll.innerHTML='';
+  psets[ST.pvVer].forEach(function(sec){
+    var block=document.createElement('div');block.className='sec-block'+(sec.hl?' hl':'');
+    var hdr=document.createElement('div');hdr.className='sec-head';hdr.textContent=ST.lang==='pl'?sec.lp:sec.le;
+    block.appendChild(hdr);
+    sec.lines.forEach(function(line){var row=document.createElement('div');row.className='line-item';row.textContent=rl(line);block.appendChild(row);});
+    scroll.appendChild(block);
+  });
+}
+
+/* ── ISLAM EVENTS ── */
+document.querySelectorAll('#iLangPill button').forEach(function(b){b.addEventListener('click',function(){ST.lang=b.dataset.lang;save();renderIslam();renderEngHome();});});
+document.getElementById('iBackList').addEventListener('click',function(){showV('vi-home');renderIslam();});
+document.getElementById('iBackLetters').addEventListener('click',function(){showV('vi-home');renderIslam();});
+document.getElementById('iBackPrayer').addEventListener('click',function(){showV('vi-home');renderIslam();});
+['pv2','pv3','pv4'].forEach(function(id){document.getElementById(id).addEventListener('click',function(){ST.pvVer=id.replace('pv','');save();openIslamPrayer();});});
+document.getElementById('iSortBtn').addEventListener('click',function(){ST.sortReversed=!ST.sortReversed;save();renderIslam();});
+document.getElementById('iThemeBtn').addEventListener('click',function(){ST.theme=ST.theme==='dark'?'light':'dark';save();applyTheme();});
+document.querySelectorAll('#iSzPill .sz-btn').forEach(function(b){b.addEventListener('click',function(){ST.scale=b.dataset.sc;save();applyScale();});});
+/* city */
+document.getElementById('pwCityBtn').addEventListener('click',function(){
+  document.getElementById('cityOvTitle').textContent=it('changeCity');
+  var ci=document.getElementById('cityInp');ci.placeholder=it('searchCity');ci.value='';
+  renderCityList('');document.getElementById('cityOv').classList.add('open');
+  setTimeout(function(){ci.focus();},50);
+});
+document.getElementById('closeCityBtn').addEventListener('click',function(){document.getElementById('cityOv').classList.remove('open');});
+document.getElementById('cityOv').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
+document.getElementById('cityInp').addEventListener('input',function(){renderCityList(this.value);});
+function renderCityList(q){
+  var el=document.getElementById('cityListEl');el.innerHTML='';
+  var qq=q.trim().toLowerCase();
+  CITIES.filter(function(c){return !qq||c.name.toLowerCase().indexOf(qq)!==-1;}).forEach(function(c){
+    var b=document.createElement('button');b.className='city-btn'+(c.id===ST.cityId?' on':'');b.textContent=c.name;
+    b.addEventListener('click',function(){ST.cityId=c.id;save();refreshP();document.getElementById('cityOv').classList.remove('open');});
+    el.appendChild(b);
+  });
+}
+
+/* ══════════════════════════════
+   ENGLISH — TRANSLATIONS
+══════════════════════════════ */
+var ES={
+  pl:{homeSub:'Ścieżka nauki angielskiego · B1 → B2',b1lbl:'B1 opanowane',b2lbl:'B2 opanowane',totlbl:'łącznie',ex:'Przykłady',tip:'Wskazówka',markDone:'Zaznacz jako opanowane'},
+  en:{homeSub:'English learning path · B1 → B2',b1lbl:'B1 mastered',b2lbl:'B2 mastered',totlbl:'total',ex:'Examples',tip:'Tip',markDone:'Mark as mastered'}
+};
+function et(k){return ES[ST.lang][k]||k;}
+
+/* ══════════════════════════════
+   ENGLISH — TOPICS DATA
+   d:{pl,en}  tip:{pl,en}  ex:[]
+══════════════════════════════ */
+var TOPICS=[
+  {id:'grammar',emoji:'⚙️',title:{pl:'Gramatyka',en:'Grammar'},sub:{pl:'Czasy, strona bierna, tryby warunkowe',en:'Tenses, passive voice, conditionals'},
+   b1:[
+    {sec:{pl:'Czasy teraźniejsze',en:'Present Tenses'},t:{pl:'Present Simple',en:'Present Simple'},
+     d:{pl:'Nawyki, fakty, stałe prawdy. He/She/It dodaje -s/-es. Znaczniki: always, usually, every day.',en:'Habits, facts and general truths. He/She/It adds -s/-es. Markers: always, usually, every day.'},
+     ex:['I work every day. — (routine / czynność stała)','The sun rises in the east. — (fact / fakt)','She doesn\'t drink coffee. — (negative / przeczenie)','Does he live in Warsaw? — (question / pytanie)'],
+     tip:{pl:'He/She/It → -s lub -es: go → goes, watch → watches, study → studies',en:'He/She/It → -s or -es: go → goes, watch → watches, study → studies'}},
+    {t:{pl:'Present Continuous',en:'Present Continuous'},
+     d:{pl:'Co dzieje się TERAZ lub co jest zaplanowane. Tworzenie: am/is/are + -ing. Znaczniki: now, at the moment, tonight.',en:'What is happening NOW or what is arranged. Form: am/is/are + -ing. Markers: now, at the moment, tonight.'},
+     ex:['I\'m working right now. — (happening now / teraz)','She\'s meeting a friend tonight. — (arranged plan / plan)','They aren\'t coming to the party. — (negative / przeczenie)','Are you listening? — (question / pytanie)'],
+     tip:{pl:'Stałe stany NIE używają Continuous: I love you (nie: I\'m loving). Verbs: know, want, like, have, see.',en:'State verbs don\'t use Continuous: I love you (NOT I\'m loving). Verbs: know, want, like, have, see.'}},
+    {t:{pl:'Present Perfect',en:'Present Perfect'},
+     d:{pl:'Czynność przeszła z efektem teraz lub bez podania czasu. Tworzenie: have/has + pp. Znaczniki: just, already, yet, ever, never.',en:'A past action with a present result, or an action at an unspecified time. Form: have/has + pp. Markers: just, already, yet, ever, never.'},
+     ex:['I\'ve just finished my homework. — (just / właśnie)','She has never been to Japan. — (never / nigdy)','Have you seen this film yet? — (yet in questions)','They\'ve already left. — (already / już)'],
+     tip:{pl:'NIE używamy z konkretnym czasem: "I have seen him yesterday" → BŁĄD. Z konkretnym czasem → Past Simple.',en:'Don\'t use with a specific past time: "I have seen him yesterday" → WRONG. With specific time → Past Simple.'}},
+    {t:{pl:'Present Perfect Continuous',en:'Present Perfect Continuous'},
+     d:{pl:'Czynność trwająca od pewnego momentu — nacisk na CZAS TRWANIA. Tworzenie: have/has been + -ing. Znaczniki: for, since.',en:'Action started in the past and still continuing — emphasis on DURATION. Form: have/has been + -ing. Markers: for, since.'},
+     ex:['I\'ve been waiting for 2 hours. — (for / przez)','She\'s been studying since 2020. — (since / od)','How long have you been living here? — (duration question)'],
+     tip:{pl:'for = PRZEZ JAK DŁUGO (for 3 hours). since = OD kiedy (since Monday, since 2020, since I was born).',en:'for = HOW LONG (for 3 hours). since = FROM when (since Monday, since 2020, since I was born).'}},
+    {sec:{pl:'Czasy przeszłe',en:'Past Tenses'},t:{pl:'Past Simple',en:'Past Simple'},
+     d:{pl:'Zakończona czynność w konkretnym momencie w przeszłości. Tworzenie: verb-ed lub 2. forma nieregularna. Znaczniki: yesterday, last week, ago.',en:'A finished action at a specific time in the past. Form: verb-ed or 2nd irregular form. Markers: yesterday, last week, ago.'},
+     ex:['I went to London last year. — (specific time / konkretny czas)','She called me at 8 pm. — (specific time)','They didn\'t come to the party. — (negative)','Where did you go on holiday? — (question)'],
+     tip:{pl:'Z yesterday, ago, last → ZAWSZE Past Simple. "I have gone yesterday" → BŁĄD.',en:'With yesterday, ago, last → ALWAYS Past Simple. "I have gone yesterday" → WRONG.'}},
+    {t:{pl:'Past Continuous',en:'Past Continuous'},
+     d:{pl:'Czynność trwała w przeszłości lub była przerywana. Tworzenie: was/were + -ing.',en:'Action in progress at a past moment, or interrupted by another action. Form: was/were + -ing.'},
+     ex:['I was reading when he called. — (interrupted / przerywana)','At 8 pm I was watching TV. — (in progress at that time)','It was raining all day. — (all day long)','What were you doing? — (question)']},
+    {t:{pl:'Past Perfect',en:'Past Perfect'},
+     d:{pl:'Czynność zakończona PRZED inną przeszłą czynnością. Tworzenie: had + pp. Kluczowe: before, after, by the time, already.',en:'Action completed BEFORE another past action. Form: had + pp. Key words: before, after, by the time, already.'},
+     ex:['By the time I arrived, she had already left. — (she left first)','He had never been abroad before he went to Spain.','When I got home, the film had already finished.'],
+     tip:{pl:'Past Perfect = "przeszłość przeszłości" — coś co stało się PRZED innym zdarzeniem przeszłym.',en:'Past Perfect = "past of the past" — something that happened BEFORE another past event.'}},
+    {sec:{pl:'Przyszłość',en:'Future'},t:{pl:'Will / Won\'t',en:'Will / Won\'t'},
+     d:{pl:'Decyzja podjęta W CHWILI mówienia, przewidywanie bez dowodu, obietnica. Tworzenie: will + infinitive.',en:'Decision made AT THE MOMENT of speaking, prediction without evidence, promise. Form: will + bare infinitive.'},
+     ex:['I\'ll help you! — (spontaneous decision / decyzja teraz)','It will probably rain tomorrow. — (prediction)','I won\'t tell anyone, I promise. — (promise / obietnica)','Will you be at the party? — (question)'],
+     tip:{pl:'Will ≠ plan! Plan → Going to. "I\'ll call you" (teraz zdecydowałem). "I\'m going to call you" (miałem plan).',en:'Will ≠ plan! Plans → Going to. "I\'ll call you" (deciding now). "I\'m going to call you" (planned before).'}},
+    {t:{pl:'Going to',en:'Going to'},
+     d:{pl:'Plan podjęty WCZEŚNIEJ lub przewidywanie z widzialnym dowodem. Tworzenie: am/is/are + going to + infinitive.',en:'Intention decided before or prediction based on visible evidence. Form: am/is/are + going to + infinitive.'},
+     ex:['I\'m going to study tonight — I have a plan. — (intention)','Look at those clouds — it\'s going to rain! — (visible evidence)','She\'s going to have a baby. — (certain future fact)','Are you going to watch the match? — (question about plan)']},
+    {sec:{pl:'Tryby warunkowe',en:'Conditionals'},t:{pl:'Conditional 0 — Zero',en:'Zero Conditional'},
+     d:{pl:'Fakty naukowe i ogólne prawdy — zawsze prawdziwe. If + Present Simple, + Present Simple.',en:'Scientific facts and general truths — always true. If + Present Simple, + Present Simple.'},
+     ex:['If you heat water to 100°C, it boils. — (physics / fizyka)','If I drink too much coffee, I can\'t sleep. — (regular result)','When it rains, the streets get wet. — (when = if)'],
+     tip:{pl:'Wynik jest ZAWSZE pewny. "if" można zastąpić "when" bez zmiany sensu.',en:'The result is ALWAYS certain. "if" can be replaced by "when" without changing the meaning.'}},
+    {t:{pl:'Conditional 1 — First',en:'First Conditional'},
+     d:{pl:'Realne możliwe warunki w przyszłości. If + Present Simple → will + infinitive.',en:'Real, possible future conditions and their likely results. If + Present Simple → will + infinitive.'},
+     ex:['If it rains, I\'ll take an umbrella. — (possible condition)','You\'ll be late if you don\'t hurry. — (if at the end)','If she calls, tell her I\'m busy. — (present simple after "if")','Will you help me if I need you?'],
+     tip:{pl:'Po "if" → ZAWSZE Present Simple (NIE will). "If it will rain" → BŁĄD! "If it rains" → POPRAWNE.',en:'After "if" → ALWAYS Present Simple (NOT will). "If it will rain" → WRONG! "If it rains" → CORRECT.'}},
+    {t:{pl:'Conditional 2 — Second',en:'Second Conditional'},
+     d:{pl:'Sytuacje nierealne lub mało prawdopodobne TERAZ. If + Past Simple → would + infinitive.',en:'Unreal or unlikely situations NOW. If + Past Simple → would + infinitive.'},
+     ex:['If I had a car, I would drive to work. — (I don\'t have one)','If I were you, I wouldn\'t do that. — (advice / rada)','What would you do if you won the lottery? — (hypothetical)','She would travel more if she had money.'],
+     tip:{pl:'"If I WERE you" (nie: was) — were we wszystkich osobach. Would NIE może być w zdaniu "if".',en:'"If I WERE you" (not: was) — were for all persons. Would CANNOT appear in the "if" clause.'}},
+    {sec:{pl:'Strona bierna',en:'Passive Voice'},t:{pl:'Passive Voice — podstawy',en:'Passive Voice — basics'},
+     d:{pl:'Używamy gdy wykonawca jest nieznany lub nieważny. Present Passive: is/are + pp. Past Passive: was/were + pp.',en:'Used when the agent is unknown or unimportant. Present Passive: is/are + pp. Past Passive: was/were + pp.'},
+     ex:['English is spoken all over the world. — (Present Simple Passive)','The window was broken by a ball. — (Past Simple Passive)','This building was built in 1920. — (without agent)','These products are made in China.'],
+     tip:{pl:'"By + wykonawca" tylko gdy to ważna informacja. Często opuszczamy "by".',en:'Add "by + agent" only when it\'s important. We often omit "by".'}},
+    {sec:{pl:'Modalne',en:'Modal Verbs'},t:{pl:'Can / Could / Be able to',en:'Can / Could / Be able to'},
+     d:{pl:'Can: zdolność teraźniejsza. Could: przeszła zdolność lub uprzejma prośba. Be able to: po will lub w czasach Perfect.',en:'Can: present ability. Could: past ability or polite request. Be able to: after will or in Perfect tenses.'},
+     ex:['I can swim very fast. — (present ability)','Could you open the window? — (polite request)','She could speak French as a child. — (past ability)','I\'ll be able to help you tomorrow. — (after will)']},
+    {t:{pl:'Should / Shouldn\'t',en:'Should / Shouldn\'t'},
+     d:{pl:'Rada lub umiarkowany obowiązek. Synonim: ought to (formalniejsze).',en:'Advice or mild obligation. Synonym: ought to (more formal).'},
+     ex:['You should see a doctor. — (advice / rada)','He shouldn\'t eat so much sugar.','Should I call her? — (asking for advice)','You ought to apologize. — (ought to = should)']},
+    {t:{pl:'Must / Have to / Don\'t have to',en:'Must / Have to / Don\'t have to'},
+     d:{pl:'Must: wewnętrzny nakaz. Have to: zewnętrzny obowiązek. Don\'t have to: brak obowiązku (NIE zakaz!). Mustn\'t = zakaz.',en:'Must: internal necessity. Have to: external obligation. Don\'t have to: no obligation (NOT a ban!). Mustn\'t = prohibition.'},
+     ex:['I must call mum — it\'s her birthday. — (internal must)','I have to work on Saturdays. — (external obligation)','You don\'t have to wear a tie. — (no obligation)','You mustn\'t smoke here. — (prohibition)'],
+     tip:{pl:'KLUCZ: Don\'t have to = brak obowiązku (możesz, ale nie musisz). Mustn\'t = zakaz (nie wolno ci). To NIE to samo!',en:'KEY: Don\'t have to = no obligation (you can but you don\'t need to). Mustn\'t = prohibition. These are NOT the same!'}},
+    {t:{pl:'Might / May',en:'Might / May'},
+     d:{pl:'Możliwość ok. 50% lub mniej. Might = nieco bardziej niepewne niż may.',en:'About 50% possibility or less. Might = slightly less certain than may.'},
+     ex:['It might rain later. — (about 50% possible)','She may not be at home. — (possibility)','Take an umbrella — it might be cold. — (cautious advice)'],
+     tip:{pl:'Skala pewności: will (100%) > should (90%) > may/might (50%) > could (30%)',en:'Certainty scale: will (100%) > should (90%) > may/might (50%) > could (30%)'}},
+    {sec:{pl:'Inne struktury',en:'Other Structures'},t:{pl:'Reported Speech — podstawy',en:'Reported Speech — basics'},
+     d:{pl:'Relacjonowanie czyjejś wypowiedzi. Czasy cofają się o krok. Said/told + obiekt.',en:'Reporting what someone said. Tenses shift back one step. Said/told + object.'},
+     ex:['"I am tired." → He said he was tired. — (Present → Past)','"I will call you." → She said she would call. — (will → would)','"I have eaten." → He said he had eaten. — (PP → Past Perfect)','"Don\'t go!" → She told me not to go. — (imperative / rozkaz)'],
+     tip:{pl:'Tell → potrzebuje obiektu (told me/him/her). Say → bez obiektu. "She said me" → BŁĄD. "She told me" → OK.',en:'Tell → needs an object (told me/him/her). Say → no object. "She said me" → WRONG. "She told me" → CORRECT.'}},
+    {t:{pl:'Relative Clauses — who / which / that',en:'Relative Clauses — who / which / that'},
+     d:{pl:'Who = osoby. Which = rzeczy/zwierzęta. That = obydwa (w defining). Defining: bez przecinków, ogranicza znaczenie.',en:'Who = people. Which = things/animals. That = both (in defining). Defining: no commas, restricts meaning.'},
+     ex:['The man who called is my boss. — (who = person)','The book that I\'m reading is great. — (that = thing)','The car which he bought was expensive.','I know a girl who speaks five languages.']},
+    {t:{pl:'Gerund vs Infinitive (podstawy)',en:'Gerund vs Infinitive (basics)'},
+     d:{pl:'Gerund (-ing): enjoy, finish, mind, avoid, consider, suggest. Infinitive (to): want, decide, hope, plan, manage, refuse.',en:'Gerund (-ing): enjoy, finish, mind, avoid, consider, suggest. Infinitive (to): want, decide, hope, plan, manage, refuse.'},
+     ex:['I enjoy swimming. — (after enjoy → gerund)','I want to swim. — (after want → infinitive)','She avoided talking to him. — (after avoid → gerund)','They decided to leave early. — (after decide → infinitive)'],
+     tip:{pl:'Stop + gerund = przestać robić (Stop smoking!). Stop + infinitive = zatrzymać się żeby coś zrobić (He stopped to buy coffee).',en:'Stop + gerund = stop doing (Stop smoking!). Stop + infinitive = stop in order to do (He stopped to buy coffee).'}}
+   ],
+   b2:[
+    {sec:{pl:'Zaawansowane tryby warunkowe',en:'Advanced Conditionals'},t:{pl:'Conditional 3 — Third',en:'Third Conditional'},
+     d:{pl:'Żal za niespełnionym warunkiem w PRZESZŁOŚCI. If + Past Perfect → would have + pp.',en:'Regret about an unfulfilled past condition. If + Past Perfect → would have + past participle.'},
+     ex:['If I had studied harder, I would have passed. — (I didn\'t study)','She wouldn\'t have been late if she had set an alarm.','If they had left earlier, they would have caught the train.','Would you have helped me if I had asked?'],
+     tip:{pl:'Formuła: If I had done X, I would have done Y. Oba zdania dotyczą przeszłości.',en:'Formula: If I had done X, I would have done Y. Both clauses refer to the past.'}},
+    {t:{pl:'Mixed Conditional',en:'Mixed Conditional'},
+     d:{pl:'Przeszła przyczyna → teraźniejszy skutek. If + Past Perfect → would + infinitive.',en:'Past cause → present result. If + Past Perfect → would + bare infinitive.'},
+     ex:['If I had taken that job (PP), I would be rich now (present).','If she hadn\'t emigrated, she would be living here now.','If he had studied medicine, he would be a doctor today.'],
+     tip:{pl:'Mixed = przeszłe "if" (PP) + teraźniejszy skutek (would + inf). Kontrast z 3rd Conditional gdzie wynik też jest w przeszłości.',en:'Mixed = past "if" (PP) + present result (would + inf). Contrast with 3rd Conditional where the result is also past.'}},
+    {t:{pl:'Wish / If only / I\'d rather',en:'Wish / If only / I\'d rather'},
+     d:{pl:'Wish + Past Simple: żałuję teraz. Wish + Past Perfect: żałuję za przeszłość. If only = silniejszy wish.',en:'Wish + Past Simple: regret about now. Wish + Past Perfect: regret about the past. If only = stronger wish.'},
+     ex:['I wish I knew the answer. — (I don\'t know now / nie wiem)','I wish I hadn\'t said that. — (past regret / żal za przeszłością)','If only I had more time! — (strong regret / silny żal)','I\'d rather you didn\'t smoke here. — (preference / wolałbym)']},
+    {sec:{pl:'Zaawansowana strona bierna',en:'Advanced Passive'},t:{pl:'Passive Voice — wszystkie czasy',en:'Passive Voice — all tenses'},
+     d:{pl:'Strona bierna we wszystkich czasach. Formuła: odpowiednia forma "be" + past participle.',en:'Passive voice in all tenses. Formula: correct form of "be" + past participle.'},
+     ex:['The report has been written. — (Present Perfect Passive)','The bridge will be repaired next year. — (Future Passive)','The house is being painted. — (Present Continuous Passive)','It should be done by Friday. — (Modal Passive)']},
+    {t:{pl:'Causative: have / get sth done',en:'Causative: have / get sth done'},
+     d:{pl:'Zlecamy czynność komuś innemu. have/get + obiekt + past participle.',en:'We arrange for someone else to do something for us. have/get + object + past participle.'},
+     ex:['I had my car repaired. — (someone repaired it for me)','She\'s getting her hair cut tomorrow. — (appointment)','We need to get the boiler fixed. — (need someone to fix)','Have you had your eyes tested recently?'],
+     tip:{pl:'Have sth done = bardziej formalne. Get sth done = potoczne. W obu TY nie robisz — ktoś inny robi dla ciebie.',en:'Have sth done = more formal. Get sth done = more informal. In both cases YOU don\'t do it — someone does it for you.'}},
+    {sec:{pl:'Zaawansowana gramatyka',en:'Advanced Grammar'},t:{pl:'Non-defining Relative Clauses',en:'Non-defining Relative Clauses'},
+     d:{pl:'Dodatkowa informacja w przecinkach, NIE ogranicza sensu zdania głównego. Zawsze przecinki, nigdy "that".',en:'Extra information in commas, does NOT restrict the main clause. Always commas, never "that".'},
+     ex:['My brother, who lives in Gdańsk, is a doctor. — (extra info)','The Eiffel Tower, which was built in 1889, is iconic.','She gave me a lift, which was very kind of her. — (which = the whole action)'],
+     tip:{pl:'Usuń klauzulę nieograniczającą → zdanie nadal ma pełny sens. Usuń klauzulę ograniczającą (defining) → zdanie traci sens.',en:'Remove non-defining clause → sentence still makes full sense. Remove defining clause → sentence loses its specific meaning.'}},
+    {t:{pl:'Inversion for Emphasis',en:'Inversion for Emphasis'},
+     d:{pl:'Inwersja podmiot-orzeczenie dla wzmocnienia lub stylu formalnego. Triggery: Never, Not only, Rarely, Seldom, Hardly.',en:'Subject-verb inversion for emphasis or formal style. Triggers: Never, Not only, Rarely, Seldom, Hardly.'},
+     ex:['Never have I seen such a mess. — (Never + aux + subject)','Not only did he lie, but he also stole. — (Not only + did + subject)','Rarely does she make mistakes. — (Rarely + does + subject)','No sooner had I left than it started raining.'],
+     tip:{pl:'Formuła: POMOCNIK + podmiot + reszta. Never have I... (nie: Never I have). Typowe w piśmie formalnym.',en:'Formula: AUXILIARY + subject + rest. Never have I... (not: Never I have). Typical in formal writing.'}},
+    {t:{pl:'Cleft Sentences',en:'Cleft Sentences'},
+     d:{pl:'Wyróżnienie wybranego elementu zdania. Struktury: It is/was... that/who. What... is/was.',en:'Highlighting a specific element. Structures: It is/was... that/who. What... is/was.'},
+     ex:['It was John who broke the window. — (not someone else)','It was in Rome that we first met. — (in Rome specifically)','What I need is a long holiday. — (what I need)','What surprised me was his reaction.']},
+    {t:{pl:'Participle Clauses',en:'Participle Clauses'},
+     d:{pl:'Skracają zdania okolicznikowe. Present participle (doing) lub Past participle (done). Typowe w piśmie formalnym.',en:'Shorten adverbial clauses. Present participle (doing) or past participle (done). Typical in formal writing.'},
+     ex:['Seeing the car, she ran away. — (= When she saw the car)','Having finished, he left. — (= After he had finished)','Exhausted by the journey, she went to bed. — (= Because she was exhausted)'],
+     tip:{pl:'Participle MUSI dotyczyć podmiotu zdania głównego! "Walking down the street, it started raining" → BŁĄD.',en:'The participle MUST refer to the subject of the main clause! "Walking down the street, it started raining" → WRONG.'}}
+   ]
+  },
+  {id:'vocabulary',emoji:'📚',title:{pl:'Słownictwo',en:'Vocabulary'},sub:{pl:'Tematy leksykalne i rejestry',en:'Lexical topics and registers'},
+   b1:[
+    {sec:{pl:'Codzienne tematy',en:'Everyday Topics'},t:{pl:'Praca i kariera',en:'Work & Career'},
+     d:{pl:'Zawody: accountant, engineer, nurse, plumber. Czynności: apply for a job, get promoted, resign, be made redundant. Kolokacje: meet a deadline, attend a meeting.',en:'Jobs: accountant, engineer, nurse, plumber. Actions: apply for a job, get promoted, resign, be made redundant. Collocations: meet a deadline, attend a meeting.'},
+     ex:['She applied for a marketing job and got an interview.','He was made redundant when the company downsized.','We need to meet the deadline — the project is due Friday.','I work the night shift three times a week.']},
+    {t:{pl:'Podróże i transport',en:'Travel & Transport'},
+     d:{pl:'Booking: book/reserve, check in/out, cancel. Transport: catch/miss a connection, take the train. Lotnisko: departure, arrivals, boarding gate, customs.',en:'Booking: book/reserve, check in/out, cancel. Transport: catch/miss a connection, take the train. Airport: departure, arrivals, boarding gate, customs.'},
+     ex:['I\'d like to book a double room for three nights.','We missed our connecting flight and had to wait 6 hours.','Passengers should arrive at the boarding gate 30 minutes early.']},
+    {t:{pl:'Zdrowie i ciało',en:'Health & Body'},
+     d:{pl:'Choroby: headache, fever, cough, rash, food poisoning. Wizyta lekarska: prescription, diagnosis, treatment, symptoms.',en:'Illnesses: headache, fever, cough, rash, food poisoning. Medical visit: prescription, diagnosis, treatment, symptoms.'},
+     ex:['I\'ve had a headache all day — I need to take a painkiller.','The doctor prescribed antibiotics for the infection.','She\'s allergic to penicillin — it\'s on her medical records.']},
+    {t:{pl:'Jedzenie i gotowanie',en:'Food & Cooking'},
+     d:{pl:'Metody: bake, fry, boil, grill, steam, roast, simmer. Restauracja: starter, main course, dessert, bill, tip. Smak: tasty, bland, bitter, sour, spicy.',en:'Methods: bake, fry, boil, grill, steam, roast, simmer. Restaurant: starter, main course, dessert, bill, tip. Taste: tasty, bland, bitter, sour, spicy.'},
+     ex:['Could we have the bill, please? We\'d like to pay separately.','The steak was overdone — I asked for medium-rare.','I always add a pinch of salt when boiling pasta.']},
+    {t:{pl:'Technologia i internet',en:'Technology & Internet'},
+     d:{pl:'Czynności: download, upload, browse, stream, charge, update, back up. Social media: post, share, follow, like, comment, go viral.',en:'Actions: download, upload, browse, stream, charge, update, back up. Social media: post, share, follow, like, comment, go viral.'},
+     ex:['Don\'t forget to back up your files before the update.','The video went viral — it got 10 million views overnight.','My phone died again — I forgot to charge it.']},
+    {t:{pl:'Pieniądze i zakupy',en:'Money & Shopping'},
+     d:{pl:'Bankowość: mortgage, loan, interest rate, overdraft. Zakupy: afford, bargain, discount, refund, exchange.',en:'Banking: mortgage, loan, interest rate, overdraft. Shopping: afford, bargain, discount, refund, exchange.'},
+     ex:['I can\'t afford a new laptop right now — I\'ll save up.','The item was damaged, so I asked for a full refund.','They\'re offering a 30% discount if you buy before midnight.']},
+    {t:{pl:'Relacje i uczucia',en:'Relationships & Feelings'},
+     d:{pl:'Relacje: colleague, neighbour, acquaintance. Uczucia: proud, jealous, anxious, relieved, frustrated, embarrassed, overwhelmed, homesick.',en:'Relationships: colleague, neighbour, acquaintance. Feelings: proud, jealous, anxious, relieved, frustrated, embarrassed, overwhelmed, homesick.'},
+     ex:['I felt really embarrassed when I forgot her name.','She was relieved when the test results came back fine.','He\'s been homesick ever since he moved abroad.']}
+   ],
+   b2:[
+    {sec:{pl:'Zaawansowany zakres',en:'Advanced Vocabulary'},t:{pl:'Język abstrakcyjny',en:'Abstract Language'},
+     d:{pl:'Pojęcia: concept, theory, perspective, implication, consequence, approach, framework, dimension, extent, scope.',en:'Concepts: concept, theory, perspective, implication, consequence, approach, framework, dimension, extent, scope.'},
+     ex:['From a broader perspective, the policy has had mixed results.','The implications of this decision are still unclear.','We need to consider all dimensions of the problem.']},
+    {t:{pl:'Biznes i finanse',en:'Business & Finance'},
+     d:{pl:'Dane: revenue, profit, expenditure, budget, forecast, stakeholder, ROI. Wyrażenia: meet targets, cut costs, expand into new markets.',en:'Data: revenue, profit, expenditure, budget, forecast, stakeholder, ROI. Expressions: meet targets, cut costs, expand into new markets.'},
+     ex:['The company exceeded its revenue forecast by 15% this quarter.','We need to cut costs without affecting service quality.','They\'re planning to expand into Eastern European markets.']},
+    {t:{pl:'Środowisko i ekologia',en:'Environment & Ecology'},
+     d:{pl:'climate change, carbon footprint, renewable energy, emissions, biodiversity, deforestation, sustainable development.',en:'climate change, carbon footprint, renewable energy, emissions, biodiversity, deforestation, sustainable development.'},
+     ex:['The government pledged to reduce carbon emissions by 50% by 2030.','Investing in renewable energy is crucial for sustainable development.','Deforestation has a devastating impact on biodiversity.']},
+    {t:{pl:'Rejestr — formalny vs nieformalny',en:'Register — formal vs informal'},
+     d:{pl:'Formal → Informal: assist (help), commence (start), obtain (get), reside (live), regarding (about), therefore (so).',en:'Formal → Informal: assist (help), commence (start), obtain (get), reside (live), regarding (about), therefore (so).'},
+     ex:['Formal: I am writing to enquire about… / Informal: I\'m writing to ask about…','Formal: We require your assistance. / Informal: We need your help.','Formal: Please commence the presentation. / Informal: Please start.']}
+   ]
+  },
+  {id:'speaking',emoji:'🗣️',title:{pl:'Mówienie',en:'Speaking'},sub:{pl:'Wyrażanie opinii, dyskusja, narracja',en:'Opinions, discussion, storytelling'},
+   b1:[
+    {sec:{pl:'Wyrażanie i reagowanie',en:'Expressing & Reacting'},t:{pl:'Wyrażanie opinii',en:'Expressing Opinions'},
+     d:{pl:'I think / I believe / In my opinion / As I see it / From my point of view / I feel that…',en:'I think / I believe / In my opinion / As I see it / From my point of view / I feel that…'},
+     ex:['In my opinion, working from home increases productivity.','As I see it, we need to invest more in education.','From my point of view, this approach is too risky.','Personally, I\'d prefer to wait and see what happens.']},
+    {t:{pl:'Zgadzanie się i niezgadzanie',en:'Agreeing & Disagreeing'},
+     d:{pl:'Zgoda: Exactly! That\'s a good point. I couldn\'t agree more. Niezgoda: I see your point, but… I\'m not sure about that.',en:'Agreement: Exactly! That\'s a good point. I couldn\'t agree more. Disagreement: I see your point, but… I\'m not sure about that.'},
+     ex:['I couldn\'t agree more — stricter rules are definitely needed.','I see your point, but I think the situation is more complex.','With all due respect, I have to disagree with that.','That\'s a good point, although I\'d add that…']},
+    {t:{pl:'Propozycje i sugestie',en:'Suggestions & Proposals'},
+     d:{pl:'Shall we…? / Why don\'t we…? / What about + -ing? / How about…? / We could… / I suggest…',en:'Shall we…? / Why don\'t we…? / What about + -ing? / How about…? / We could… / I suggest…'},
+     ex:['Why don\'t we meet for coffee this weekend?','What about going to the cinema instead?','How does Saturday sound to you?','I suggest we start with the most urgent tasks first.']},
+    {t:{pl:'Opowiadanie historii',en:'Storytelling'},
+     d:{pl:'Wstęp: It happened when / Once… Napięcie: Suddenly / To my surprise. Zakończenie: In the end / Eventually.',en:'Opening: It happened when / Once… Tension: Suddenly / To my surprise. Ending: In the end / Eventually.'},
+     ex:['It all started when I got on the wrong train by mistake.','Suddenly, I realized I\'d left my passport at the hotel.','To my surprise, the shop was completely empty.','In the end, we managed to catch the last flight home.']}
+   ],
+   b2:[
+    {sec:{pl:'Zaawansowane techniki',en:'Advanced Techniques'},t:{pl:'Perswazja i argumentowanie',en:'Persuasion & Argumentation'},
+     d:{pl:'On the one hand… on the other hand. Although it is true that… nevertheless. Evidence suggests that…',en:'On the one hand… on the other hand. Although it is true that… nevertheless. Evidence suggests that…'},
+     ex:['On the one hand, remote work offers flexibility; on the other, it can be isolating.','Although it\'s true that prices have risen, the quality has also improved.','It could be argued that this policy benefits only the wealthiest.','Evidence suggests that regular exercise reduces stress significantly.']},
+    {t:{pl:'Język hedgingu',en:'Hedging Language'},
+     d:{pl:'It seems to me that… / It would appear that… / To some extent… / I might be wrong, but…',en:'It seems to me that… / It would appear that… / To some extent… / I might be wrong, but…'},
+     ex:['It seems to me that the government has underestimated the problem.','To some extent, both sides are responsible for the conflict.','It would appear that the data is incomplete.','I might be wrong, but I think the deadline has already passed.']},
+    {t:{pl:'Dyskurs-markery zaawansowane',en:'Advanced Discourse Markers'},
+     d:{pl:'Kontrast: whereas, nevertheless, in contrast. Przyczyna: consequently, as a result. Konkluzja: to sum up, on balance, all things considered.',en:'Contrast: whereas, nevertheless, in contrast. Cause: consequently, as a result. Conclusion: to sum up, on balance, all things considered.'},
+     ex:['Whereas some people thrive working from home, others find it isolating.','Consequently, the company was forced to restructure its operations.','On balance, the benefits of the policy outweigh the drawbacks.','All things considered, this was the right decision.']}
+   ]
+  },
+  {id:'writing',emoji:'✍️',title:{pl:'Pisanie',en:'Writing'},sub:{pl:'E-maile, eseje, raporty',en:'Emails, essays, reports'},
+   b1:[
+    {sec:{pl:'Typy tekstów B1',en:'B1 Text Types'},t:{pl:'E-mail nieformalny',en:'Informal Email'},
+     d:{pl:'Wstęp: Hi / Dear [imię]. Zakończenie: Best / Take care / Cheers. Cel: zaproszenie, dziękowanie, prośba. Rejestr potoczny.',en:'Opening: Hi / Dear [name]. Closing: Best / Take care / Cheers. Purpose: invitation, thanks, request. Informal register.'},
+     ex:['Hi Tom, Just a quick note to say thank you for last night — it was great!','Hope you\'re doing well! I\'m writing to let you know that…','I was wondering if you could give me some advice about…']},
+    {t:{pl:'E-mail formalny',en:'Formal Email'},
+     d:{pl:'Wstęp: Dear Mr/Ms + nazwisko lub Dear Sir/Madam. Zakończenie: Yours sincerely / Yours faithfully. Bez skrótów, formalny ton.',en:'Opening: Dear Mr/Ms + surname or Dear Sir/Madam. Closing: Yours sincerely / Yours faithfully. No contractions, formal tone.'},
+     ex:['I am writing to enquire about the position advertised on your website.','I would be grateful if you could provide further information regarding…','Please find attached my CV for your consideration.']},
+    {t:{pl:'Esej za/przeciw',en:'For/Against Essay'},
+     d:{pl:'Struktura: Wstęp → argumenty za → argumenty przeciw → podsumowanie. Spójniki: However / On the other hand / In conclusion / Furthermore.',en:'Structure: Introduction → arguments for → arguments against → conclusion. Connectives: However / On the other hand / In conclusion / Furthermore.'},
+     ex:['There are several advantages to working from home. Firstly, it saves commuting time.','However, there are also some drawbacks. For instance, it can be hard to concentrate.','In conclusion, while working from home has benefits, it is not for everyone.']}
+   ],
+   b2:[
+    {sec:{pl:'Typy tekstów B2',en:'B2 Text Types'},t:{pl:'Esej dyskursywny',en:'Discursive Essay'},
+     d:{pl:'Teza → rozwinięcie → kontrargumenty → konkluzja. Discourse markers: Moreover / Nevertheless / Admittedly / Despite / It cannot be denied that…',en:'Thesis → development → counter-arguments → conclusion. Discourse markers: Moreover / Nevertheless / Admittedly / Despite / It cannot be denied that…'},
+     ex:['Moreover, the evidence suggests that investment in public transport reduces pollution.','Nevertheless, critics argue that the costs outweigh the benefits.','Admittedly, there are valid concerns about the long-term impact.','Despite these advantages, the consequences remain uncertain.']},
+    {t:{pl:'Raport z rekomendacjami',en:'Report with Recommendations'},
+     d:{pl:'Sekcje: tło (background), ustalenia (findings), wnioski (conclusions), zalecenia (recommendations). Rejestr formalny, strona bierna.',en:'Sections: background, findings, conclusions, recommendations. Formal register, passive voice.'},
+     ex:['The survey revealed that 70% of employees prefer flexible working hours.','It is recommended that the company introduce a hybrid working policy.','Based on the findings, it is clear that further investment is required.']},
+    {t:{pl:'Spójność tekstu — discourse markers',en:'Text Cohesion — discourse markers'},
+     d:{pl:'Dodawanie: Furthermore, Moreover, In addition. Kontrast: However, Nevertheless, In contrast, Whereas. Podsumowanie: To sum up, On balance.',en:'Adding: Furthermore, Moreover, In addition. Contrast: However, Nevertheless, In contrast, Whereas. Summary: To sum up, On balance.'},
+     ex:['Furthermore, the study revealed that exercise improves mental health significantly.','Consequently, the company was forced to restructure its operations.','In contrast, countries with stricter regulations showed lower unemployment.','With regard to the environmental impact, further research is needed.']}
+   ]
+  },
+  {id:'listening',emoji:'🎧',title:{pl:'Słuchanie',en:'Listening'},sub:{pl:'Rozumienie ze słuchu',en:'Listening comprehension'},
+   b1:[
+    {sec:{pl:'Poziom B1',en:'B1 Level'},t:{pl:'Strategie słuchania',en:'Listening Strategies'},
+     d:{pl:'1. Słuchaj globalnie (główna myśl). 2. Korzystaj z kontekstu i intonacji. 3. Przed słuchaniem przejrzyj pytania. 4. Nieznane słowa pomiń.',en:'1. Listen globally first (main idea). 2. Use context and intonation. 3. Before listening, preview questions. 4. Skip unknown words — focus on key information.'},
+     ex:['When you hear an announcement, focus on: WHERE, WHEN, WHAT — not every word.','If you miss a word, don\'t panic — use context to guess the meaning.','Intonation tells you if someone is certain, surprised, or ironic.']},
+    {t:{pl:'Rozumienie ogłoszeń i rozmów',en:'Announcements & Conversations'},
+     d:{pl:'Ogłoszenia: wychwytuj WHERE, WHEN, WHAT. Rozmowy telefoniczne: standard phrases.',en:'Announcements: catch WHERE, WHEN, WHAT. Phone calls: standard phrases.'},
+     ex:['Platform 3 for the 14:25 to Warsaw — listen for: number, time, destination.','In a call: "I\'m calling to confirm…" — purpose stated at the start.','If you didn\'t catch it: "I\'m sorry, could you repeat that?" or "Could you speak more slowly?"']}
+   ],
+   b2:[
+    {sec:{pl:'Poziom B2',en:'B2 Level'},t:{pl:'Autentyczne nagrania',en:'Authentic Recordings'},
+     d:{pl:'Redukcje: gonna (going to), wanna (want to), kinda (kind of), didja (did you). Naturalne tempo, różne akcenty.',en:'Reductions: gonna (going to), wanna (want to), kinda (kind of), didja (did you). Natural pace, various accents.'},
+     ex:['I\'m gonna call you later. → (= I\'m going to call)','Didja see the match last night? → (= Did you see)','You wanna grab a coffee? → (= Do you want to)','It\'s kinda complicated. → (= kind of / rather)']},
+    {t:{pl:'Znaczenie implicite',en:'Implicit Meaning'},
+     d:{pl:'Rozumiesz co NIE jest powiedziane wprost: sarkazm, ironię, aluzje, postawę rozmówcy.',en:'You understand what is NOT said directly: sarcasm, irony, allusions, speaker\'s attitude.'},
+     ex:['"Oh, that\'s just great." (flat tone) — often means the opposite: that\'s terrible!','A: "What do you think of my idea?" B: "It\'s... interesting." — often means: I don\'t like it.','"He\'s not exactly the most reliable person." — understatement for: he\'s very unreliable.']}
+   ]
+  },
+  {id:'reading',emoji:'📖',title:{pl:'Czytanie',en:'Reading'},sub:{pl:'Rozumienie tekstów',en:'Understanding written texts'},
+   b1:[
+    {sec:{pl:'Poziom B1',en:'B1 Level'},t:{pl:'Strategie czytania',en:'Reading Strategies'},
+     d:{pl:'Skimming: czytasz szybko dla głównej myśli. Scanning: szukasz konkretnej informacji. Inference: domyślasz się sensu z kontekstu.',en:'Skimming: read quickly for the main idea. Scanning: search for specific information. Inference: guess meaning from context.'},
+     ex:['Skimming: read only the first sentence of each paragraph for the main idea.','Scanning: run your eyes down the text for a specific name, number or date.','Inference: "He slammed the door and left." — infer he was angry (not stated directly).']},
+    {t:{pl:'Typy tekstów B1',en:'B1 Text Types'},
+     d:{pl:'E-maile i listy, artykuły prasowe na znane tematy, opisy, narracje, instrukcje, fora internetowe.',en:'Emails and letters, newspaper articles on familiar topics, descriptions, narratives, instructions, internet forums.'},
+     ex:['"The hostel is a 5-minute walk from the main station." — understand: location and distance.','"Prices start from €49 per person." — understand: cost information.','Forum post: "Has anyone tried this? tbh it\'s kinda overrated imo" — informal language, abbreviations.']}
+   ],
+   b2:[
+    {sec:{pl:'Poziom B2',en:'B2 Level'},t:{pl:'Teksty abstrakcyjne i literackie',en:'Abstract & Literary Texts'},
+     d:{pl:'Rozumiesz teksty na skomplikowane tematy, wychwycisz postawę i ton autora, implikacje i ironię.',en:'You understand complex texts, can identify the author\'s attitude and tone, implications and irony.'},
+     ex:['"The report paints a grim picture of the housing market." — "grim picture" = very negative.','"One might argue that this policy is misguided." — distanced, critical tone.','Understated: "The results were not entirely satisfactory." — means: the results were bad.']}
+   ]
+  },
+  {id:'phrasal',emoji:'🔗',title:{pl:'Frazale i idiomy',en:'Phrasal Verbs & Idioms'},sub:{pl:'Phrasal verbs, idiomy, kolokacje',en:'Phrasal verbs, idioms, collocations'},
+   b1:[
+    {sec:{pl:'Popularne frazale',en:'Common Phrasal Verbs'},t:{pl:'GET — najważniejsze',en:'GET — most important'},
+     d:{pl:'get up, get on/off, get over (pokonać/wyleczyć się z), get along with (dogadywać się), get rid of (pozbyć się), get away with (ujść bezkarnie).',en:'get up, get on/off, get over (recover/overcome), get along with (have a good relationship with), get rid of (remove/eliminate), get away with (not be caught/punished).'},
+     ex:['She gets up at 6 every morning. — (wstaje / wakes up)','I can\'t get over how beautiful this city is. — (nie mogę wyjść z podziwu)','They get along really well — they never argue.','He got away with cheating on the test. — (uszło mu to na sucho)']},
+    {t:{pl:'LOOK — najważniejsze',en:'LOOK — most important'},
+     d:{pl:'look up (szukać), look after (opiekować się), look forward to (czekać z niecierpliwością), look into (zbadać), look down on (pogardzać).',en:'look up (search for), look after (take care of), look forward to (anticipate with excitement), look into (investigate), look down on (feel superior to).'},
+     ex:['I\'ll look it up in the dictionary. — (sprawdzę)','She looks after her elderly parents. — (opiekuje się)','I\'m really looking forward to the holidays! — (nie mogę się doczekać)','The police are looking into the matter. — (badają sprawę)']},
+    {sec:{pl:'Kolokacje',en:'Collocations'},t:{pl:'DO vs MAKE',en:'DO vs MAKE'},
+     d:{pl:'DO: homework, dishes, business, damage, exercise, someone a favour. MAKE: decision, effort, progress, mistake, complaint, noise.',en:'DO: homework, dishes, business, damage, exercise, someone a favour. MAKE: decision, effort, progress, mistake, complaint, noise.'},
+     ex:['Could you do me a favour? — (wyświadczyć przysługę)','I made a mistake — I sent the wrong file. — (popełniłem błąd)','She\'s making great progress with her English. — (robi postępy)','Please don\'t make so much noise! — (nie hałasuj)'],
+     tip:{pl:'NIE mieszaj: "make homework" → BŁĄD. "do a decision" → BŁĄD. Zapamiętaj kolokacje całe jako jednostki.',en:'Don\'t mix: "make homework" → WRONG. "do a decision" → WRONG. Learn collocations as whole chunks.'}}
+   ],
+   b2:[
+    {sec:{pl:'Zaawansowane',en:'Advanced'},t:{pl:'Frazale nieoczywiste',en:'Non-obvious Phrasal Verbs'},
+     d:{pl:'bring about (spowodować), draw on (korzystać z), fall through (nie dojść do skutku), phase out (stopniowo eliminować), account for (stanowić; wyjaśnić).',en:'bring about (cause), draw on (use/rely on), fall through (fail to happen), phase out (gradually eliminate), account for (make up; explain).'},
+     ex:['The reforms brought about significant changes in healthcare.','She drew on her experience as a nurse to write the book.','The deal fell through at the last minute — both sides walked away.','Fossil fuels account for over 70% of global energy use.']},
+    {t:{pl:'Idiomy zaawansowane',en:'Advanced Idioms'},
+     d:{pl:'go back to the drawing board (zacząć od nowa), on the same page (rozumieć się), a blessing in disguise (nieszczęście w szczęściu), cut corners (iść na skróty).',en:'go back to the drawing board (start again from scratch), on the same page (have the same understanding), a blessing in disguise (something bad that turns out good), cut corners (do something poorly to save time/money).'},
+     ex:['The project failed — we had to go back to the drawing board. — (zacząć od nowa)','Make sure everyone is on the same page before the meeting. — (rozumie to samo)','Losing that job was a blessing in disguise — I found a much better one.','We can\'t cut corners on safety — it\'s not worth the risk.']}
+   ]
+  },
+  {id:'pronunciation',emoji:'🔊',title:{pl:'Wymowa',en:'Pronunciation'},sub:{pl:'Dźwięki, akcent, intonacja',en:'Sounds, word stress, intonation'},
+   b1:[
+    {sec:{pl:'Trudne dźwięki',en:'Difficult Sounds'},t:{pl:'TH — /θ/ i /ð/',en:'TH — /θ/ and /ð/'},
+     d:{pl:'/θ/ bezdźwięczne: think, three, bath. /ð/ dźwięczne: this, the, breathe. Język dotyka górnych zębów.',en:'/θ/ voiceless: think, three, bath. /ð/ voiced: this, the, breathe. Tongue touches upper teeth.'},
+     ex:['/θ/: think, three, birthday, tooth, month, south, path','/ð/: this, that, the, breathe, mother, weather, together','Minimal pairs: thin vs den vs fin (three different sounds!)','Practice: "This Thursday, I\'ll think of something thick."'],
+     tip:{pl:'Polacy często używają "t/d" lub "f/v" zamiast th. Ćwicz przed lustrem — język musi być widoczny!',en:'Polish speakers often use "t/d" or "f/v" instead of th. Practice in front of a mirror — your tongue should be visible!'}},
+    {t:{pl:'Akcent wyrazowy (Word Stress)',en:'Word Stress'},
+     d:{pl:'Każde słowo angielskie ma stały akcent. PHOtograph → phoTOgraphy → photoGRAPHic. Błędny akcent = niezrozumiane słowo.',en:'Every English word has fixed stress. PHOtograph → phoTOgraphy → photoGRAPHic. Wrong stress = misunderstood word.'},
+     ex:['REcord (noun: płyta) vs reCORD (verb: nagrywać)','PREsent (noun/adj: prezent/obecny) vs preSENT (verb: prezentować)','CONflict (noun) vs conFLICT (verb)','ADdress (noun: adres) vs adDRESS (verb: zwracać się do)'],
+     tip:{pl:'Ucz się akcentu RAZEM ze słowem. Słownik Cambridge online — klikaj głośnik żeby usłyszeć wymowę.',en:'Learn word stress TOGETHER with the word. Cambridge Dictionary online — click the speaker to hear pronunciation.'}},
+    {t:{pl:'Redukcje mówione',en:'Spoken Reductions'},
+     d:{pl:'gonna (going to), wanna (want to), kinda (kind of), gotta (got to/have to), shoulda/coulda/woulda (should/could/would have).',en:'gonna (going to), wanna (want to), kinda (kind of), gotta (got to/have to), shoulda/coulda/woulda (should/could/would have).'},
+     ex:['I\'m gonna call you later. → (going to)','You wanna grab a coffee? → (want to)','I shoulda told her the truth. → (should have)','It\'s kinda complicated to explain. → (kind of)']},
+    {t:{pl:'Łączenie słów (Linking)',en:'Linking Words'},
+     d:{pl:'Native speakerzy łączą słowa bez przerw. Spółgłoska + samogłoska łączą się naturalnie. "turn it off" → "turnnitoff".',en:'Native speakers link words without pauses. Consonant + vowel link naturally. "turn it off" → "turnnitoff".'},
+     ex:['turn it off → "tur-ni-toff"','not at all → "no-tat-all"','go on → "go-won"','did you → "di-djou"']}
+   ],
+   b2:[
+    {sec:{pl:'Poziom B2',en:'B2 Level'},t:{pl:'Intonacja zdaniowa',en:'Sentence Intonation'},
+     d:{pl:'Rising (↑): pytania Yes/No. Falling (↓): pytania WH-, twierdzenia. Rise-fall: ironia, zaskoczenie.',en:'Rising (↑): Yes/No questions. Falling (↓): WH- questions, statements. Rise-fall: irony, surprise.'},
+     ex:['Are you coming? ↑ — (Yes/No question — rising)','Where are you going? ↓ — (WH- question — falling)','I got the job! ↓ — (excited statement — falling)','Oh, THAT\'s surprising. ↗↘ — (sarcastic — rise-fall)'],
+     tip:{pl:'"Really?" z rosnącą = prawdziwe zaskoczenie. "Really." z opadającą = sceptycyzm lub ironia. Intonacja zmienia znaczenie!',en:'"Really?" with rising = genuine surprise. "Really." with falling = scepticism or irony. Intonation changes meaning!'}},
+    {t:{pl:'Weak forms — schwa /ə/',en:'Weak forms — schwa /ə/'},
+     d:{pl:'Najczęstszy dźwięk w angielskim. Słowa bez akcentu → schwa: the /ðə/, a /ə/, and /ən/, can /kən/, for /fər/.',en:'The most frequent sound in English. Unstressed words → schwa: the /ðə/, a /ə/, and /ən/, can /kən/, for /fər/.'},
+     ex:['I\'ll meet you at the /ðə/ station for /fər/ a /ə/ coffee.','Can /kən/ you help me? — "can" in weak form','Them, him, her, his, us — all use schwa in natural speech.'],
+     tip:{pl:'Używanie "silnych form" wszędzie (the = "thee", and = "end") brzmi robotycznie. Weak forms to sekret naturalnego brzmienia.',en:'Using "strong forms" everywhere (the = "thee", and = "end") sounds robotic. Weak forms are the secret to sounding natural.'}}
+   ]
+  }
+];
+
+/* ══════════════════════════════
+   ENGLISH — HELPERS & RENDER
+══════════════════════════════ */
+var curEngTopic=null;
+var curEngItemData=null; // {item, key}
+
+function eKey(topicId,level,idx){return topicId+'_'+level+'_'+idx;}
+function tStats(t){
+  var b1t=t.b1.length,b1d=0,b2t=t.b2.length,b2d=0;
+  t.b1.forEach(function(_,i){if(ST.done[eKey(t.id,'b1',i)])b1d++;});
+  t.b2.forEach(function(_,i){if(ST.done[eKey(t.id,'b2',i)])b2d++;});
+  return{b1t:b1t,b1d:b1d,b2t:b2t,b2d:b2d};
+}
+function allEStats(){
+  var r={b1t:0,b1d:0,b2t:0,b2d:0};
+  TOPICS.forEach(function(t){var s=tStats(t);r.b1t+=s.b1t;r.b1d+=s.b1d;r.b2t+=s.b2t;r.b2d+=s.b2d;});
+  return r;
+}
+function eT(item){return(item.t[ST.lang]||item.t.pl);}
+function eD(item){return(item.d[ST.lang]||item.d.pl);}
+function eSec(item){if(!item.sec)return null;return(item.sec[ST.lang]||item.sec.pl);}
+function eTip(item){if(!item.tip)return null;return(item.tip[ST.lang]||item.tip.pl);}
+
+function renderEngHome(){
+  document.querySelectorAll('#eLangPill button').forEach(function(b){b.classList.toggle('on',b.dataset.lang===ST.lang);});
+  document.querySelectorAll('#eSzPill .sz-btn').forEach(function(b){b.classList.toggle('on',b.dataset.sc===ST.scale);b.style.fontSize=b.dataset.sc==='0.85'?'10px':b.dataset.sc==='1'?'12px':'14px';});
+  document.getElementById('tabB1').classList.toggle('on',ST.engLevel==='b1');
+  document.getElementById('tabB2').classList.toggle('on',ST.engLevel==='b2');
+  var s=allEStats();
+  document.getElementById('eStB1').textContent=s.b1d+'/'+s.b1t;
+  document.getElementById('eStB2').textContent=s.b2d+'/'+s.b2t;
+  document.getElementById('eStAll').textContent=(s.b1t+s.b2t)+'';
+  document.getElementById('e-homeSub').textContent=et('homeSub');
+  document.getElementById('eLblB1').textContent=et('b1lbl');
+  document.getElementById('eLblB2').textContent=et('b2lbl');
+  document.getElementById('eLblAll').textContent=et('totlbl');
+  var lv=ST.engLevel;
+  var list=document.getElementById('e-topicList');list.innerHTML='';
+  TOPICS.forEach(function(t){
+    var ts=tStats(t);
+    var doneN=lv==='b1'?ts.b1d:ts.b2d;
+    var total=lv==='b1'?ts.b1t:ts.b2t;
+    var pct=total>0?Math.round(doneN/total*100):0;
+    var row=document.createElement('div');row.className='entry-row';
+    row.innerHTML='<div class="e-ico">'+t.emoji+'</div>'+
+      '<div class="e-body"><div class="e-title">'+t.title[ST.lang]+'</div><div class="e-sub">'+t.sub[ST.lang]+'</div></div>'+
+      '<div class="e-right">'+
+        '<div class="e-pct">'+doneN+'/'+total+'</div>'+
+        '<div class="prog-bar"><div class="prog-fill" id="epf-'+t.id+'" style="width:'+pct+'%"></div></div>'+
+        '<span class="e-arr">›</span></div>';
+    row.addEventListener('click',function(){openEngTopic(t.id);});
+    list.appendChild(row);
+  });
+}
+
+function openEngTopic(id){
+  curEngTopic=TOPICS.find(function(t){return t.id===id;});
+  var lv=ST.engLevel;
+  document.getElementById('e-topicTitle').textContent=curEngTopic.emoji+' '+curEngTopic.title[ST.lang]+' — '+lv.toUpperCase();
+  renderEngItems();
+  showV('ve-topic');
+}
+function renderEngItems(){
+  var lv=ST.engLevel;
+  var items=lv==='b1'?curEngTopic.b1:curEngTopic.b2;
+  var list=document.getElementById('e-itemList');list.innerHTML='';
+  var lastSec=null;
+  items.forEach(function(item,idx){
+    var sec=eSec(item);
+    if(sec&&sec!==lastSec){
+      var h=document.createElement('div');h.className='topic-sec-hdr';h.textContent=sec;list.appendChild(h);lastSec=sec;
+    }
+    var ky=eKey(curEngTopic.id,lv,idx);
+    var isDone=!!ST.done[ky];
+    var row=document.createElement('div');row.className='item-row';
+    var chk=document.createElement('div');chk.className='i-chk'+(isDone?' done':'');chk.textContent=isDone?'✓':'';
+    var body=document.createElement('div');body.className='i-body';
+    var tt=document.createElement('div');tt.className='i-ttl';tt.textContent=eT(item);
+    var dd=document.createElement('div');dd.className='i-desc';dd.textContent=eD(item);
+    body.appendChild(tt);body.appendChild(dd);
+    var arr=document.createElement('span');arr.className='i-arr';arr.textContent='›';
+    row.appendChild(chk);row.appendChild(body);row.appendChild(arr);
+    (function(ky2,chkEl,item2,idx2){
+      row.addEventListener('click',function(){openEngItem(item2,ky2,chkEl);});
+    })(ky,chk,item,idx);
+    list.appendChild(row);
+  });
+}
+
+function openEngItem(item,ky,chkRef){
+  curEngItemData={item:item,key:ky,chkRef:chkRef};
+  document.getElementById('e-itemTopTtl').textContent=eT(item);
+  var scroll=document.getElementById('e-itemScroll');scroll.innerHTML='';
+  // Title
+  var ttEl=document.createElement('div');ttEl.className='id-title';ttEl.textContent=eT(item);
+  scroll.appendChild(ttEl);
+  // Description
+  var ddEl=document.createElement('div');ddEl.className='id-desc';ddEl.textContent=eD(item);
+  scroll.appendChild(ddEl);
+  // Examples
+  if(item.ex&&item.ex.length>0){
+    var exHdr=document.createElement('div');exHdr.className='id-shdr';exHdr.textContent=et('ex');
+    scroll.appendChild(exHdr);
+    item.ex.forEach(function(ex){
+      var parts=ex.split(' — ');
+      var exEl=document.createElement('div');exEl.className='id-ex';
+      var bold=document.createElement('strong');bold.textContent=parts[0];
+      exEl.appendChild(bold);
+      if(parts[1]){exEl.appendChild(document.createTextNode(' '));var em=document.createElement('em');em.textContent='— '+parts[1];exEl.appendChild(em);}
+      scroll.appendChild(exEl);
+    });
+  }
+  // Tip
+  var tip=eTip(item);
+  if(tip){
+    var tipEl=document.createElement('div');tipEl.className='id-tip';
+    var tipHdr=document.createElement('div');tipHdr.className='id-tip-hdr';tipHdr.textContent=et('tip');
+    tipEl.appendChild(tipHdr);
+    tipEl.appendChild(document.createTextNode(tip));
+    scroll.appendChild(tipEl);
+  }
+  // Done row
+  var isDone=!!ST.done[ky];
+  var doneRow=document.createElement('div');doneRow.className='id-done-row';
+  var dChk=document.createElement('div');dChk.className='i-chk'+(isDone?' done':'');dChk.textContent=isDone?'✓':'';
+  var dLbl=document.createElement('span');dLbl.className='id-done-lbl';dLbl.textContent=et('markDone');
+  doneRow.appendChild(dChk);doneRow.appendChild(dLbl);
+  doneRow.addEventListener('click',function(){
+    ST.done[ky]=!ST.done[ky];save();
+    dChk.className='i-chk'+(ST.done[ky]?' done':'');dChk.textContent=ST.done[ky]?'✓':'';
+    if(chkRef){chkRef.className='i-chk'+(ST.done[ky]?' done':'');chkRef.textContent=ST.done[ky]?'✓':'';}
+  });
+  scroll.appendChild(doneRow);
+  showV('ve-item');
+}
+
+/* ── ENGLISH EVENTS ── */
+document.getElementById('tabB1').addEventListener('click',function(){ST.engLevel='b1';save();renderEngHome();});
+document.getElementById('tabB2').addEventListener('click',function(){ST.engLevel='b2';save();renderEngHome();});
+document.getElementById('eBackTopic').addEventListener('click',function(){showV('ve-home');renderEngHome();});
+document.getElementById('eBackItem').addEventListener('click',function(){showV('ve-topic');renderEngItems();});
+document.querySelectorAll('#eLangPill button').forEach(function(b){b.addEventListener('click',function(){ST.lang=b.dataset.lang;save();renderEngHome();});});
+document.getElementById('eThemeBtn').addEventListener('click',function(){ST.theme=ST.theme==='dark'?'light':'dark';save();applyTheme();});
+document.querySelectorAll('#eSzPill .sz-btn').forEach(function(b){b.addEventListener('click',function(){ST.scale=b.dataset.sc;save();applyScale();});});
+
+/* ── BOTTOM NAV ── */
+document.getElementById('bnIslam').addEventListener('click',function(){
+  ST.sect='islam';save();applySect();
+  var alive=document.querySelector('#vi-home.active,#vi-list.active,#vi-letters.active,#vi-prayer.active');
+  if(!alive){showV('vi-home');}
+  renderIslam();refreshP();
+});
+document.getElementById('bnEng').addEventListener('click',function(){
+  ST.sect='eng';save();applySect();
+  var alive=document.querySelector('#ve-home.active,#ve-topic.active,#ve-item.active');
+  if(!alive){showV('ve-home');}
+  renderEngHome();
+});
+
+/* ══════════════════════════════
+   INIT
+══════════════════════════════ */
+(function init(){
+  if(ST.sect==='eng'){
+    APP.setAttribute('data-sect','eng');
+    document.getElementById('bnIslam').classList.remove('on');
+    document.getElementById('bnEng').classList.add('on');
+    showV('ve-home');
+    renderEngHome();
+  } else {
+    showV('vi-home');
+    renderIslam();
+    refreshP();
+  }
+  setInterval(refreshP,60000);
+})();
+
+})();
+</script>
+</body>
+</html>
