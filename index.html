@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Moja Droga</title>
 <meta name="theme-color" content="#F4EFE6">
 <meta name="mobile-web-app-capable" content="yes">
@@ -233,6 +233,16 @@ html,body{transition:background-color .3s ease,color .3s ease;}
 .s-ring .ring-bg{fill:none;stroke:var(--border);stroke-width:3;}
 .s-ring .ring-fg{fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset .5s ease;}
 .s-ring .s-val{font-size:calc(9.5px * var(--scale));}
+@keyframes chkPop{0%{transform:scale(.6);}60%{transform:scale(1.12);}100%{transform:scale(1);}}
+.i-chk.done{animation:chkPop .18s ease-out;}
+.pw-cell.next{box-shadow:inset 0 0 0 1.5px var(--accent);animation:pwGlow 2.6s ease-in-out infinite;}
+@keyframes pwGlow{0%,100%{box-shadow:inset 0 0 0 1.5px var(--accent);}50%{box-shadow:inset 0 0 0 1.5px transparent;}}
+.overlay.open{animation:ovIn .2s ease;}
+@keyframes ovIn{from{opacity:0;}to{opacity:1;}}
+body.no-scroll{overflow:hidden;}
+.upd-bar{position:fixed;left:50%;bottom:calc(72px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(8px);background:var(--accent);color:#fff;font-family:'Inter',sans-serif;font-size:calc(12px * var(--scale));font-weight:600;padding:8px 9px 8px 15px;border-radius:20px;opacity:0;transition:opacity .25s ease,transform .25s ease;z-index:45;display:flex;align-items:center;gap:10px;box-shadow:0 4px 16px rgba(0,0,0,0.18);max-width:90vw;}
+.upd-bar.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.upd-bar button{background:rgba(255,255,255,0.24);border:none;color:#fff;font:inherit;padding:6px 13px;border-radius:14px;cursor:pointer;}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}}
 /* ── DESKTOP ── */
 @media(min-width:760px){#app{border-left:1px solid var(--border);border-right:1px solid var(--border);}}
@@ -589,7 +599,7 @@ function renderPW(){
   document.getElementById('pwMethod').textContent=it('pwMethod');
   var grid=document.getElementById('pwGrid');grid.innerHTML='';
   ['fajr','sunrise','dhuhr','asr','maghrib','isha'].forEach(function(k){
-    var el=document.createElement('div');el.className='pw-cell'+(k!=='sunrise'&&k===d.cur?' on':'')+(k==='sunrise'?' dim':'');
+    var el=document.createElement('div');el.className='pw-cell'+(k!=='sunrise'&&k===d.cur?' on':'')+(k===d.next?' next':'')+(k==='sunrise'?' dim':'');
     el.innerHTML='<div class="pw-l">'+PL_N[k][ST.lang]+'</div><div class="pw-v">'+fmtT(d.times[k],d.city.tz)+'</div>';
     grid.appendChild(el);
   });
@@ -728,6 +738,9 @@ document.getElementById('setOv').addEventListener('click',function(e){if(e.targe
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){document.querySelectorAll('.overlay.open').forEach(function(o){o.classList.remove('open');});}
 });
+/* blokada przewijania tla, gdy otwarty jest overlay */
+var ovLockObs=new MutationObserver(function(){document.body.classList.toggle('no-scroll',!!document.querySelector('.overlay.open'));});
+document.querySelectorAll('.overlay').forEach(function(o){ovLockObs.observe(o,{attributes:true,attributeFilter:['class']});});
 /* export */
 document.getElementById('exportBtn').addEventListener('click',function(){
   var blob=new Blob([JSON.stringify(ST,null,2)],{type:'application/json'});
@@ -1611,7 +1624,7 @@ function renderEngItems(){
     (function(ky2,chkEl,item2){
       chkEl.addEventListener('click',function(ev){
         ev.stopPropagation();
-        ST.done[ky2]=!ST.done[ky2];save();
+        ST.done[ky2]=!ST.done[ky2];save();if(navigator.vibrate)navigator.vibrate(10);
         chkEl.className='i-chk'+(ST.done[ky2]?' done':'');chkEl.textContent=ST.done[ky2]?'✓':'';
         toast(ST.done[ky2]?it('doneOn'):it('doneOff'));
       });
@@ -1719,7 +1732,7 @@ function openEngItem(item,ky){
   var dLbl=document.createElement('span');dLbl.className='id-done-lbl';dLbl.textContent=et('markDone');
   doneRow.appendChild(dChk);doneRow.appendChild(dLbl);
   doneRow.addEventListener('click',function(){
-    ST.done[ky]=!ST.done[ky];save();
+    ST.done[ky]=!ST.done[ky];save();if(navigator.vibrate)navigator.vibrate(10);
     dChk.className='i-chk'+(ST.done[ky]?' done':'');dChk.textContent=ST.done[ky]?'✓':'';
     toast(ST.done[ky]?it('doneOn'):it('doneOff'));
     var lChk=document.querySelector('#e-itemList [data-k="'+ky+'"]');
@@ -1767,13 +1780,25 @@ document.getElementById('bnEng').addEventListener('click',function(){
     renderIslam();
     refreshP();
   }
-  setInterval(refreshP,60000);
+  /* odswiezanie wyrownane do pelnej minuty + natychmiast po powrocie do karty */
+  (function tick(){refreshP();setTimeout(tick,60000-(Date.now()%60000)+60);})();
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)refreshP();});
 })();
 
 })();
 </script>
 <script>
-/* ── PWA: rejestracja Service Workera + automatyczna aktualizacja ── */
+/* ── PWA: rejestracja Service Workera + powiadomienie o aktualizacji ── */
+function showUpdateBar(nw){
+  if(document.getElementById('updBar'))return;
+  var pl=(document.documentElement.lang||'pl')!=='en';
+  var bar=document.createElement('div');bar.id='updBar';bar.className='upd-bar';bar.setAttribute('role','status');
+  var sp=document.createElement('span');sp.textContent=pl?'Dostępna nowa wersja':'New version available';
+  var btn=document.createElement('button');btn.type='button';btn.textContent=pl?'Odśwież':'Refresh';
+  btn.addEventListener('click',function(){nw.postMessage('SKIP_WAITING');});
+  bar.appendChild(sp);bar.appendChild(btn);document.body.appendChild(bar);
+  setTimeout(function(){bar.classList.add('show');},30);
+}
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
     navigator.serviceWorker.register('sw.js').then(function (reg) {
@@ -1784,7 +1809,7 @@ if ('serviceWorker' in navigator) {
         if (!nw) return;
         nw.addEventListener('statechange', function () {
           if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-            nw.postMessage('SKIP_WAITING');
+            showUpdateBar(nw);
           }
         });
       });

@@ -1,12 +1,11 @@
 /* Moja Droga — Service Worker (auto-update, offline) */
-const CACHE = 'moja-droga-v7';
+const CACHE = 'moja-droga-v8';
 const CORE = [
   './',
   './index.html',
   './manifest.webmanifest',
   './icon-192.png',
-  './icon-512.png',
-  './icon-512-maskable.png'
+  './icon-512.png'
 ];
 
 self.addEventListener('install', e => {
