@@ -9,6 +9,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Moja Droga">
+<meta name="description" content="Moja Droga — notatnik drogi w islamie (godziny modlitw, wudu, modlitwa krok po kroku) oraz ścieżka nauki angielskiego B1–B2. Działa offline (PWA).">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,8 +19,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 /* ── SECTION-SPECIFIC PALETTE (light) ── */
-#app[data-sect="islam"]{--bg:#F4EFE6;--bg-panel:#FDFAF5;--accent:#A9762F;--accent-soft:rgba(169,118,47,0.11);}
-#app[data-sect="eng"]  {--bg:#F5F8FD;--bg-panel:#FFFFFF;--accent:#3A6FC2;--accent-soft:rgba(58,111,194,0.11);--b2:#6B4AC2;--b2-soft:rgba(107,74,194,0.11);}
+:root[data-sect="islam"]{--bg:#F4EFE6;--bg-panel:#FDFAF5;--accent:#A9762F;--accent-soft:rgba(169,118,47,0.11);}
+:root[data-sect="eng"]  {--bg:#F5F8FD;--bg-panel:#FFFFFF;--accent:#3A6FC2;--accent-soft:rgba(58,111,194,0.11);--b2:#6B4AC2;--b2-soft:rgba(107,74,194,0.11);}
 /* ── SHARED LIGHT ── */
 :root{--text:#1A2820;--text-muted:#6B7A6F;--border:rgba(26,40,32,0.13);--scale:1;
   padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
@@ -25,8 +28,8 @@ html{scroll-padding-top:env(safe-area-inset-top,0px);}
 /* ── DARK SHARED ── */
 [data-theme="dark"]{--text:#EAE4D6;--text-muted:#8A9E94;--border:rgba(234,228,214,0.11);}
 /* ── DARK SECTION ── */
-[data-theme="dark"] #app[data-sect="islam"]{--bg:#0E1C18;--bg-panel:#142018;--accent:#C79A46;--accent-soft:rgba(199,154,70,0.14);}
-[data-theme="dark"] #app[data-sect="eng"]  {--bg:#0D1117;--bg-panel:#161B22;--accent:#6B9ED4;--accent-soft:rgba(107,158,212,0.16);--b2:#9F82D8;--b2-soft:rgba(159,130,216,0.16);}
+[data-theme="dark"][data-sect="islam"]{--bg:#0E1C18;--bg-panel:#142018;--accent:#C79A46;--accent-soft:rgba(199,154,70,0.14);}
+[data-theme="dark"][data-sect="eng"]  {--bg:#0D1117;--bg-panel:#161B22;--accent:#6B9ED4;--accent-soft:rgba(107,158,212,0.16);--b2:#9F82D8;--b2-soft:rgba(159,130,216,0.16);}
 /* ── RESET ── */
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;overscroll-behavior:none;}
@@ -412,7 +415,8 @@ function save(){try{localStorage.setItem(LS_KEY,JSON.stringify(ST));}catch(e){}}
 
 var APP=document.getElementById('app');
 
-function applyTheme(){document.documentElement.setAttribute('data-theme',ST.theme);}
+function applyMeta(){var d=ST.theme==='dark',m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',ST.sect==='eng'?(d?'#0D1117':'#F5F8FD'):(d?'#0E1C18':'#F4EFE6'));}
+function applyTheme(){document.documentElement.setAttribute('data-theme',ST.theme);applyMeta();}
 applyTheme();
 
 function applyScale(){
@@ -426,10 +430,14 @@ applyScale();
 
 function applySect(){
   APP.setAttribute('data-sect',ST.sect);
+  document.documentElement.setAttribute('data-sect',ST.sect);
+  applyMeta();
   document.getElementById('bnIslam').classList.toggle('on',ST.sect==='islam');
   document.getElementById('bnEng').classList.toggle('on',ST.sect==='eng');
 }
 applySect();
+
+function applyLangChrome(){document.getElementById('bnEngLbl').textContent=ST.lang==='pl'?'Angielski':'English';document.title=IS[ST.lang].appTitle;}
 
 var VIEWS=['vi-home','vi-list','vi-letters','vi-prayer','ve-home','ve-topic','ve-item'];
 function showV(id){VIEWS.forEach(function(v){document.getElementById(v).classList.toggle('active',v===id);});}
@@ -439,6 +447,7 @@ function currentView(){var a=document.querySelector('.view.active');return a?a.i
 var curIslamEntry=null;
 function rerender(){
   applyScale();
+  applyLangChrome();
   var v=currentView();
   if(v==='vi-home'){renderIslam();refreshP();}
   else if(v==='vi-list'){if(curIslamEntry)openIslamList(curIslamEntry);refreshP();}
@@ -454,8 +463,8 @@ function setLang(l){ST.lang=l;save();document.documentElement.setAttribute('lang
    ISLAM — TRANSLATIONS
 ══════════════════════════════ */
 var IS={
-  pl:{appTitle:'Moja Droga',appSub:'Notatnik drogi w islamie',pv2:'2 rakaty',pv3:'3 rakaty',pv4:'4 rakaty',pwMethod:'MWL · przybliżone',changeCity:'Zmień miasto',searchCity:'Szukaj…',now:'Teraz',next:'Następna',between:'między modlitwami',listHeader:'Twój notatnik',settings:'Ustawienia',dataLbl:'Twoje dane',exportBtn:'Eksportuj dane (JSON)',importBtn:'Importuj dane (JSON)',setNote:'Dane są zapisywane lokalnie w tej przeglądarce. Eksport pozwala przenieść je na inne urządzenie lub zrobić kopię zapasową.',importOk:'Dane zaimportowane pomyślnie.',importErr:'Nieprawidłowy plik — import nie powiódł się.'},
-  en:{appTitle:'My Path',appSub:'Notebook of my journey in Islam',pv2:"2 rak'ahs",pv3:"3 rak'ahs",pv4:"4 rak'ahs",pwMethod:'MWL · approximate',changeCity:'Change city',searchCity:'Search…',now:'Now',next:'Next',between:'between prayers',listHeader:'Your notebook',settings:'Settings',dataLbl:'Your data',exportBtn:'Export data (JSON)',importBtn:'Import data (JSON)',setNote:'Data is stored locally in this browser. Export lets you move it to another device or keep a backup.',importOk:'Data imported successfully.',importErr:'Invalid file — import failed.'}
+  pl:{appTitle:'Moja Droga',appSub:'Notatnik drogi w islamie',pv2:'2 rakaty',pv3:'3 rakaty',pv4:'4 rakaty',pwMethod:'MWL · przybliżone',changeCity:'Zmień miasto',searchCity:'Szukaj…',now:'Teraz',next:'Następna',between:'między modlitwami',inTime:'za',listHeader:'Twój notatnik',settings:'Ustawienia',dataLbl:'Twoje dane',exportBtn:'Eksportuj dane (JSON)',importBtn:'Importuj dane (JSON)',setNote:'Dane są zapisywane lokalnie w tej przeglądarce. Eksport pozwala przenieść je na inne urządzenie lub zrobić kopię zapasową.',importOk:'Dane zaimportowane pomyślnie.',importErr:'Nieprawidłowy plik — import nie powiódł się.'},
+  en:{appTitle:'My Path',appSub:'Notebook of my journey in Islam',pv2:"2 rak'ahs",pv3:"3 rak'ahs",pv4:"4 rak'ahs",pwMethod:'MWL · approximate',changeCity:'Change city',searchCity:'Search…',now:'Now',next:'Next',between:'between prayers',inTime:'in',listHeader:'Your notebook',settings:'Settings',dataLbl:'Your data',exportBtn:'Export data (JSON)',importBtn:'Import data (JSON)',setNote:'Data is stored locally in this browser. Export lets you move it to another device or keep a backup.',importOk:'Data imported successfully.',importErr:'Invalid file — import failed.'}
 };
 var PL_N={fajr:{pl:'Fajr',en:'Fajr'},sunrise:{pl:'Wschód',en:'Sunrise'},dhuhr:{pl:'Dhuhr',en:'Dhuhr'},asr:{pl:'Asr',en:'Asr'},maghrib:{pl:'Maghrib',en:'Maghrib'},isha:{pl:'Isha',en:'Isha'}};
 function it(k){return IS[ST.lang][k]||k;}
@@ -530,7 +539,7 @@ function renderPW(){
   });
   return d;
 }
-function miniH(d){var c=d.cur?PL_N[d.cur][ST.lang]:it('between');return it('now')+': <b>'+c+'</b> · '+it('next')+': <b>'+PL_N[d.next][ST.lang]+' '+fmtT(d.nextD,d.city.tz)+'</b>';}
+function miniH(d){var c=d.cur?PL_N[d.cur][ST.lang]:it('between');var ms=d.nextD-new Date(),mn=Math.max(0,Math.round(ms/60000)),hh=Math.floor(mn/60),mm=mn%60,cd=hh>0?hh+' h '+mm+' min':mm+' min';return it('now')+': <b>'+c+'</b> · '+it('next')+': <b>'+PL_N[d.next][ST.lang]+' '+fmtT(d.nextD,d.city.tz)+'</b> · '+it('inTime')+' '+cd;}
 function refreshP(){var d=renderPW(),h=miniH(d);['i-mbHome','i-mbList','i-mbLetters','i-mbPrayer'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=h;});}
 
 /* ── ISLAM RENDER MENU ── */
@@ -743,7 +752,7 @@ var TOPICS=[
      remember:{pl:'Znaczniki: always, usually, often, every day/week. Pytania i przeczenia z do/does.',en:'Markers: always, usually, often, every day/week. Questions and negatives with do/does.'},
      quiz:[{q:{pl:'She ___ coffee every morning.',en:'She ___ coffee every morning.'},opts:[{pl:'drink',en:'drink'},{pl:'drinks',en:'drinks'},{pl:'is drinking',en:'is drinking'}],a:1,why:{pl:'3. osoba (she) w Present Simple → drinks.',en:'Third person (she) in Present Simple → drinks.'}}]},
     {t:{pl:'Present Continuous',en:'Present Continuous'},
-     d:{pl:'Co dzieje się TERAZ, jest tymczasowe albo zaplanowane na przyszłość. Czas „w ruchu”.',en:'What is happening NOW, is temporary, or is an arranged future plan. The tense „in motion”.'},
+     d:{pl:'Co dzieje się TERAZ, jest tymczasowe albo zaplanowane na przyszłość. Czas „w ruchu”.',en:'What is happening NOW, is temporary, or is an arranged future plan. The tense "in motion".'},
      form:{pl:'am/is/are + czasownik-ing (I am working, she is working)',en:'am/is/are + verb-ing (I am working, she is working)'},
      when:[
       {pl:'dzieje się w tej chwili — I\'m working right now.',en:'happening at this moment — I\'m working right now.'},
@@ -766,7 +775,7 @@ var TOPICS=[
      ex:['I\'ve just finished my homework. — (just / właśnie)','She has never been to Japan. — (never / nigdy)','Have you seen this film yet? — (yet in questions)','They\'ve already left. — (already / już)'],
      mistakes:[
       {bad:'I have seen him yesterday.',good:'I saw him yesterday.',why:{pl:'Z konkretnym czasem przeszłym (yesterday, last week) → Past Simple, nie Present Perfect.',en:'With a specific past time (yesterday, last week) → Past Simple, not Present Perfect.'}},
-      {bad:'I\'ve been to London last year.',good:'I went to London last year.',why:{pl:'„Last year” to zakończony okres → Past Simple.',en:'„Last year” is a finished period → Past Simple.'}}],
+      {bad:'I\'ve been to London last year.',good:'I went to London last year.',why:{pl:'„Last year” to zakończony okres → Past Simple.',en:'"Last year" is a finished period → Past Simple.'}}],
      compare:[
       {h:{pl:'Present Perfect',en:'Present Perfect'},ex:'I have lost my keys.',note:{pl:'nie wiemy kiedy — ważny jest efekt: nie mogę otworzyć drzwi TERAZ',en:'we don\'t know when — the result matters: I can\'t open the door NOW'}},
       {h:{pl:'Past Simple',en:'Past Simple'},ex:'I lost my keys yesterday.',note:{pl:'konkretny, zakończony moment w przeszłości',en:'a specific, finished moment in the past'}}],
@@ -781,14 +790,14 @@ var TOPICS=[
       {pl:'pytania o długość — How long have you been living here?',en:'duration questions — How long have you been living here?'}],
      ex:['I\'ve been waiting for 2 hours. — (for / przez)','She\'s been studying since 2020. — (since / od)','How long have you been living here? — (duration question)'],
      mistakes:[
-      {bad:'I\'m working here since 2020.',good:'I\'ve been working here since 2020.',why:{pl:'„Since/for” z czynnością trwającą do teraz → Present Perfect (Continuous), nie Present Continuous.',en:'„Since/for” with an action continuing until now → Present Perfect (Continuous), not Present Continuous.'}}],
+      {bad:'I\'m working here since 2020.',good:'I\'ve been working here since 2020.',why:{pl:'„Since/for” z czynnością trwającą do teraz → Present Perfect (Continuous), nie Present Continuous.',en:'"Since/for" with an action continuing until now → Present Perfect (Continuous), not Present Continuous.'}}],
      compare:[
       {h:{pl:'Present Perfect Continuous',en:'Present Perfect Continuous'},ex:'I\'ve been reading this book for a week.',note:{pl:'proces — czytam dalej, nie wiadomo czy skończyłem',en:'process — still reading, maybe not finished'}},
       {h:{pl:'Present Perfect',en:'Present Perfect'},ex:'I\'ve read 100 pages.',note:{pl:'wynik / ilość — wiadomo, ile zrobiono',en:'result / amount — we know how much is done'}}],
      remember:{pl:'for = PRZEZ JAK DŁUGO (for 3 hours). since = OD KIEDY (since Monday, since 2020).',en:'for = HOW LONG (for 3 hours). since = FROM WHEN (since Monday, since 2020).'},
      quiz:[{q:{pl:'How long ___ here?',en:'How long ___ here?'},opts:[{pl:'are you living',en:'are you living'},{pl:'have you been living',en:'have you been living'},{pl:'do you live',en:'do you live'}],a:1,why:{pl:'Pytanie o czas trwania do teraz → Present Perfect Continuous.',en:'Duration until now → Present Perfect Continuous.'}}]},
     {sec:{pl:'Czasy przeszłe',en:'Past Tenses'},t:{pl:'Past Simple',en:'Past Simple'},
-     d:{pl:'Zakończona czynność w konkretnym momencie w przeszłości. Czas „zamkniętej sprawy” — wiemy KIEDY to się stało.',en:'A finished action at a specific moment in the past. The „closed case” tense — we know WHEN it happened.'},
+     d:{pl:'Zakończona czynność w konkretnym momencie w przeszłości. Czas „zamkniętej sprawy” — wiemy KIEDY to się stało.',en:'A finished action at a specific moment in the past. The "closed case" tense — we know WHEN it happened.'},
      form:{pl:'czasownik-ed (worked) albo 2. forma nieregularna (went, saw, ate)',en:'verb-ed (worked) or 2nd irregular form (went, saw, ate)'},
      when:[
       {pl:'z konkretnym czasem: yesterday, last week, in 2010, ago — I went there last year.',en:'with a specific time: yesterday, last week, in 2010, ago — I went there last year.'},
@@ -796,12 +805,12 @@ var TOPICS=[
      ex:['I went to London last year. — (specific time / konkretny czas)','She called me at 8 pm. — (specific time)','They didn\'t come to the party. — (negative)','Where did you go on holiday? — (question)'],
      mistakes:[
       {bad:'Did you went there?',good:'Did you go there?',why:{pl:'Po did czasownik wraca do formy podstawowej.',en:'After did the verb goes back to the base form.'}},
-      {bad:'I have seen him yesterday.',good:'I saw him yesterday.',why:{pl:'„Yesterday” to konkretny czas przeszły → Past Simple, nie Present Perfect.',en:'„Yesterday” is a specific past time → Past Simple, not Present Perfect.'}}],
+      {bad:'I have seen him yesterday.',good:'I saw him yesterday.',why:{pl:'„Yesterday” to konkretny czas przeszły → Past Simple, nie Present Perfect.',en:'"Yesterday" is a specific past time → Past Simple, not Present Perfect.'}}],
      compare:[
       {h:{pl:'Past Simple',en:'Past Simple'},ex:'I lost my keys yesterday.',note:{pl:'konkretny, zakończony moment — sprawa zamknięta',en:'specific, finished moment — case closed'}},
       {h:{pl:'Present Perfect',en:'Present Perfect'},ex:'I have lost my keys.',note:{pl:'bez czasu — liczy się efekt teraz',en:'no time given — the present result matters'}}],
      remember:{pl:'Z yesterday, ago, last, in 2010 → ZAWSZE Past Simple.',en:'With yesterday, ago, last, in 2010 → ALWAYS Past Simple.'},
-     quiz:[{q:{pl:'We ___ to Gdańsk last summer.',en:'We ___ to Gdańsk last summer.'},opts:[{pl:'have gone',en:'have gone'},{pl:'went',en:'went'},{pl:'go',en:'go'}],a:1,why:{pl:'„Last summer” to zakończony, konkretny czas → Past Simple.',en:'„Last summer” is a finished, specific time → Past Simple.'}}]},
+     quiz:[{q:{pl:'We ___ to Gdańsk last summer.',en:'We ___ to Gdańsk last summer.'},opts:[{pl:'have gone',en:'have gone'},{pl:'went',en:'went'},{pl:'go',en:'go'}],a:1,why:{pl:'„Last summer” to zakończony, konkretny czas → Past Simple.',en:'"Last summer" is a finished, specific time → Past Simple.'}}]},
     {t:{pl:'Past Continuous',en:'Past Continuous'},
      d:{pl:'Czynność W TRAKCIE w konkretnym momencie przeszłym — tło wydarzeń albo czynność przerwana przez inną.',en:'An action IN PROGRESS at a past moment — the background of events, or an action interrupted by another one.'},
      form:{pl:'was/were + czasownik-ing: I was reading, they were sleeping',en:'was/were + verb-ing: I was reading, they were sleeping'},
@@ -818,7 +827,7 @@ var TOPICS=[
      remember:{pl:'Układanka: długa czynność (Past Continuous) + krótkie zdarzenie (Past Simple) — when / while.',en:'Pattern: long action (Past Continuous) + short event (Past Simple) — when / while.'},
      quiz:[{q:{pl:'I ___ TV when he called.',en:'I ___ TV when he called.'},opts:[{pl:'watched',en:'watched'},{pl:'was watching',en:'was watching'},{pl:'watch',en:'watch'}],a:1,why:{pl:'Długa czynność przerwana krótkim zdarzeniem → Past Continuous.',en:'Long action interrupted by a short event → Past Continuous.'}}]},
     {t:{pl:'Past Perfect',en:'Past Perfect'},
-     d:{pl:'„Przeszłość przeszłości” — czynność zakończona PRZED inną przeszłą czynnością. Pokazuje kolejność zdarzeń.',en:'The „past of the past” — an action completed BEFORE another past action. It shows the order of events.'},
+     d:{pl:'„Przeszłość przeszłości” — czynność zakończona PRZED inną przeszłą czynnością. Pokazuje kolejność zdarzeń.',en:'The "past of the past" — an action completed BEFORE another past action. It shows the order of events.'},
      form:{pl:'had + 3. forma czasownika: I had eaten, she had left',en:'had + past participle: I had eaten, she had left'},
      when:[
       {pl:'wcześniejsze z dwóch przeszłych zdarzeń — When I got home, the film had already started.',en:'the earlier of two past events — When I got home, the film had already started.'},
@@ -838,7 +847,7 @@ var TOPICS=[
       {pl:'spontaniczna decyzja — I\'ll help you!',en:'spontaneous decision — I\'ll help you!'},
       {pl:'przewidywanie bez dowodu (opinia) — I think it will rain.',en:'prediction without evidence (opinion) — I think it will rain.'},
       {pl:'obietnica — I won\'t tell anyone.',en:'promise — I won\'t tell anyone.'},
-      {pl:'oferta — Shall I / Will I carry that for you?',en:'offer — Shall I / Will I carry that for you?'}],
+      {pl:'oferta — Shall I / Can I carry that for you?',en:'offer — Shall I / Can I carry that for you?'}],
      ex:['I\'ll help you! — (spontaneous decision / decyzja teraz)','It will probably rain tomorrow. — (prediction)','I won\'t tell anyone, I promise. — (promise / obietnica)','Will you be at the party? — (question)'],
      mistakes:[
       {bad:'I will to help you.',good:'I will help you.',why:{pl:'Po will bezokolicznik BEZ to.',en:'After will, bare infinitive WITHOUT to.'}},
@@ -854,7 +863,7 @@ var TOPICS=[
      when:[
       {pl:'zamiar / plan z wcześniej — I\'m going to study tonight.',en:'intention / earlier plan — I\'m going to study tonight.'},
       {pl:'przewidywanie z widocznym dowodem — Look at those clouds! It\'s going to rain.',en:'prediction with visible evidence — Look at those clouds! It\'s going to rain.'}],
-     ex:['I\'m going to study tonight — I have a plan. — (intention)','Look at those clouds — it\'s going to rain! — (visible evidence)','She\'s going to have a baby. — (certain future fact)','Are you going to watch the match? — (question about plan)'],
+     ex:['I\'m going to study tonight — I have a plan (intention)','Look at those clouds — it\'s going to rain! — (visible evidence)','She\'s going to have a baby. — (certain future fact)','Are you going to watch the match? — (question about plan)'],
      mistakes:[
       {bad:'Look! It will rain!',good:'Look! It\'s going to rain!',why:{pl:'Widzisz dowód (ciemne chmury) → going to, nie will.',en:'You can see evidence (dark clouds) → going to, not will.'}}],
      compare:[
@@ -862,7 +871,7 @@ var TOPICS=[
       {h:{pl:'Present Continuous',en:'Present Continuous'},ex:'I\'m visiting grandma on Sunday — we agreed.',note:{pl:'plan z UMÓWIONYM terminem/osobą',en:'an arrangement with a fixed time/person'}}],
      remember:{pl:'Widzisz dowód → going to. Masz wcześniejszy plan → going to. Decyzja teraz → will.',en:'You see evidence → going to. Earlier plan → going to. Decision now → will.'},
      quiz:[{q:{pl:'Watch out! You ___ your coffee!',en:'Watch out! You ___ your coffee!'},opts:[{pl:'will spill',en:'will spill'},{pl:'\'re going to spill',en:'\'re going to spill'},{pl:'spill',en:'spill'}],a:1,why:{pl:'Widzisz, że kubek stoi na krawędzi — widoczny dowód → going to.',en:'You can see the cup on the edge — visible evidence → going to.'}}]},
-    {sec:{pl:'Tryby warunkowe',en:'Conditionals'},t:{pl:'Conditional 0 — Zero',en:'Zero Conditional'},
+    {sec:{pl:'Tryby warunkowe',en:'Conditionals'},t:{pl:'Zerowy tryb warunkowy',en:'Zero Conditional'},
      d:{pl:'Fakty naukowe i ogólne prawdy — wynik ZAWSZE pewny, niezależny od czasu.',en:'Scientific facts and general truths — the result is ALWAYS certain, independent of time.'},
      form:{pl:'If + Present Simple, … + Present Simple',en:'If + Present Simple, … + Present Simple'},
      when:[
@@ -874,7 +883,7 @@ var TOPICS=[
       {bad:'If you will heat water, it boils.',good:'If you heat water, it boils.',why:{pl:'W zerowym trybie po if nigdy will.',en:'In zero conditional, never will after if.'}}],
      remember:{pl:'If = when (bez zmiany sensu). Wynik zawsze pewny → Zero Conditional.',en:'If = when (no change in meaning). Result always certain → Zero Conditional.'},
      quiz:[{q:{pl:'If you ___ ice in the sun, it melts.',en:'If you ___ ice in the sun, it melts.'},opts:[{pl:'leave',en:'leave'},{pl:'will leave',en:'will leave'},{pl:'left',en:'left'}],a:0,why:{pl:'Prawo natury → Present Simple po obu stronach.',en:'Law of nature → Present Simple on both sides.'}}]},
-    {t:{pl:'Conditional 1 — First',en:'First Conditional'},
+    {t:{pl:'Pierwszy tryb warunkowy',en:'First Conditional'},
      d:{pl:'Realny, możliwy warunek w przyszłości i jego prawdopodobny skutek.',en:'A real, possible future condition and its likely result.'},
      form:{pl:'If + Present Simple, … will + bezokolicznik (albo odwrotnie)',en:'If + Present Simple, … will + bare infinitive (or reversed)'},
      when:[
@@ -890,7 +899,7 @@ var TOPICS=[
       {h:{pl:'Second Conditional',en:'Second Conditional'},ex:'If I won the lottery, I\'d buy a house.',note:{pl:'marzenie — mało prawdopodobne',en:'a dream — unlikely'}}],
      remember:{pl:'Po if → NIGDY will. Wynik → will + infinitive.',en:'After if → NEVER will. Result → will + infinitive.'},
      quiz:[{q:{pl:'If she ___ me, I\'ll tell her.',en:'If she ___ me, I\'ll tell her.'},opts:[{pl:'calls',en:'calls'},{pl:'will call',en:'will call'},{pl:'call',en:'call'}],a:0,why:{pl:'Po if → Present Simple (calls), wynik z will.',en:'After if → Present Simple (calls), result with will.'}}]},
-    {t:{pl:'Conditional 2 — Second',en:'Second Conditional'},
+    {t:{pl:'Drugi tryb warunkowy',en:'Second Conditional'},
      d:{pl:'Sytuacja nierealna lub mało prawdopodobna TERAZ / W PRZYSZŁOŚCI. Marzenia i hipotezy.',en:'An unreal or unlikely situation NOW / IN THE FUTURE. Dreams and hypotheses.'},
      form:{pl:'If + Past Simple, … would + bezokolicznik',en:'If + Past Simple, … would + bare infinitive'},
      when:[
@@ -904,23 +913,23 @@ var TOPICS=[
      compare:[
       {h:{pl:'First Conditional',en:'First Conditional'},ex:'If it rains, I\'ll stay home.',note:{pl:'realne — może padać',en:'realistic — it might rain'}},
       {h:{pl:'Second Conditional',en:'Second Conditional'},ex:'If I lived by the sea, I\'d swim every day.',note:{pl:'nierealne — nie mieszkam nad morzem',en:'unreal — I don\'t live by the sea'}}],
-     remember:{pl:'„If I were you, I would…” — najczęstsza fraza z tym czasem. Uwaga: was → were.',en:'„If I were you, I would…” — the most common phrase with this conditional. Note: was → were.'},
+     remember:{pl:'„If I were you, I would…” — najczęstsza fraza z tym czasem. Uwaga: was → were.',en:'"If I were you, I would…" — the most common phrase with this conditional. Note: was → were.'},
      quiz:[{q:{pl:'If I ___ rich, I would travel the world.',en:'If I ___ rich, I would travel the world.'},opts:[{pl:'was/were',en:'was/were'},{pl:'am',en:'am'},{pl:'would be',en:'would be'}],a:0,why:{pl:'Po if → Past Simple (were); would tylko w wyniku.',en:'After if → Past Simple (were); would only in the result.'}}]},
     {sec:{pl:'Strona bierna',en:'Passive Voice'},t:{pl:'Passive Voice — podstawy',en:'Passive Voice — basics'},
      d:{pl:'Używamy, gdy WYKONAWCA jest nieznany, nieważny albo oczywisty. Liczy się czynność, nie kto ją zrobił.',en:'Used when the AGENT is unknown, unimportant or obvious. The action matters, not who did it.'},
-     form:{pl:'odpowiednia forma „be” + 3. forma czasownika: is made, was built',en:'correct form of „be” + past participle: is made, was built'},
+     form:{pl:'odpowiednia forma „be” + 3. forma czasownika: is made, was built',en:'correct form of "be" + past participle: is made, was built'},
      when:[
       {pl:'wykonawca nieznany — My bike was stolen.',en:'agent unknown — My bike was stolen.'},
       {pl:'wykonawca nieważny — English is spoken worldwide.',en:'agent unimportant — English is spoken worldwide.'},
       {pl:'styl formalny / informacje — The museum is closed on Mondays.',en:'formal style / information — The museum is closed on Mondays.'}],
      ex:['English is spoken all over the world. — (Present Simple Passive)','The window was broken by a ball. — (Past Simple Passive)','This building was built in 1920. — (without agent)','These products are made in China.'],
      mistakes:[
-      {bad:'The house was build in 1990.',good:'The house was built in 1990.',why:{pl:'Po be zawsze 3. forma (built), nie 2. (build/built? — uwaga na nieregularne).',en:'After be always the 3rd form (built) — watch irregular verbs.'}},
-      {bad:'My phone has stole.',good:'My phone has been stolen.',why:{pl:'W stronie biernej zawsze jest „be” + 3. forma.',en:'The passive always needs „be” + past participle.'}}],
+      {bad:'The house was build in 1990.',good:'The house was built in 1990.',why:{pl:'Po „be” zawsze 3. forma (built), nie forma podstawowa — uwaga na czasowniki nieregularne.',en:'After be always the 3rd form (built) — watch irregular verbs.'}},
+      {bad:'My phone has stole.',good:'My phone has been stolen.',why:{pl:'W stronie biernej zawsze jest „be” + 3. forma.',en:'The passive always needs "be" + past participle.'}}],
      compare:[
       {h:{pl:'Strona czynna',en:'Active'},ex:'A ball broke the window.',note:{pl:'wiemy i ważne jest, CO zrobiło szkodę',en:'we know and care WHAT caused the damage'}},
       {h:{pl:'Strona bierna',en:'Passive'},ex:'The window was broken.',note:{pl:'liczy się skutek; sprawca nieznany/nieważny',en:'the result matters; the agent is unknown/unimportant'}}],
-     remember:{pl:'„by + wykonawca” tylko gdy to ważna informacja — zwykle pomijamy.',en:'„by + agent” only when it\'s important — usually omitted.'},
+     remember:{pl:'„by + wykonawca” tylko gdy to ważna informacja — zwykle pomijamy.',en:'"by + agent" only when it\'s important — usually omitted.'},
      quiz:[{q:{pl:'This bridge ___ in 1880.',en:'This bridge ___ in 1880.'},opts:[{pl:'built',en:'built'},{pl:'was built',en:'was built'},{pl:'is built',en:'is built'}],a:1,why:{pl:'Przeszłość + strona bierna → was + 3. forma.',en:'Past + passive → was + past participle.'}}]},
     {sec:{pl:'Modalne',en:'Modal Verbs'},t:{pl:'Can / Could / Be able to',en:'Can / Could / Be able to'},
      d:{pl:'Zdolność i uprzejme prośby. Can — teraz, could — przeszłość lub grzeczność, be able to — gdzie can nie działa.',en:'Ability and polite requests. Can — now, could — past or politeness, be able to — where can doesn\'t work.'},
@@ -933,8 +942,8 @@ var TOPICS=[
      ex:['I can swim very fast. — (present ability)','Could you open the window? — (polite request)','She could speak French as a child. — (past ability)','I\'ll be able to help you tomorrow. — (after will)'],
      mistakes:[
       {bad:'I can to swim.',good:'I can swim.',why:{pl:'Po modalnych bezokolicznik BEZ to.',en:'After modals, bare infinitive WITHOUT to.'}},
-      {bad:'I will can help you.',good:'I\'ll be able to help you.',why:{pl:'„Will can” nie istnieje — użyj be able to.',en:'„Will can” doesn\'t exist — use be able to.'}}],
-     remember:{pl:'Po modalnym nigdy „to”. Przyszłość zdolności → be able to.',en:'Never „to” after a modal. Future ability → be able to.'},
+      {bad:'I will can help you.',good:'I\'ll be able to help you.',why:{pl:'„Will can” nie istnieje — użyj be able to.',en:'"Will can" doesn\'t exist — use be able to.'}}],
+     remember:{pl:'Po modalnym nigdy „to”. Przyszłość zdolności → be able to.',en:'Never "to" after a modal. Future ability → be able to.'},
      quiz:[{q:{pl:'I hope I ___ speak English fluently one day.',en:'I hope I ___ speak English fluently one day.'},opts:[{pl:'will can',en:'will can'},{pl:'\'ll be able to',en:'\'ll be able to'},{pl:'can to',en:'can to'}],a:1,why:{pl:'Po will nie ma can — używamy be able to.',en:'There\'s no can after will — we use be able to.'}}]},
     {t:{pl:'Should / Shouldn\'t',en:'Should / Shouldn\'t'},
      d:{pl:'Rada, rekomendacja lub umiarkowany obowiązek. Synonim: ought to (bardziej formalne).',en:'Advice, recommendation or mild obligation. Synonym: ought to (more formal).'},
@@ -945,33 +954,33 @@ var TOPICS=[
       {pl:'oczekiwanie — The train should arrive soon.',en:'expectation — The train should arrive soon.'}],
      ex:['You should see a doctor. — (advice / rada)','He shouldn\'t eat so much sugar.','Should I call her? — (asking for advice)','You ought to apologize. — (ought to = should)'],
      mistakes:[
-      {bad:'You should to see a doctor.',good:'You should see a doctor.',why:{pl:'Po should bez „to” (ale: ought TO).',en:'No „to” after should (but: ought TO).'}}],
+      {bad:'You should to see a doctor.',good:'You should see a doctor.',why:{pl:'Po should bez „to” (ale: ought TO).',en:'No "to" after should (but: ought TO).'}}],
      compare:[
-      {h:{pl:'Should',en:'Should'},ex:'You should rest.',note:{pl:'rada — dobra byłoby, ale nie musisz',en:'advice — it would be good, but you don\'t have to'}},
+      {h:{pl:'Should',en:'Should'},ex:'You should rest.',note:{pl:'rada — dobrze byłoby, ale nie musisz',en:'advice — it would be good, but you don\'t have to'}},
       {h:{pl:'Must',en:'Must'},ex:'You must rest — doctor\'s orders.',note:{pl:'silny nakaz — nie masz wyboru',en:'strong necessity — no choice'}}],
      remember:{pl:'Should = „powinieneś” (rada). Must = „musisz” (nakaz).',en:'Should = advice. Must = strong obligation.'},
      quiz:[{q:{pl:'You look tired. You ___ go to bed earlier.',en:'You look tired. You ___ go to bed earlier.'},opts:[{pl:'should',en:'should'},{pl:'should to',en:'should to'},{pl:'must to',en:'must to'}],a:0,why:{pl:'Rada → should + bezokolicznik bez to.',en:'Advice → should + bare infinitive.'}}]},
     {t:{pl:'Must / Have to / Don\'t have to',en:'Must / Have to / Don\'t have to'},
-     d:{pl:'Silny obowiązek i jego przeciwieństwa. Uwaga: przeciwieństwo must NIE znaczy „nie wolno”!',en:'Strong obligation and its opposites. Careful: the opposite of must does NOT mean „forbidden”!'},
+     d:{pl:'Silny obowiązek i jego przeciwieństwa. Uwaga: przeciwieństwo must NIE znaczy „nie wolno”!',en:'Strong obligation and its opposites. Careful: the opposite of must does NOT mean "forbidden"!'},
      form:{pl:'must/have to + bezokolicznik; przeczenia: mustn\'t (zakaz) i don\'t have to (brak obowiązku)',en:'must/have to + bare infinitive; negatives: mustn\'t (prohibition) and don\'t have to (no obligation)'},
      when:[
-      {pl:'wewnętrzny nakaz — I must call mum, it\'s her birthday.',en:'internal necessity — I must call mum, it\'s her birthday.'},
+      {pl:'wewnętrzny nakaz — I must call Mum, it\'s her birthday.',en:'internal necessity — I must call Mum, it\'s her birthday.'},
       {pl:'zewnętrzny obowiązek (przepisy, praca) — I have to wear a uniform at work.',en:'external obligation (rules, work) — I have to wear a uniform at work.'},
       {pl:'brak obowiązku — You don\'t have to come if you\'re tired.',en:'no obligation — You don\'t have to come if you\'re tired.'},
       {pl:'zakaz — You mustn\'t smoke here.',en:'prohibition — You mustn\'t smoke here.'}],
-     ex:['I must call mum — it\'s her birthday. — (internal must)','I have to work on Saturdays. — (external obligation)','You don\'t have to wear a tie. — (no obligation)','You mustn\'t smoke here. — (prohibition)'],
+     ex:['I must call Mum — it\'s her birthday (internal must)','I have to work on Saturdays. — (external obligation)','You don\'t have to wear a tie. — (no obligation)','You mustn\'t smoke here. — (prohibition)'],
      mistakes:[
-      {bad:'You don\'t have to smoke here. (= nie wolno)',good:'You mustn\'t smoke here.',why:{pl:'Zakaz → mustn\'t. Don\'t have to znaczy tylko „nie musisz”.',en:'Prohibition → mustn\'t. Don\'t have to only means „you don\'t need to”.'}}],
+      {bad:'You don\'t have to smoke here. (= not allowed)',good:'You mustn\'t smoke here.',why:{pl:'Zakaz → mustn\'t. Don\'t have to znaczy tylko „nie musisz”.',en:'Prohibition → mustn\'t. Don\'t have to only means "you don\'t need to".'}}],
      compare:[
       {h:{pl:'Mustn\'t',en:'Mustn\'t'},ex:'You mustn\'t be late.',note:{pl:'ZAKAZ — nie wolno ci',en:'PROHIBITION — you are not allowed'}},
       {h:{pl:'Don\'t have to',en:'Don\'t have to'},ex:'You don\'t have to come early.',note:{pl:'BRAK OBOWIĄZKU — możesz, ale nie musisz',en:'NO OBLIGATION — you can, but you don\'t need to'}}],
      remember:{pl:'KLUCZ: don\'t have to = nie musisz (możesz). mustn\'t = nie wolno (zakaz).',en:'KEY: don\'t have to = no need (you may). mustn\'t = not allowed (ban).'},
      quiz:[{q:{pl:'It\'s free! You ___ pay anything.',en:'It\'s free! You ___ pay anything.'},opts:[{pl:'mustn\'t',en:'mustn\'t'},{pl:'don\'t have to',en:'don\'t have to'},{pl:'don\'t must',en:'don\'t must'}],a:1,why:{pl:'Brak obowiązku (nie musisz płacić) → don\'t have to.',en:'No obligation (no need to pay) → don\'t have to.'}}]},
     {t:{pl:'Might / May',en:'Might / May'},
-     d:{pl:'Możliwość ok. 50% lub mniej — „może tak, może nie”. Might jest nieco mniej pewne niż may.',en:'About 50% possibility or less — „maybe yes, maybe no”. Might is slightly less certain than may.'},
+     d:{pl:'Możliwość ok. 50% lub mniej — „może tak, może nie”. Might jest nieco mniej pewne niż may.',en:'About 50% possibility or less — "maybe yes, maybe no". Might is slightly less certain than may.'},
      form:{pl:'might/may + bezokolicznik; przeczenie: might not, may not',en:'might/may + bare infinitive; negatives: might not, may not'},
      when:[
-      {pl:'niepewna przewidywalność — It might rain later.',en:'uncertain prediction — It might rain later.'},
+      {pl:'niepewna prognoza — It might rain later.',en:'uncertain prediction — It might rain later.'},
       {pl:'niepewność o fakcie — She may not be at home.',en:'uncertainty about a fact — She may not be at home.'},
       {pl:'ostrożna sugestia — Take an umbrella, it might rain.',en:'cautious suggestion — Take an umbrella, it might rain.'},
       {pl:'grzeczna prośba (may) — May I come in?',en:'polite request (may) — May I come in?'}],
@@ -982,9 +991,9 @@ var TOPICS=[
       {h:{pl:'Will',en:'Will'},ex:'It will rain tomorrow.',note:{pl:'pewność ~100%',en:'certainty ~100%'}},
       {h:{pl:'Might / May',en:'Might / May'},ex:'It might rain tomorrow.',note:{pl:'możliwość ~50%',en:'possibility ~50%'}}],
      remember:{pl:'Skala pewności: will (100%) > should (90%) > may/might (50%) > could (30%).',en:'Certainty scale: will (100%) > should (90%) > may/might (50%) > could (30%).'},
-     quiz:[{q:{pl:'I\'m not sure — I ___ go to the party.',en:'I\'m not sure — I ___ go to the party.'},opts:[{pl:'might',en:'might'},{pl:'will',en:'will'},{pl:'must',en:'must'}],a:0,why:{pl:'„I\'m not sure” → niepewność ~50% → might.',en:'„I\'m not sure” → ~50% uncertainty → might.'}}]},
+     quiz:[{q:{pl:'I\'m not sure — I ___ go to the party.',en:'I\'m not sure — I ___ go to the party.'},opts:[{pl:'might',en:'might'},{pl:'will',en:'will'},{pl:'must',en:'must'}],a:0,why:{pl:'„I\'m not sure” → niepewność ~50% → might.',en:'"I\'m not sure" → ~50% uncertainty → might.'}}]},
     {sec:{pl:'Inne struktury',en:'Other Structures'},t:{pl:'Reported Speech — podstawy',en:'Reported Speech — basics'},
-     d:{pl:'Relacjonowanie czyjejś wypowiedzi — „on powiedział, że…”. Czasy cofają się o krok wstecz.',en:'Reporting what someone said — „he said that…”. Tenses shift one step back.'},
+     d:{pl:'Relacjonowanie czyjejś wypowiedzi — „on powiedział, że…”. Czasy cofają się o krok wstecz.',en:'Reporting what someone said — "he said that…". Tenses shift one step back.'},
      form:{pl:'said / told + osoba + (that) + zdanie z cofniętym czasem',en:'said / told + person + (that) + sentence with a backshifted tense'},
      when:[
       {pl:'relacjonowanie wypowiedzi — He said (that) he was tired.',en:'reporting a statement — He said (that) he was tired.'},
@@ -1014,7 +1023,7 @@ var TOPICS=[
       {h:{pl:'Defining (bez przecinków)',en:'Defining (no commas)'},ex:'The students who passed got certificates.',note:{pl:'tylko CI, którzy zdali — klauzula zawęża',en:'only THOSE who passed — the clause narrows it down'}},
       {h:{pl:'Non-defining (z przecinkami)',en:'Non-defining (commas)'},ex:'My students, who passed, got certificates.',note:{pl:'wszyscy zdali — klauzula tylko dopowiada',en:'all of them passed — the clause just adds info'}}],
      remember:{pl:'Who = ludzie, which = rzeczy, that = oba (defining). W defining można pominąć that/which, gdy to obiekt: The book (that) I read.',en:'Who = people, which = things, that = both (defining). In defining clauses you can drop that/which when it\'s the object: The book (that) I read.'},
-     quiz:[{q:{pl:'That\'s the girl ___ brother is my friend.',en:'That\'s the girl ___ brother is my friend.'},opts:[{pl:'who',en:'who'},{pl:'whose',en:'whose'},{pl:'which',en:'which'}],a:1,why:{pl:'„Jej brat” → dzierżawcze whose.',en:'„Her brother” → possessive whose.'}}]},
+     quiz:[{q:{pl:'That\'s the girl ___ brother is my friend.',en:'That\'s the girl ___ brother is my friend.'},opts:[{pl:'who',en:'who'},{pl:'whose',en:'whose'},{pl:'which',en:'which'}],a:1,why:{pl:'„Jej brat” → dzierżawcze whose.',en:'"Her brother" → possessive whose.'}}]},
     {t:{pl:'Gerund vs Infinitive (podstawy)',en:'Gerund vs Infinitive (basics)'},
      d:{pl:'Po niektórych czasownikach zawsze -ing, po innych zawsze to + czasownik. To trzeba po prostu zapamiętać w parach.',en:'Some verbs are always followed by -ing, others by to + verb. These simply need to be memorised in pairs.'},
      form:{pl:'gerund: enjoy, finish, mind, avoid, suggest + -ing | infinitive: want, decide, hope, plan, manage + to + verb',en:'gerund: enjoy, finish, mind, avoid, suggest + -ing | infinitive: want, decide, hope, plan, manage + to + verb'},
@@ -1029,10 +1038,10 @@ var TOPICS=[
      compare:[
       {h:{pl:'stop + -ing',en:'stop + -ing'},ex:'I stopped smoking.',note:{pl:'przestałem palić — koniec czynności',en:'I quit smoking — the activity ended'}},
       {h:{pl:'stop + to + verb',en:'stop + to + verb'},ex:'I stopped to smoke.',note:{pl:'zatrzymałem się, ŻEBY zapalić',en:'I paused IN ORDER TO smoke'}}],
-     remember:{pl:'Uwaga na zmianę sensu: stop/remember/try + -ing znaczy co innego niż + to.',en:'Watch meaning changes: stop/remember/try + -ing mean something different than + to.'},
+     remember:{pl:'Uwaga na zmianę sensu: stop/remember/try + -ing znaczy co innego niż + to.',en:'Watch meaning changes: stop/remember/try + -ing mean something different from + to.'},
      quiz:[{q:{pl:'I really enjoy ___ books.',en:'I really enjoy ___ books.'},opts:[{pl:'reading',en:'reading'},{pl:'to read',en:'to read'},{pl:'read',en:'read'}],a:0,why:{pl:'Po enjoy zawsze forma -ing.',en:'After enjoy, always the -ing form.'}}]},
     {sec:{pl:'Praktyczne podstawy',en:'Practical Basics'},t:{pl:'Przedimki: a / an / the',en:'Articles: a / an / the'},
-     d:{pl:'Najczęstszy błąd Polaków! a/an = „jakiś” (pierwszy raz, niesprecyzowane). the = „ten konkretny” (znany obu stronom).',en:'The most common Polish speaker mistake! a/an = „some” (first mention, unspecific). the = „this particular one” (known to both sides).'},
+     d:{pl:'Najczęstszy błąd Polaków! a/an = „jakiś” (pierwszy raz, niesprecyzowane). the = „ten konkretny” (znany obu stronom).',en:'The most common mistake Polish learners make! a/an = "some" (first mention, unspecific). the = "this particular one" (known to both sides).'},
      form:{pl:'a + spółgłoska (a book), an + samogłoska (an apple), the + znane/unikalne (the sun, the book I bought)',en:'a + consonant (a book), an + vowel (an apple), the + known/unique (the sun, the book I bought)'},
      when:[
       {pl:'pierwsza wzmianka / cokolwiek — I saw a dog.',en:'first mention / any — I saw a dog.'},
@@ -1041,15 +1050,15 @@ var TOPICS=[
       {pl:'bez przedimka: posiłki, języki, większość krajów — I have lunch at 1. I speak Polish.',en:'no article: meals, languages, most countries — I have lunch at 1. I speak Polish.'}],
      ex:['I saw a dog. The dog was huge. — (a → the)','She\'s an engineer. — (profession → a/an)','The sun is shining. — (unique thing)','I love music. — (general — no article)'],
      mistakes:[
-      {bad:'I am the student.',good:'I am a student.',why:{pl:'Mówisz o sobie jako o „kimś z grupy” → a, nie the.',en:'You describe yourself as „one of a group” → a, not the.'}},
-      {bad:'I go to the school to learn. (ogólnie)',good:'I go to school.',why:{pl:'Instytucje używane „celowo” (school, bed, work, church) → bez the.',en:'Institutions used for their purpose (school, bed, work, church) → no the.'}}],
+      {bad:'I am the student.',good:'I am a student.',why:{pl:'Mówisz o sobie jako o „kimś z grupy” → a, nie the.',en:'You describe yourself as "one of a group" → a, not the.'}},
+      {bad:'I go to the school to learn. (general meaning)',good:'I go to school.',why:{pl:'Instytucje używane „celowo” (school, bed, work, church) → bez the.',en:'Institutions used for their purpose (school, bed, work, church) → no the.'}}],
      compare:[
       {h:{pl:'a/an',en:'a/an'},ex:'I need a pen.',note:{pl:'jakikolwiek długopis — pierwszy raz, niesprecyzowane',en:'any pen — first mention, unspecific'}},
-      {h:{pl:'the',en:'the'},ex:'The pen you gave me is great.',note:{pl:'ten konkretny — oboje wiemy o który',en:'that specific one — we both know which'}}],
-     remember:{pl:'Pytanie-test: „czy słuchacz wie, o który chodzi?” TAK → the. NIE → a/an. Ogólnie w l.mn. → bez przedimka.',en:'Test question: „does the listener know which one?” YES → the. NO → a/an. General plural → no article.'},
+      {h:{pl:'the',en:'the'},ex:'The pen you gave me is great.',note:{pl:'ten konkretny — oboje wiemy, o który',en:'that specific one — we both know which'}}],
+     remember:{pl:'Pytanie-test: „czy słuchacz wie, o który chodzi?” TAK → the. NIE → a/an. Ogólnie w l.mn. → bez przedimka.',en:'Test question: "does the listener know which one?" YES → the. NO → a/an. General plural → no article.'},
      quiz:[{q:{pl:'I bought ___ book yesterday. ___ book is amazing!',en:'I bought ___ book yesterday. ___ book is amazing!'},opts:[{pl:'a … The',en:'a … The'},{pl:'the … A',en:'the … A'},{pl:'a … A',en:'a … A'}],a:0,why:{pl:'Pierwsza wzmianka → a; druga (już znamy) → the.',en:'First mention → a; second (already known) → the.'}}]},
     {t:{pl:'Przyimki czasu: in / on / at',en:'Prepositions of Time: in / on / at'},
-     d:{pl:'Trzy poziomy „zegara”: at = godzina (punkt), on = dzień, in = okres dłuższy niż dzień.',en:'Three „clock” levels: at = clock time (a point), on = a day, in = a period longer than a day.'},
+     d:{pl:'Trzy poziomy „zegara”: at = godzina (punkt), on = dzień, in = okres dłuższy niż dzień.',en:'Three "clock" levels: at = clock time (a point), on = a day, in = a period longer than a day.'},
      form:{pl:'at + godzina (at 7:30) | on + dzień/data (on Monday, on 5 May) | in + miesiąc/rok/pora (in July, in 2024, in the morning)',en:'at + clock time (at 7:30) | on + day/date (on Monday, on 5 May) | in + month/year/season (in July, in 2024, in the morning)'},
      when:[
       {pl:'at — godziny, night, noon — at 8 o\'clock, at night.',en:'at — clock times, night, noon — at 8 o\'clock, at night.'},
@@ -1076,8 +1085,8 @@ var TOPICS=[
       {pl:'kontrast z teraz — I used to hate coffee — now I love it.',en:'contrast with now — I used to hate coffee — now I love it.'}],
      ex:['I used to play football every weekend. — (habit in the past)','Did you use to live in Warsaw? — (question)','She didn\'t use to like spicy food. — (negative)'],
      mistakes:[
-      {bad:'I use to play tennis. (o przeszłości)',good:'I used to play tennis.',why:{pl:'W twierdzeniach zawsze used to (z „d”).',en:'In statements always used to (with „d”).'}},
-      {bad:'I\'m used to wake up early.',good:'I\'m used to waking up early.',why:{pl:'be used to + -ing = „jestem przyzwyczajony” — inna struktura!',en:'be used to + -ing = „I\'m accustomed to” — a different structure!'}}],
+      {bad:'I use to play tennis. (about the past)',good:'I used to play tennis.',why:{pl:'W twierdzeniach zawsze used to (z „d”).',en:'In statements always used to (with "d").'}},
+      {bad:'I\'m used to wake up early.',good:'I\'m used to waking up early.',why:{pl:'be used to + -ing = „jestem przyzwyczajony” — inna struktura!',en:'be used to + -ing = "I\'m accustomed to" — a different structure!'}}],
      compare:[
       {h:{pl:'used to + verb',en:'used to + verb'},ex:'I used to drink coffee.',note:{pl:'KIEDYŚ piłem — już nie',en:'I USED TO drink it — not anymore'}},
       {h:{pl:'be used to + -ing',en:'be used to + -ing'},ex:'I\'m used to drinking coffee.',note:{pl:'JESTEM przyzwyczajony do picia',en:'I\'m ACCUSTOMED to drinking it'}}],
@@ -1085,7 +1094,7 @@ var TOPICS=[
      quiz:[{q:{pl:'I ___ play the piano, but I stopped years ago.',en:'I ___ play the piano, but I stopped years ago.'},opts:[{pl:'used to',en:'used to'},{pl:'use to',en:'use to'},{pl:'am used to',en:'am used to'}],a:0,why:{pl:'Dawny zwyczaj, którego już nie ma → used to.',en:'A past habit that\'s over → used to.'}}]}
    ],
    b2:[
-    {sec:{pl:'Zaawansowane tryby warunkowe',en:'Advanced Conditionals'},t:{pl:'Conditional 3 — Third',en:'Third Conditional'},
+    {sec:{pl:'Zaawansowane tryby warunkowe',en:'Advanced Conditionals'},t:{pl:'Trzeci tryb warunkowy',en:'Third Conditional'},
      d:{pl:'Żal za niespełnionym warunkiem w PRZESZŁOŚCI — stało się, nie da się zmienić.',en:'Regret about an unfulfilled PAST condition — it happened, it can\'t be changed.'},
      form:{pl:'If + Past Perfect, … would have + 3. forma',en:'If + Past Perfect, … would have + past participle'},
      when:[
@@ -1102,7 +1111,7 @@ var TOPICS=[
      remember:{pl:'Formuła: If I had done X, I would have done Y. Oba dotyczą przeszłości.',en:'Formula: If I had done X, I would have done Y. Both clauses refer to the past.'},
      quiz:[{q:{pl:'If we ___ earlier, we wouldn\'t have missed the flight.',en:'If we ___ earlier, we wouldn\'t have missed the flight.'},opts:[{pl:'had left',en:'had left'},{pl:'left',en:'left'},{pl:'would have left',en:'would have left'}],a:0,why:{pl:'Po if → Past Perfect (had left).',en:'After if → Past Perfect (had left).'}}]},
     {t:{pl:'Mixed Conditional',en:'Mixed Conditional'},
-     d:{pl:'Mieszanka: PRZESZŁA przyczyna → TERAŹNIEJSZY skutek. Najczęstszy typ: „gdybym wtedy…, to teraz…”.',en:'A mix: PAST cause → PRESENT result. The most common type: „if I had then…, I would now…”.'},
+     d:{pl:'Mieszanka: PRZESZŁA przyczyna → TERAŹNIEJSZY skutek. Najczęstszy typ: „gdybym wtedy…, to teraz…”.',en:'A mix: PAST cause → PRESENT result. The most common type: "if I had then…, I would now…".'},
      form:{pl:'If + Past Perfect (przeszłość), … would + bezokolicznik (teraz)',en:'If + Past Perfect (past), … would + bare infinitive (now)'},
      when:[
       {pl:'przeszła decyzja → dziś inaczej — If I had taken that job, I would be rich now.',en:'past decision → different today — If I had taken that job, I would be rich now.'},
@@ -1113,8 +1122,8 @@ var TOPICS=[
      compare:[
       {h:{pl:'Third Conditional',en:'Third Conditional'},ex:'If I had taken the job, I would have become rich.',note:{pl:'skutek też w przeszłości',en:'the result is also past'}},
       {h:{pl:'Mixed Conditional',en:'Mixed Conditional'},ex:'If I had taken the job, I would be rich now.',note:{pl:'przeszła przyczyna → skutek TERAZ',en:'past cause → result NOW'}}],
-     remember:{pl:'Mixed = przeszłe „if” (had + 3. forma) + teraźniejszy skutek (would + infinitive). Słowo-klucz: now/today.',en:'Mixed = past „if” (had + pp) + present result (would + inf). Key word: now/today.'},
-     quiz:[{q:{pl:'If I had learned English earlier, I ___ fluent now.',en:'If I had learned English earlier, I ___ fluent now.'},opts:[{pl:'would be',en:'would be'},{pl:'would have been',en:'would have been'},{pl:'will be',en:'will be'}],a:0,why:{pl:'„now” → skutek teraźniejszy → would be.',en:'„now” → present result → would be.'}}]},
+     remember:{pl:'Mixed = przeszłe „if” (had + 3. forma) + teraźniejszy skutek (would + infinitive). Słowo-klucz: now/today.',en:'Mixed = past "if" (had + pp) + present result (would + inf). Key word: now/today.'},
+     quiz:[{q:{pl:'If I had learned English earlier, I ___ fluent now.',en:'If I had learned English earlier, I ___ fluent now.'},opts:[{pl:'would be',en:'would be'},{pl:'would have been',en:'would have been'},{pl:'will be',en:'will be'}],a:0,why:{pl:'„now” → skutek teraźniejszy → would be.',en:'"now" → present result → would be.'}}]},
     {t:{pl:'Wish / If only / I\'d rather',en:'Wish / If only / I\'d rather'},
      d:{pl:'Wyrażanie żalu i życzeń. Wish + Past Simple = żal o TERAZ. Wish + Past Perfect = żal o PRZESZŁOŚCI.',en:'Expressing regrets and wishes. Wish + Past Simple = regret about NOW. Wish + Past Perfect = regret about the PAST.'},
      form:{pl:'wish + Past Simple (I wish I knew) | wish + Past Perfect (I wish I had known) | wish + would (I wish you would stop)',en:'wish + Past Simple (I wish I knew) | wish + Past Perfect (I wish I had known) | wish + would (I wish you would stop)'},
@@ -1134,8 +1143,8 @@ var TOPICS=[
      remember:{pl:'Wish działa jak tryb warunkowy: teraz → Past Simple, przeszłość → Past Perfect. If only = mocniejsze.',en:'Wish works like conditionals: present → Past Simple, past → Past Perfect. If only = stronger.'},
      quiz:[{q:{pl:'I wish I ___ more attention at school. (żal za przeszłością)',en:'I wish I ___ more attention at school. (past regret)'},opts:[{pl:'had paid',en:'had paid'},{pl:'paid',en:'paid'},{pl:'would pay',en:'would pay'}],a:0,why:{pl:'Żal o przeszłości → Past Perfect (had paid).',en:'Regret about the past → Past Perfect (had paid).'}}]},
     {sec:{pl:'Zaawansowana strona bierna',en:'Advanced Passive'},t:{pl:'Passive Voice — wszystkie czasy',en:'Passive Voice — all tenses'},
-     d:{pl:'Strona bierna we wszystkich czasach. Formuła: odpowiednia forma „be” + 3. forma (past participle).',en:'Passive voice in all tenses. Formula: the correct form of „be” + past participle.'},
-     form:{pl:'be + 3. forma; czas kryje się w „be”: is done / was done / has been done / is being done / will be done / should be done',en:'be + past participle; the tense hides in „be”: is done / was done / has been done / is being done / will be done / should be done'},
+     d:{pl:'Strona bierna we wszystkich czasach. Formuła: odpowiednia forma „be” + 3. forma (past participle).',en:'Passive voice in all tenses. Formula: the correct form of "be" + past participle.'},
+     form:{pl:'be + 3. forma; czas kryje się w „be”: is done / was done / has been done / is being done / will be done / should be done',en:'be + past participle; the tense hides in "be": is done / was done / has been done / is being done / will be done / should be done'},
      when:[
       {pl:'Present Simple — The office is cleaned daily.',en:'Present Simple — The office is cleaned daily.'},
       {pl:'Present Perfect — The report has been written.',en:'Present Perfect — The report has been written.'},
@@ -1145,11 +1154,11 @@ var TOPICS=[
      ex:['The report has been written. — (Present Perfect Passive)','The bridge will be repaired next year. — (Future Passive)','The house is being painted. — (Present Continuous Passive)','It should be done by Friday. — (Modal Passive)'],
      mistakes:[
       {bad:'The house is being paint.',good:'The house is being painted.',why:{pl:'Zawsze 3. forma (painted), nigdy bezokolicznik.',en:'Always past participle (painted), never the infinitive.'}},
-      {bad:'It should been done.',good:'It should be done.',why:{pl:'Po modalu → be + 3. forma (bez „been”).',en:'After a modal → be + pp (no „been”).'}}],
+      {bad:'It should been done.',good:'It should be done.',why:{pl:'Po modalu → be + 3. forma (bez „been”).',en:'After a modal → be + pp (no "been").'}}],
      compare:[
       {h:{pl:'is being done',en:'is being done'},ex:'The road is being repaired.',note:{pl:'dzieje się TERAZ — trwa',en:'happening NOW — in progress'}},
       {h:{pl:'has been done',en:'has been done'},ex:'The road has been repaired.',note:{pl:'już ZROBIONE — efekt widoczny',en:'already DONE — visible result'}}],
-     remember:{pl:'Czas siedzi w „be”, nie w czasowniku głównym — ten zawsze jest w 3. formie.',en:'The tense lives in „be”, not in the main verb — that one is always the past participle.'},
+     remember:{pl:'Czas siedzi w „be”, nie w czasowniku głównym — ten zawsze jest w 3. formie.',en:'The tense lives in "be", not in the main verb — that one is always the past participle.'},
      quiz:[{q:{pl:'The documents ___ yesterday. (Past Simple Passive)',en:'The documents ___ yesterday. (Past Simple Passive)'},opts:[{pl:'were sent',en:'were sent'},{pl:'was sent',en:'was sent'},{pl:'are sent',en:'are sent'}],a:0,why:{pl:'L. mn. + przeszłość → were sent.',en:'Plural + past → were sent.'}}]},
     {t:{pl:'Causative: have / get sth done',en:'Causative: have / get sth done'},
      d:{pl:'Zlecamy czynność komuś innemu — TY nie robisz, ktoś robi dla ciebie. have/get + obiekt + 3. forma.',en:'We arrange for someone else to do something — YOU don\'t do it. have/get + object + past participle.'},
@@ -1160,15 +1169,15 @@ var TOPICS=[
       {pl:'potrzeba zlecenia — We need to get the boiler fixed.',en:'the need to outsource — We need to get the boiler fixed.'}],
      ex:['I had my car repaired. — (someone repaired it for me)','She\'s getting her hair cut tomorrow. — (appointment)','We need to get the boiler fixed. — (need someone to fix)','Have you had your eyes tested recently?'],
      mistakes:[
-      {bad:'I repaired my car yesterday. (gdy mechanik to zrobił)',good:'I had my car repaired yesterday.',why:{pl:'Jeśli zleciłeś komuś — causative, nie zwykły Past Simple.',en:'If you outsourced it — causative, not plain Past Simple.'}},
+      {bad:'I repaired my car yesterday. (when a mechanic did it)',good:'I had my car repaired yesterday.',why:{pl:'Jeśli zleciłeś komuś — causative, nie zwykły Past Simple.',en:'If you outsourced it — causative, not plain Past Simple.'}},
       {bad:'I had repaired my car. (o zleceniu)',good:'I had my car repaired.',why:{pl:'Kolejność: had + OBIEKT + 3. forma.',en:'Order: had + OBJECT + past participle.'}}],
      compare:[
       {h:{pl:'have sth done',en:'have sth done'},ex:'I had the documents checked.',note:{pl:'neutralne / bardziej formalne',en:'neutral / more formal'}},
-      {h:{pl:'get sth done',en:'get sth done'},ex:'I got the documents checked.',note:{pl:'potoczne, „załatwiłem”',en:'informal, „I got it sorted”'}}],
+      {h:{pl:'get sth done',en:'get sth done'},ex:'I got the documents checked.',note:{pl:'potoczne, „załatwiłem”',en:'informal, "I got it sorted"'}}],
      remember:{pl:'Have sth done = bardziej formalne. Get sth done = potoczne. W obu TY nie robisz — ktoś inny robi dla ciebie.',en:'Have sth done = more formal. Get sth done = more informal. In both cases YOU don\'t do it — someone does it for you.'},
      quiz:[{q:{pl:'I ___ at the dentist\'s yesterday.',en:'I ___ at the dentist\'s yesterday.'},opts:[{pl:'had my tooth filled',en:'had my tooth filled'},{pl:'filled my tooth',en:'filled my tooth'},{pl:'had filled my tooth',en:'had filled my tooth'}],a:0,why:{pl:'Dentysta zrobił to za mnie → had + obiekt + 3. forma.',en:'The dentist did it for me → had + object + past participle.'}}]},
     {sec:{pl:'Zaawansowana gramatyka',en:'Advanced Grammar'},t:{pl:'Non-defining Relative Clauses',en:'Non-defining Relative Clauses'},
-     d:{pl:'Dodatkowa informacja w przecinkach — NIE ogranicza sensu zdania głównego. Zawsze przecinki, nigdy „that”.',en:'Extra information in commas — it does NOT restrict the main clause. Always commas, never „that”.'},
+     d:{pl:'Dodatkowa informacja w przecinkach — NIE ogranicza sensu zdania głównego. Zawsze przecinki, nigdy „that”.',en:'Extra information in commas — it does NOT restrict the main clause. Always commas, never "that".'},
      form:{pl:'podmiot, who/which/whose + klauzula, + reszta zdania: My brother, who lives in Gdańsk, is a doctor.',en:'subject, who/which/whose + clause, + rest of sentence: My brother, who lives in Gdańsk, is a doctor.'},
      when:[
       {pl:'dodatkowa info o osobie — My brother, who lives in Gdańsk, is a doctor.',en:'extra info about a person — My brother, who lives in Gdańsk, is a doctor.'},
@@ -1176,16 +1185,16 @@ var TOPICS=[
       {pl:'komentarz do całego zdania — She gave me a lift, which was very kind of her.',en:'comment on the whole sentence — She gave me a lift, which was very kind of her.'}],
      ex:['My brother, who lives in Gdańsk, is a doctor. — (extra info)','The Eiffel Tower, which was built in 1889, is iconic.','She gave me a lift, which was very kind of her. — (which = the whole action)'],
      mistakes:[
-      {bad:'My brother, that lives in Gdańsk, is a doctor.',good:'My brother, who lives in Gdańsk, is a doctor.',why:{pl:'W non-defining nigdy „that” — tylko who/which.',en:'In non-defining clauses never „that” — only who/which.'}},
-      {bad:'My brother who lives in Gdańsk is a doctor. (o jedynym bracie)',good:'My brother, who lives in Gdańsk, is a doctor.',why:{pl:'Bez przecinków brzmi, jakbyś miał kilku braci.',en:'Without commas it sounds like you have several brothers.'}}],
+      {bad:'My brother, that lives in Gdańsk, is a doctor.',good:'My brother, who lives in Gdańsk, is a doctor.',why:{pl:'W non-defining nigdy „that” — tylko who/which.',en:'In non-defining clauses never "that" — only who/which.'}},
+      {bad:'My brother who lives in Gdańsk is a doctor. (about an only brother)',good:'My brother, who lives in Gdańsk, is a doctor.',why:{pl:'Bez przecinków brzmi, jakbyś miał kilku braci.',en:'Without commas it sounds like you have several brothers.'}}],
      compare:[
       {h:{pl:'defining (bez przecinków)',en:'defining (no commas)'},ex:'The students who passed were happy.',note:{pl:'tylko CI, którzy zdali — ogranicza grupę',en:'only THOSE who passed — restricts the group'}},
       {h:{pl:'non-defining (z przecinkami)',en:'non-defining (with commas)'},ex:'The students, who passed, were happy.',note:{pl:'wszyscy zdali — dodatkowa informacja',en:'all of them passed — extra information'}}],
      remember:{pl:'Usuń klauzulę nieograniczającą → zdanie nadal ma pełny sens. Usuń ograniczającą (defining) → zdanie traci sens.',en:'Remove a non-defining clause → the sentence still makes full sense. Remove a defining clause → it loses its meaning.'},
      quiz:[{q:{pl:'My house, ___ is over 100 years old, needs renovation.',en:'My house, ___ is over 100 years old, needs renovation.'},opts:[{pl:'which',en:'which'},{pl:'that',en:'that'},{pl:'who',en:'who'}],a:0,why:{pl:'Non-defining + rzecz → which (nigdy that).',en:'Non-defining + thing → which (never that).'}}]},
     {t:{pl:'Inversion for Emphasis',en:'Inversion for Emphasis'},
-     d:{pl:'Inwersja podmiot-orzeczenie dla wzmocnienia lub w stylu formalnym. Triggery: Never, Not only, Rarely, Seldom, Hardly, No sooner.',en:'Subject-verb inversion for emphasis or formal style. Triggers: Never, Not only, Rarely, Seldom, Hardly, No sooner.'},
-     form:{pl:'trigger + POMOCNIK + podmiot + reszta: Never have I seen… / Not only did he lie…',en:'trigger + AUXILIARY + subject + rest: Never have I seen… / Not only did he lie…'},
+     d:{pl:'Inwersja podmiot-orzeczenie dla wzmocnienia lub w stylu formalnym. Słowa sygnałowe: Never, Not only, Rarely, Seldom, Hardly, No sooner.',en:'Subject-verb inversion for emphasis or formal style. Triggers: Never, Not only, Rarely, Seldom, Hardly, No sooner.'},
+     form:{pl:'słowo sygnałowe + POMOCNIK + podmiot + reszta: Never have I seen… / Not only did he lie…',en:'trigger + AUXILIARY + subject + rest: Never have I seen… / Not only did he lie…'},
      when:[
       {pl:'wzmocnienie emocji — Never have I seen such a mess!',en:'emotional emphasis — Never have I seen such a mess!'},
       {pl:'styl formalny (eseje) — Rarely does she make mistakes.',en:'formal style (essays) — Rarely does she make mistakes.'},
@@ -1193,7 +1202,7 @@ var TOPICS=[
       {pl:'Hardly/No sooner + Past Perfect — No sooner had I left than it started raining.',en:'Hardly/No sooner + Past Perfect — No sooner had I left than it started raining.'}],
      ex:['Never have I seen such a mess. — (Never + aux + subject)','Not only did he lie, but he also stole. — (Not only + did + subject)','Rarely does she make mistakes. — (Rarely + does + subject)','No sooner had I left than it started raining.'],
      mistakes:[
-      {bad:'Never I have seen such a mess.',good:'Never have I seen such a mess.',why:{pl:'Po triggerze → inwersja: pomocnik PRZED podmiotem.',en:'After a trigger → inversion: auxiliary BEFORE the subject.'}},
+      {bad:'Never I have seen such a mess.',good:'Never have I seen such a mess.',why:{pl:'Po słowie sygnałowym → inwersja: pomocnik PRZED podmiotem.',en:'After a trigger → inversion: auxiliary BEFORE the subject.'}},
       {bad:'Not only he lied, but he also stole.',good:'Not only did he lie, but he also stole.',why:{pl:'Not only + did + podmiot + bezokolicznik.',en:'Not only + did + subject + bare infinitive.'}}],
      compare:[
       {h:{pl:'normalna kolejność',en:'normal order'},ex:'I have never seen such a mess.',note:{pl:'neutralnie, codziennie',en:'neutral, everyday'}},
@@ -1210,7 +1219,7 @@ var TOPICS=[
       {pl:'akcent na reakcji/zdarzeniu — What surprised me was his reaction.',en:'focus on a reaction/event — What surprised me was his reaction.'}],
      ex:['It was John who broke the window. — (not someone else)','It was in Rome that we first met. — (in Rome specifically)','What I need is a long holiday. — (what I need)','What surprised me was his reaction.'],
      mistakes:[
-      {bad:'What I need it is a holiday.',good:'What I need is a holiday.',why:{pl:'Po What-klauzuli → od razu is/was, bez „it”.',en:'After a What-clause → straight to is/was, no „it”.'}},
+      {bad:'What I need it is a holiday.',good:'What I need is a holiday.',why:{pl:'Po What-klauzuli → od razu is/was, bez „it”.',en:'After a What-clause → straight to is/was, no "it".'}},
       {bad:'It was John which broke the window.',good:'It was John who broke the window.',why:{pl:'Osoba → who (nie which).',en:'A person → who (not which).'}}],
      compare:[
       {h:{pl:'It-cleft',en:'It-cleft'},ex:'It was Anna who called.',note:{pl:'akcent: ANNA (nie ktoś inny)',en:'focus: ANNA (not someone else)'}},
@@ -1231,7 +1240,7 @@ var TOPICS=[
      compare:[
       {h:{pl:'Seeing… (równocześnie)',en:'Seeing… (simultaneous)'},ex:'Walking home, I called her.',note:{pl:'dwie czynności naraz',en:'two actions at once'}},
       {h:{pl:'Having seen… (wcześniej)',en:'Having seen… (earlier)'},ex:'Having read the email, I replied.',note:{pl:'najpierw przeczytałem, potem odpisałem',en:'first I read it, then I replied'}}],
-     remember:{pl:'Imiesłów MUSI dotyczyć podmiotu zdania głównego! „Walking down the street, it started raining” → BŁĄD.',en:'The participle MUST refer to the subject of the main clause! „Walking down the street, it started raining” → WRONG.'},
+     remember:{pl:'Imiesłów MUSI dotyczyć podmiotu zdania głównego! „Walking down the street, it started raining” → BŁĄD.',en:'The participle MUST refer to the subject of the main clause! "Walking down the street, it started raining" → WRONG.'},
      quiz:[{q:{pl:'___ the news, she started to cry. (= When she heard)',en:'___ the news, she started to cry. (= When she heard)'},opts:[{pl:'Hearing',en:'Hearing'},{pl:'Heard',en:'Heard'},{pl:'Having hearded',en:'Having hearded'}],a:0,why:{pl:'Równoczesna czynność, aktywna → -ing (Hearing).',en:'Simultaneous active action → -ing (Hearing).'}}]}
    ]
   },
@@ -1239,7 +1248,7 @@ var TOPICS=[
    b1:[
     {sec:{pl:'Codzienne tematy',en:'Everyday Topics'},t:{pl:'Praca i kariera',en:'Work & Career'},
      d:{pl:'Zawody: accountant, engineer, nurse, plumber. Czynności: apply for a job, get promoted, resign, be made redundant. Kolokacje: meet a deadline, attend a meeting.',en:'Jobs: accountant, engineer, nurse, plumber. Actions: apply for a job, get promoted, resign, be made redundant. Collocations: meet a deadline, attend a meeting.'},
-     ex:['She applied for a marketing job and got an interview.','He was made redundant when the company downsized.','We need to meet the deadline — the project is due Friday.','I work the night shift three times a week.']},
+     ex:['She applied for a marketing job and got an interview.','He was made redundant when the company downsized.','We need to meet the deadline — the project is due on Friday.','I work the night shift three times a week.']},
     {t:{pl:'Podróże i transport',en:'Travel & Transport'},
      d:{pl:'Booking: book/reserve, check in/out, cancel. Transport: catch/miss a connection, take the train. Lotnisko: departure, arrivals, boarding gate, customs.',en:'Booking: book/reserve, check in/out, cancel. Transport: catch/miss a connection, take the train. Airport: departure, arrivals, boarding gate, customs.'},
      ex:['I\'d like to book a double room for three nights.','We missed our connecting flight and had to wait 6 hours.','Passengers should arrive at the boarding gate 30 minutes early.']},
@@ -1264,7 +1273,7 @@ var TOPICS=[
      d:{pl:'Pojęcia: concept, theory, perspective, implication, consequence, approach, framework, dimension, extent, scope.',en:'Concepts: concept, theory, perspective, implication, consequence, approach, framework, dimension, extent, scope.'},
      ex:['From a broader perspective, the policy has had mixed results.','The implications of this decision are still unclear.','We need to consider all dimensions of the problem.']},
     {t:{pl:'Biznes i finanse',en:'Business & Finance'},
-     d:{pl:'Dane: revenue, profit, expenditure, budget, forecast, stakeholder, ROI. Wyrażenia: meet targets, cut costs, expand into new markets.',en:'Data: revenue, profit, expenditure, budget, forecast, stakeholder, ROI. Expressions: meet targets, cut costs, expand into new markets.'},
+     d:{pl:'Terminy: revenue, profit, expenditure, budget, forecast, stakeholder, ROI. Wyrażenia: meet targets, cut costs, expand into new markets.',en:'Terms: revenue, profit, expenditure, budget, forecast, stakeholder, ROI. Expressions: meet targets, cut costs, expand into new markets.'},
      ex:['The company exceeded its revenue forecast by 15% this quarter.','We need to cut costs without affecting service quality.','They\'re planning to expand into Eastern European markets.']},
     {t:{pl:'Środowisko i ekologia',en:'Environment & Ecology'},
      d:{pl:'climate change, carbon footprint, renewable energy, emissions, biodiversity, deforestation, sustainable development.',en:'climate change, carbon footprint, renewable energy, emissions, biodiversity, deforestation, sustainable development.'},
@@ -1287,7 +1296,7 @@ var TOPICS=[
      ex:['Why don\'t we meet for coffee this weekend?','What about going to the cinema instead?','How does Saturday sound to you?','I suggest we start with the most urgent tasks first.']},
     {t:{pl:'Opowiadanie historii',en:'Storytelling'},
      d:{pl:'Wstęp: It happened when / Once… Napięcie: Suddenly / To my surprise. Zakończenie: In the end / Eventually.',en:'Opening: It happened when / Once… Tension: Suddenly / To my surprise. Ending: In the end / Eventually.'},
-     ex:['It all started when I got on the wrong train by mistake.','Suddenly, I realized I\'d left my passport at the hotel.','To my surprise, the shop was completely empty.','In the end, we managed to catch the last flight home.']}
+     ex:['It all started when I got on the wrong train by mistake.','Suddenly, I realised I\'d left my passport at the hotel.','To my surprise, the shop was completely empty.','In the end, we managed to catch the last flight home.']}
    ],
    b2:[
     {sec:{pl:'Zaawansowane techniki',en:'Advanced Techniques'},t:{pl:'Perswazja i argumentowanie',en:'Persuasion & Argumentation'},
@@ -1296,7 +1305,7 @@ var TOPICS=[
     {t:{pl:'Język hedgingu',en:'Hedging Language'},
      d:{pl:'It seems to me that… / It would appear that… / To some extent… / I might be wrong, but…',en:'It seems to me that… / It would appear that… / To some extent… / I might be wrong, but…'},
      ex:['It seems to me that the government has underestimated the problem.','To some extent, both sides are responsible for the conflict.','It would appear that the data is incomplete.','I might be wrong, but I think the deadline has already passed.']},
-    {t:{pl:'Dyskurs-markery zaawansowane',en:'Advanced Discourse Markers'},
+    {t:{pl:'Zaawansowane spójniki (discourse markers)',en:'Advanced Discourse Markers'},
      d:{pl:'Kontrast: whereas, nevertheless, in contrast. Przyczyna: consequently, as a result. Konkluzja: to sum up, on balance, all things considered.',en:'Contrast: whereas, nevertheless, in contrast. Cause: consequently, as a result. Conclusion: to sum up, on balance, all things considered.'},
      ex:['Whereas some people thrive working from home, others find it isolating.','Consequently, the company was forced to restructure its operations.','On balance, the benefits of the policy outweigh the drawbacks.','All things considered, this was the right decision.']}
    ]
@@ -1328,10 +1337,10 @@ var TOPICS=[
   {id:'listening',emoji:'🎧',title:{pl:'Słuchanie',en:'Listening'},sub:{pl:'Rozumienie ze słuchu',en:'Listening comprehension'},
    b1:[
     {sec:{pl:'Poziom B1',en:'B1 Level'},t:{pl:'Strategie słuchania',en:'Listening Strategies'},
-     d:{pl:'1. Słuchaj globalnie (główna myśl). 2. Korzystaj z kontekstu i intonacji. 3. Przed słuchaniem przejrzyj pytania. 4. Nieznane słowa pomiń.',en:'1. Listen globally first (main idea). 2. Use context and intonation. 3. Before listening, preview questions. 4. Skip unknown words — focus on key information.'},
+     d:{pl:'1. Słuchaj globalnie (główna myśl). 2. Korzystaj z kontekstu i intonacji. 3. Przed słuchaniem przejrzyj pytania. 4. Nieznane słowa pomiń — skup się na kluczowych informacjach.',en:'1. Listen globally first (main idea). 2. Use context and intonation. 3. Before listening, preview questions. 4. Skip unknown words — focus on key information.'},
      ex:['When you hear an announcement, focus on: WHERE, WHEN, WHAT — not every word.','If you miss a word, don\'t panic — use context to guess the meaning.','Intonation tells you if someone is certain, surprised, or ironic.']},
     {t:{pl:'Rozumienie ogłoszeń i rozmów',en:'Announcements & Conversations'},
-     d:{pl:'Ogłoszenia: wychwytuj WHERE, WHEN, WHAT. Rozmowy telefoniczne: standard phrases.',en:'Announcements: catch WHERE, WHEN, WHAT. Phone calls: standard phrases.'},
+     d:{pl:'Ogłoszenia: wychwytuj WHERE, WHEN, WHAT. Rozmowy telefoniczne: standardowe zwroty.',en:'Announcements: catch WHERE, WHEN, WHAT. Phone calls: standard phrases.'},
      ex:['Platform 3 for the 14:25 to Warsaw — listen for: number, time, destination.','In a call: "I\'m calling to confirm…" — purpose stated at the start.','If you didn\'t catch it: "I\'m sorry, could you repeat that?" or "Could you speak more slowly?"']}
    ],
    b2:[
@@ -1354,7 +1363,7 @@ var TOPICS=[
    ],
    b2:[
     {sec:{pl:'Poziom B2',en:'B2 Level'},t:{pl:'Teksty abstrakcyjne i literackie',en:'Abstract & Literary Texts'},
-     d:{pl:'Rozumiesz teksty na skomplikowane tematy, wychwycisz postawę i ton autora, implikacje i ironię.',en:'You understand complex texts, can identify the author\'s attitude and tone, implications and irony.'},
+     d:{pl:'Rozumiesz złożone teksty, wychwytujesz postawę i ton autora, implikacje i ironię.',en:'You understand complex texts, can identify the author\'s attitude and tone, implications and irony.'},
      ex:['"The report paints a grim picture of the housing market." — "grim picture" = very negative.','"One might argue that this policy is misguided." — distanced, critical tone.','Understated: "The results were not entirely satisfactory." — means: the results were bad.']}
    ]
   },
@@ -1369,7 +1378,7 @@ var TOPICS=[
     {sec:{pl:'Kolokacje',en:'Collocations'},t:{pl:'DO vs MAKE',en:'DO vs MAKE'},
      d:{pl:'DO: homework, dishes, business, damage, exercise, someone a favour. MAKE: decision, effort, progress, mistake, complaint, noise.',en:'DO: homework, dishes, business, damage, exercise, someone a favour. MAKE: decision, effort, progress, mistake, complaint, noise.'},
      ex:['Could you do me a favour? — (wyświadczyć przysługę)','I made a mistake — I sent the wrong file. — (popełniłem błąd)','She\'s making great progress with her English. — (robi postępy)','Please don\'t make so much noise! — (nie hałasuj)'],
-     tip:{pl:'NIE mieszaj: "make homework" → BŁĄD. "do a decision" → BŁĄD. Zapamiętaj kolokacje całe jako jednostki.',en:'Don\'t mix: "make homework" → WRONG. "do a decision" → WRONG. Learn collocations as whole chunks.'}}
+     tip:{pl:'NIE mieszaj: "make homework" → BŁĄD. "do a decision" → BŁĄD. Zapamiętaj całe kolokacje jako jednostki.',en:'Don\'t mix: "make homework" → WRONG. "do a decision" → WRONG. Learn collocations as whole chunks.'}}
    ],
    b2:[
     {sec:{pl:'Zaawansowane',en:'Advanced'},t:{pl:'Frazale nieoczywiste',en:'Non-obvious Phrasal Verbs'},
@@ -1460,7 +1469,7 @@ function renderEngHome(){
   var s=allEStats();
   document.getElementById('eStB1').textContent=s.b1d+'/'+s.b1t;
   document.getElementById('eStB2').textContent=s.b2d+'/'+s.b2t;
-  document.getElementById('eStAll').textContent=(s.b1t+s.b2t)+'';
+  document.getElementById('eStAll').textContent=(s.b1d+s.b2d)+'/'+(s.b1t+s.b2t);
   document.getElementById('e-homeSub').textContent=et('homeSub');
   document.getElementById('e-homeTitle').textContent=it('appTitle');
   document.getElementById('eLblB1').textContent=et('b1lbl');
@@ -1685,10 +1694,10 @@ document.getElementById('bnEng').addEventListener('click',function(){
    INIT
 ══════════════════════════════ */
 (function init(){
+  document.documentElement.setAttribute('lang',ST.lang);
+  applySect();
+  applyLangChrome();
   if(ST.sect==='eng'){
-    APP.setAttribute('data-sect','eng');
-    document.getElementById('bnIslam').classList.remove('on');
-    document.getElementById('bnEng').classList.add('on');
     showV('ve-home');
     renderEngHome();
   } else {
