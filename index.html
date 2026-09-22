@@ -197,6 +197,43 @@ button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);ou
 .set-btn{border:1px solid var(--border);background:none;color:var(--text);font-family:'Inter',sans-serif;font-weight:600;font-size:calc(12px * var(--scale));padding:10px 12px;border-radius:5px;cursor:pointer;text-align:left;min-height:40px;}
 .set-btn:active{background:var(--accent-soft);}
 .set-note{font-size:calc(10.5px * var(--scale));color:var(--text-muted);line-height:1.5;padding:10px 16px;}
+/* ── POLISH: MOTION & UX ── */
+html,body{transition:background-color .3s ease,color .3s ease;}
+#app,.top-bar,.bnav,.sub-top,.stats-bar,.pw,.cont-card,.quiz,.overlay-panel{transition:background-color .3s ease,border-color .3s ease;}
+@keyframes viewIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+.view.active{animation:viewIn .22s ease-out;}
+@keyframes rowIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+.entry-row,.item-row{animation:rowIn .28s ease-out backwards;}
+.entry-row:nth-child(2),.item-row:nth-child(2){animation-delay:.04s;}
+.entry-row:nth-child(3),.item-row:nth-child(3){animation-delay:.08s;}
+.entry-row:nth-child(4),.item-row:nth-child(4){animation-delay:.12s;}
+.entry-row:nth-child(5),.item-row:nth-child(5){animation-delay:.16s;}
+.entry-row:nth-child(6),.item-row:nth-child(6){animation-delay:.20s;}
+.entry-row:nth-child(7),.item-row:nth-child(7){animation-delay:.24s;}
+.entry-row:nth-child(8),.item-row:nth-child(8){animation-delay:.28s;}
+.entry-row:nth-child(9),.item-row:nth-child(9){animation-delay:.32s;}
+.entry-row:nth-child(10),.item-row:nth-child(10){animation-delay:.36s;}
+.entry-row:nth-child(11),.item-row:nth-child(11){animation-delay:.40s;}
+.entry-row:nth-child(12),.item-row:nth-child(12){animation-delay:.44s;}
+.entry-row,.item-row,.cont-card,.tab-btn,.set-btn,.quiz-opt,.bnav-btn,.cont-btn,.city-btn,.pw{transition:transform .12s ease,box-shadow .15s ease;}
+.entry-row:active,.item-row:active,.cont-card:active,.tab-btn:active,.set-btn:active,.bnav-btn:active,.city-btn:active{transform:scale(.98);}
+@media(hover:hover){
+.entry-row:hover,.item-row:hover{background:var(--accent-soft);}
+.cont-card:hover,.pw:hover{transform:translateY(-1px);box-shadow:0 2px 10px rgba(0,0,0,0.06);}
+}
+.bnav-btn{position:relative;}
+.bnav-btn::after{content:'';position:absolute;top:0;left:50%;width:20px;height:2.5px;border-radius:2px;background:var(--accent);opacity:0;transform:translateX(-50%) scaleX(.4);transition:opacity .2s ease,transform .2s ease;}
+.bnav-btn.on::after{opacity:1;transform:translateX(-50%) scaleX(1);}
+:focus{outline:none;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px;}
+.toast{position:fixed;left:50%;bottom:calc(72px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(8px);background:var(--text);color:var(--bg);font-family:'Inter',sans-serif;font-size:calc(12px * var(--scale));font-weight:600;padding:8px 15px;border-radius:20px;opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;z-index:40;max-width:86vw;text-align:center;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.s-ring{position:relative;width:38px;height:38px;margin:0 auto 2px;display:flex;align-items:center;justify-content:center;}
+.s-ring svg{position:absolute;inset:0;transform:rotate(-90deg);}
+.s-ring .ring-bg{fill:none;stroke:var(--border);stroke-width:3;}
+.s-ring .ring-fg{fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset .5s ease;}
+.s-ring .s-val{font-size:calc(9.5px * var(--scale));}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}}
 /* ── DESKTOP ── */
 @media(min-width:760px){#app{border-left:1px solid var(--border);border-right:1px solid var(--border);}}
 </style>
@@ -307,7 +344,7 @@ button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);ou
     <div class="s-div"></div>
     <div class="s-cell"><div class="s-val" id="eStB2">—</div><div class="s-lbl" id="eLblB2">—</div></div>
     <div class="s-div"></div>
-    <div class="s-cell"><div class="s-val" id="eStAll">—</div><div class="s-lbl" id="eLblAll">—</div></div>
+    <div class="s-cell" id="eCellAll"><div class="s-ring"><svg viewBox="0 0 38 38" aria-hidden="true"><circle class="ring-bg" cx="19" cy="19" r="16"/><circle class="ring-fg" id="eRingFg" cx="19" cy="19" r="16"/></svg><div class="s-val" id="eStAll">—</div></div><div class="s-lbl" id="eLblAll">—</div></div>
   </div>
   <div class="tab-bar">
     <button class="tab-btn on" id="tabB1">B1</button>
@@ -434,13 +471,32 @@ function applySect(){
   applyMeta();
   document.getElementById('bnIslam').classList.toggle('on',ST.sect==='islam');
   document.getElementById('bnEng').classList.toggle('on',ST.sect==='eng');
+  document.getElementById('bnIslam').setAttribute('aria-current',ST.sect==='islam'?'page':'false');
+  document.getElementById('bnEng').setAttribute('aria-current',ST.sect==='eng'?'page':'false');
 }
 applySect();
 
 function applyLangChrome(){document.getElementById('bnEngLbl').textContent=ST.lang==='pl'?'Angielski':'English';document.title=IS[ST.lang].appTitle;}
 
+var toastEl=null,toastT=null;
+function toast(msg){
+  if(!toastEl){toastEl=document.createElement('div');toastEl.className='toast';toastEl.setAttribute('role','status');document.body.appendChild(toastEl);}
+  toastEl.textContent=msg;toastEl.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show');},1600);
+}
+
 var VIEWS=['vi-home','vi-list','vi-letters','vi-prayer','ve-home','ve-topic','ve-item'];
-function showV(id){VIEWS.forEach(function(v){document.getElementById(v).classList.toggle('active',v===id);});}
+var VIEW_SCROLL={};
+var RESTORE_VIEWS={'vi-home':1,'ve-home':1,'ve-topic':1};
+function viewScroller(id){var v=document.getElementById(id);return v?v.querySelector('.entry-list,.detail-scroll,.pscroll,.id-scroll'):null;}
+var raf=(typeof requestAnimationFrame==='function')?requestAnimationFrame:function(f){return setTimeout(f,0);};
+function showV(id){
+  var cur=currentView();
+  if(cur&&cur!==id){var sc=viewScroller(cur);if(sc)VIEW_SCROLL[cur]=sc.scrollTop;}
+  VIEWS.forEach(function(v){document.getElementById(v).classList.toggle('active',v===id);});
+  var y=(RESTORE_VIEWS[id]&&VIEW_SCROLL[id]!==undefined)?VIEW_SCROLL[id]:0;
+  raf(function(){var t=viewScroller(id);if(t)t.scrollTop=y;});
+}
 function currentView(){var a=document.querySelector('.view.active');return a?a.id:null;}
 
 /* Central re-render — used after language change so detail views update too */
@@ -463,8 +519,8 @@ function setLang(l){ST.lang=l;save();document.documentElement.setAttribute('lang
    ISLAM — TRANSLATIONS
 ══════════════════════════════ */
 var IS={
-  pl:{appTitle:'Moja Droga',appSub:'Notatnik drogi w islamie',pv2:'2 rakaty',pv3:'3 rakaty',pv4:'4 rakaty',pwMethod:'MWL · przybliżone',changeCity:'Zmień miasto',searchCity:'Szukaj…',now:'Teraz',next:'Następna',between:'między modlitwami',inTime:'za',listHeader:'Twój notatnik',settings:'Ustawienia',dataLbl:'Twoje dane',exportBtn:'Eksportuj dane (JSON)',importBtn:'Importuj dane (JSON)',setNote:'Dane są zapisywane lokalnie w tej przeglądarce. Eksport pozwala przenieść je na inne urządzenie lub zrobić kopię zapasową.',importOk:'Dane zaimportowane pomyślnie.',importErr:'Nieprawidłowy plik — import nie powiódł się.'},
-  en:{appTitle:'My Path',appSub:'Notebook of my journey in Islam',pv2:"2 rak'ahs",pv3:"3 rak'ahs",pv4:"4 rak'ahs",pwMethod:'MWL · approximate',changeCity:'Change city',searchCity:'Search…',now:'Now',next:'Next',between:'between prayers',inTime:'in',listHeader:'Your notebook',settings:'Settings',dataLbl:'Your data',exportBtn:'Export data (JSON)',importBtn:'Import data (JSON)',setNote:'Data is stored locally in this browser. Export lets you move it to another device or keep a backup.',importOk:'Data imported successfully.',importErr:'Invalid file — import failed.'}
+  pl:{appTitle:'Moja Droga',appSub:'Notatnik drogi w islamie',pv2:'2 rakaty',pv3:'3 rakaty',pv4:'4 rakaty',pwMethod:'MWL · przybliżone',changeCity:'Zmień miasto',searchCity:'Szukaj…',now:'Teraz',next:'Następna',between:'między modlitwami',inTime:'za',listHeader:'Twój notatnik',settings:'Ustawienia',dataLbl:'Twoje dane',exportBtn:'Eksportuj dane (JSON)',importBtn:'Importuj dane (JSON)',setNote:'Dane są zapisywane lokalnie w tej przeglądarce. Eksport pozwala przenieść je na inne urządzenie lub zrobić kopię zapasową.',importOk:'Dane zaimportowane pomyślnie.',importErr:'Nieprawidłowy plik — import nie powiódł się.',doneOn:'Oznaczono jako opanowane ✓',doneOff:'Cofnięto oznaczenie'},
+  en:{appTitle:'My Path',appSub:'Notebook of my journey in Islam',pv2:"2 rak'ahs",pv3:"3 rak'ahs",pv4:"4 rak'ahs",pwMethod:'MWL · approximate',changeCity:'Change city',searchCity:'Search…',now:'Now',next:'Next',between:'between prayers',inTime:'in',listHeader:'Your notebook',settings:'Settings',dataLbl:'Your data',exportBtn:'Export data (JSON)',importBtn:'Import data (JSON)',setNote:'Data is stored locally in this browser. Export lets you move it to another device or keep a backup.',importOk:'Data imported successfully.',importErr:'Invalid file — import failed.',doneOn:'Marked as mastered ✓',doneOff:'Mark removed'}
 };
 var PL_N={fajr:{pl:'Fajr',en:'Fajr'},sunrise:{pl:'Wschód',en:'Sunrise'},dhuhr:{pl:'Dhuhr',en:'Dhuhr'},asr:{pl:'Asr',en:'Asr'},maghrib:{pl:'Maghrib',en:'Maghrib'},isha:{pl:'Isha',en:'Isha'}};
 function it(k){return IS[ST.lang][k]||k;}
@@ -1469,7 +1525,11 @@ function renderEngHome(){
   var s=allEStats();
   document.getElementById('eStB1').textContent=s.b1d+'/'+s.b1t;
   document.getElementById('eStB2').textContent=s.b2d+'/'+s.b2t;
-  document.getElementById('eStAll').textContent=(s.b1d+s.b2d)+'/'+(s.b1t+s.b2t);
+  var sAllD=s.b1d+s.b2d,sAllT=s.b1t+s.b2t,sPct=sAllT?sAllD/sAllT:0;
+  document.getElementById('eStAll').textContent=Math.round(sPct*100)+'%';
+  document.getElementById('eCellAll').title=sAllD+'/'+sAllT;
+  var ring=document.getElementById('eRingFg');
+  if(ring){ring.style.strokeDasharray='100.53';ring.style.strokeDashoffset=(100.53*(1-sPct)).toFixed(1);}
   document.getElementById('e-homeSub').textContent=et('homeSub');
   document.getElementById('e-homeTitle').textContent=it('appTitle');
   document.getElementById('eLblB1').textContent=et('b1lbl');
@@ -1522,7 +1582,7 @@ function renderEngHome(){
 
 function openEngTopic(id){
   curEngTopic=TOPICS.find(function(t){return t.id===id;});
-  engListScroll=0;
+  engListScroll=0;VIEW_SCROLL['ve-topic']=0;
   var lv=ST.engLevel;
   document.getElementById('e-topicTitle').textContent=curEngTopic.emoji+' '+curEngTopic.title[ST.lang]+' — '+lv.toUpperCase();
   renderEngItems();
@@ -1553,6 +1613,7 @@ function renderEngItems(){
         ev.stopPropagation();
         ST.done[ky2]=!ST.done[ky2];save();
         chkEl.className='i-chk'+(ST.done[ky2]?' done':'');chkEl.textContent=ST.done[ky2]?'✓':'';
+        toast(ST.done[ky2]?it('doneOn'):it('doneOff'));
       });
       row.addEventListener('click',function(){engListScroll=list.scrollTop;openEngItem(item2,ky2);});
     })(ky,chk,item);
@@ -1660,6 +1721,7 @@ function openEngItem(item,ky){
   doneRow.addEventListener('click',function(){
     ST.done[ky]=!ST.done[ky];save();
     dChk.className='i-chk'+(ST.done[ky]?' done':'');dChk.textContent=ST.done[ky]?'✓':'';
+    toast(ST.done[ky]?it('doneOn'):it('doneOff'));
     var lChk=document.querySelector('#e-itemList [data-k="'+ky+'"]');
     if(lChk){lChk.className='i-chk'+(ST.done[ky]?' done':'');lChk.textContent=ST.done[ky]?'✓':'';}
   });
