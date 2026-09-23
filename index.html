@@ -56,6 +56,7 @@ html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--text);
 .pw-city{background:none;border:none;padding:0;cursor:pointer;color:var(--text);font-family:'Inter',sans-serif;font-size:calc(12px * var(--scale));font-weight:700;}
 .pw-city::after{content:' ›';color:var(--accent);}
 .pw-method{font-size:calc(9px * var(--scale));color:var(--text-muted);}
+.pw-right{display:flex;align-items:center;gap:8px;}
 .pw-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:2px;}
 .pw-cell{text-align:center;padding:3px 1px;border-radius:3px;}.pw-cell.on{background:var(--accent-soft);}.pw-cell.dim{opacity:0.4;}
 .pw-l{font-size:calc(8.5px * var(--scale));color:var(--text-muted);line-height:1;}.pw-cell.on .pw-l{color:var(--accent);font-weight:600;}
@@ -244,7 +245,7 @@ body.no-scroll{overflow:hidden;}
 .upd-bar.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .upd-bar button{background:rgba(255,255,255,0.24);border:none;color:#fff;font:inherit;padding:6px 13px;border-radius:14px;cursor:pointer;}
 /* ── STREAK / HEATMAPA (jak GitHub: im wiecej aktywnosci, tym mocniejszy kolor) ── */
-.streak-ico{width:auto;min-width:34px;padding:5px 9px;gap:4px;display:inline-flex;align-items:center;justify-content:center;font-size:calc(12px * var(--scale));font-weight:700;color:var(--accent);border:1px solid var(--border);border-radius:16px;line-height:1;}
+.streak-ico{width:auto;min-width:34px;padding:5px 9px;gap:4px;display:inline-flex;align-items:center;justify-content:center;background:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:calc(12px * var(--scale));font-weight:700;color:var(--accent);border:1px solid var(--border);border-radius:16px;line-height:1;}
 .streak-ico .si-moon{font-size:calc(13px * var(--scale));font-weight:400;}
 .heat-d{width:11px;height:11px;border-radius:3px;background:var(--accent-soft);}
 .heat-d.lv1{background:var(--accent);opacity:.28;}
@@ -266,10 +267,13 @@ body.no-scroll{overflow:hidden;}
 .prof-legend{display:flex;align-items:center;gap:3px;justify-content:flex-end;font-size:calc(9.5px * var(--scale));color:var(--text-muted);}
 .prof-legend i{width:9px;height:9px;border-radius:3px;}
 /* ── TRACKER MODLITW (Pomodlilem sie) ── */
-.ptrack{margin:8px 16px 2px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:var(--bg-panel);flex-shrink:0;}
-.ptrack-h{display:flex;justify-content:space-between;align-items:center;font-size:calc(11px * var(--scale));color:var(--text-muted);margin-bottom:8px;}
-.ptrack-h b{color:var(--accent);font-size:calc(12px * var(--scale));}
-.ptrack-row{display:flex;gap:6px;}
+.ptrack{margin:6px 16px 2px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;}
+.pt-toggle{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--bg-panel);border-radius:16px;padding:5px 10px;font-family:'Inter',sans-serif;font-size:calc(11px * var(--scale));color:var(--text-muted);cursor:pointer;line-height:1;}
+.pt-toggle:active{color:var(--accent);}
+.pt-toggle b{color:var(--accent);font-size:calc(11.5px * var(--scale));}
+.pt-chev{font-size:calc(9px * var(--scale));transition:transform .15s ease;}
+.ptrack.open .pt-chev{transform:rotate(180deg);}
+.ptrack-row{display:flex;gap:5px;width:100%;}
 .pt-chip{flex:1;border:1px solid var(--border);background:transparent;border-radius:10px;padding:7px 2px;font-family:'Inter',sans-serif;color:var(--text);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:transform .1s ease;}
 .pt-chip .pt-n{font-weight:600;font-size:calc(10.5px * var(--scale));}
 .pt-chip .pt-s{color:var(--text-muted);font-size:calc(9px * var(--scale));min-height:12px;}
@@ -288,8 +292,6 @@ body.no-scroll{overflow:hidden;}
 /* ── WIGGLE (podpowiedź ustawień) ── */
 @keyframes wig{0%,100%{transform:rotate(0);}20%{transform:rotate(-14deg);}40%{transform:rotate(10deg);}60%{transform:rotate(-7deg);}80%{transform:rotate(5deg);}}
 .icon-btn.wig{animation:wig .8s ease 3;}
-.set-stats{margin-top:12px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;font-size:calc(12px * var(--scale));color:var(--text-muted);line-height:1.6;}
-.set-stats b{color:var(--text);}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}}
 /* ── DESKTOP ── */
 @media(min-width:760px){#app{border-left:1px solid var(--border);border-right:1px solid var(--border);}}
@@ -312,7 +314,6 @@ body.no-scroll{overflow:hidden;}
         <button class="sz-btn" data-sc="1">A</button>
         <button class="sz-btn" data-sc="1.2">A</button>
       </div>
-      <button class="icon-btn streak-ico" id="iStatsBtn" aria-label="Postępy / Progress"><span class="si-moon">☾</span><span id="iStreakNum">0</span></button>
       <button class="icon-btn" id="iThemeBtn" aria-label="Motyw / Theme">🌓</button>
       <button class="icon-btn" id="iSettingsBtn" aria-label="Ustawienia / Settings">⚙</button>
     </div>
@@ -324,7 +325,10 @@ body.no-scroll{overflow:hidden;}
   <div class="pw">
     <div class="pw-head">
       <button class="pw-city" id="pwCityBtn"></button>
-      <span class="pw-method" id="pwMethod"></span>
+      <div class="pw-right">
+        <span class="pw-method" id="pwMethod"></span>
+        <button class="streak-ico" id="iStatsBtn" aria-label="Postępy / Progress"><span class="si-moon">☾</span><span id="iStreakNum">0</span></button>
+      </div>
     </div>
     <div class="pw-grid" id="pwGrid"></div>
   </div>
@@ -369,9 +373,9 @@ body.no-scroll{overflow:hidden;}
   </div>
   <div class="pbar"><i id="pbarPrayer"></i></div>
   <div class="mini-bar" id="i-mbPrayer"></div>
-  <div class="ptrack">
-    <div class="ptrack-h"><span id="ptTitle"></span><b id="ptCount"></b></div>
-    <div class="ptrack-row" id="ptRow"></div>
+  <div class="ptrack" id="ptWrap">
+    <button class="pt-toggle" id="ptToggle" aria-expanded="false"><span id="ptToggleLbl"></span><b id="ptCount"></b><span class="pt-chev">▾</span></button>
+    <div class="ptrack-row" id="ptRow" hidden></div>
   </div>
   <div class="prayer-pills">
     <button id="pv2"></button><button id="pv3"></button><button id="pv4"></button>
@@ -474,7 +478,6 @@ body.no-scroll{overflow:hidden;}
       <button class="set-btn" id="importBtn"></button>
       <input type="file" id="importFile" accept="application/json,.json" style="display:none">
     </div>
-    <div class="set-stats" id="setStats" style="display:none"></div>
     <div class="set-row" id="installRow" style="display:none;margin-top:12px">
       <span class="set-lbl" id="installLbl"></span>
       <button class="set-btn" id="installBtn"></button>
@@ -608,8 +611,8 @@ function setLang(l){ST.lang=l;save();document.documentElement.setAttribute('lang
    ISLAM — TRANSLATIONS
 ══════════════════════════════ */
 var IS={
-  pl:{appTitle:'Moja Droga',appSub:'Notatnik drogi w islamie',pv2:'2 rakaty',pv3:'3 rakaty',pv4:'4 rakaty',pwMethod:'MWL · przybliżone',changeCity:'Zmień miasto',searchCity:'Szukaj…',now:'Teraz',next:'Następna',between:'między modlitwami',inTime:'za',listHeader:'Twój notatnik',settings:'Ustawienia',dataLbl:'Twoje dane',exportBtn:'Eksportuj dane (JSON)',importBtn:'Importuj dane (JSON)',setNote:'Dane są zapisywane lokalnie w tej przeglądarce. Eksport pozwala przenieść je na inne urządzenie lub zrobić kopię zapasową.',importOk:'Dane zaimportowane pomyślnie.',importErr:'Nieprawidłowy plik — import nie powiódł się.',doneOn:'Oznaczono jako opanowane ✓',doneOff:'Cofnięto oznaczenie',day1:'dzień z rzędu',dayN:'dni z rzędu',profT:'Twoje postępy',profBest:'rekord',profPray:'Modlitwy (Salah)',profPToday:'dziś',profPMonth:'w tym miesiącu',profPStreak:'seria dni 5/5',profHeat:'Ostatnie 6 tygodni',profLess:'mniej',profMore:'więcej',profRule:'Dzień liczy się do serii od 2 aktywności — czytanie, odhaczanie i odnotowane modlitwy.',ptBtn:'Pomodliłem się',ptSure:'Na pewno?',ptUndo:'Cofnąć?',ptOn:'Modlitwa odnotowana ✓',ptOff:'Odznaczono modlitwę',ptToday:'Dzisiejsze modlitwy',msP5:'☾ 5/5 modlitw dziś — Alhamdulillah!',msP7:'☾ 7 dni z rzędu z kompletem modlitw!',statsDays:'dni z aplikacją',statsDone:'opanowanych',ms7:'☾ 7 dni z rzędu — tak trzymaj!',msAll:'🎉 Cały temat opanowany!',ms100:'💯 100 opanowanych elementów!',installLbl:'Aplikacja na telefonie',installBtn:'Zainstaluj',installIos:'iPhone/iPad: Udostępnij → „Dodaj do ekranu głównego”'},
-  en:{appTitle:'My Path',appSub:'Notebook of my journey in Islam',pv2:"2 rak'ahs",pv3:"3 rak'ahs",pv4:"4 rak'ahs",pwMethod:'MWL · approximate',changeCity:'Change city',searchCity:'Search…',now:'Now',next:'Next',between:'between prayers',inTime:'in',listHeader:'Your notebook',settings:'Settings',dataLbl:'Your data',exportBtn:'Export data (JSON)',importBtn:'Import data (JSON)',setNote:'Data is stored locally in this browser. Export lets you move it to another device or keep a backup.',importOk:'Data imported successfully.',importErr:'Invalid file — import failed.',doneOn:'Marked as mastered ✓',doneOff:'Mark removed',day1:'day streak',dayN:'day streak',profT:'Your progress',profBest:'best streak',profPray:'Prayers (Salah)',profPToday:'today',profPMonth:'this month',profPStreak:'full 5/5 days in a row',profHeat:'Last 6 weeks',profLess:'less',profMore:'more',profRule:'A day counts towards the streak from 2 activities — reading, ticking off and marking prayers.',ptBtn:'I prayed',ptSure:'Sure?',ptUndo:'Undo?',ptOn:'Prayer marked ✓',ptOff:'Prayer unmarked',ptToday:'Today\'s prayers',msP5:'☾ All 5 prayers today — Alhamdulillah!',msP7:'☾ 7 days in a row with all prayers!',statsDays:'days active',statsDone:'mastered',ms7:'☾ 7 days in a row — keep it up!',msAll:'🎉 Whole topic mastered!',ms100:'💯 100 items mastered!',installLbl:'App on your phone',installBtn:'Install',installIos:'iPhone/iPad: Share → “Add to Home Screen”'}
+  pl:{appTitle:'Moja Droga',appSub:'Notatnik drogi w islamie',pv2:'2 rakaty',pv3:'3 rakaty',pv4:'4 rakaty',pwMethod:'MWL · przybliżone',changeCity:'Zmień miasto',searchCity:'Szukaj…',now:'Teraz',next:'Następna',between:'między modlitwami',inTime:'za',listHeader:'Twój notatnik',settings:'Ustawienia',dataLbl:'Twoje dane',exportBtn:'Eksportuj dane (JSON)',importBtn:'Importuj dane (JSON)',setNote:'Dane są zapisywane lokalnie w tej przeglądarce. Eksport pozwala przenieść je na inne urządzenie lub zrobić kopię zapasową.',importOk:'Dane zaimportowane pomyślnie.',importErr:'Nieprawidłowy plik — import nie powiódł się.',doneOn:'Oznaczono jako opanowane ✓',doneOff:'Cofnięto oznaczenie',day1:'dzień z rzędu',dayN:'dni z rzędu',profT:'Twoje postępy',profBest:'rekord',profPray:'Modlitwy (Salah)',profPToday:'dziś',profPMonth:'w tym miesiącu',profPStreak:'seria dni 5/5',profHeat:'Ostatnie 6 tygodni',profLess:'mniej',profMore:'więcej',profRule:'Dzień liczy się do serii od 2 aktywności — czytanie, odhaczanie i odnotowane modlitwy.',ptBtn:'Pomodliłem się',ptSure:'Na pewno?',ptUndo:'Cofnąć?',ptOn:'Modlitwa odnotowana ✓',ptOff:'Odznaczono modlitwę',ptToggle:'Modlitwy',msP5:'☾ 5/5 modlitw dziś — Alhamdulillah!',msP7:'☾ 7 dni z rzędu z kompletem modlitw!',statsDays:'dni z aplikacją',statsDone:'opanowanych',ms7:'☾ 7 dni z rzędu — tak trzymaj!',msAll:'🎉 Cały temat opanowany!',ms100:'💯 100 opanowanych elementów!',installLbl:'Aplikacja na telefonie',installBtn:'Zainstaluj',installIos:'iPhone/iPad: Udostępnij → „Dodaj do ekranu głównego”'},
+  en:{appTitle:'My Path',appSub:'Notebook of my journey in Islam',pv2:"2 rak'ahs",pv3:"3 rak'ahs",pv4:"4 rak'ahs",pwMethod:'MWL · approximate',changeCity:'Change city',searchCity:'Search…',now:'Now',next:'Next',between:'between prayers',inTime:'in',listHeader:'Your notebook',settings:'Settings',dataLbl:'Your data',exportBtn:'Export data (JSON)',importBtn:'Import data (JSON)',setNote:'Data is stored locally in this browser. Export lets you move it to another device or keep a backup.',importOk:'Data imported successfully.',importErr:'Invalid file — import failed.',doneOn:'Marked as mastered ✓',doneOff:'Mark removed',day1:'day streak',dayN:'day streak',profT:'Your progress',profBest:'best streak',profPray:'Prayers (Salah)',profPToday:'today',profPMonth:'this month',profPStreak:'full 5/5 days in a row',profHeat:'Last 6 weeks',profLess:'less',profMore:'more',profRule:'A day counts towards the streak from 2 activities — reading, ticking off and marking prayers.',ptBtn:'I prayed',ptSure:'Sure?',ptUndo:'Undo?',ptOn:'Prayer marked ✓',ptOff:'Prayer unmarked',ptToggle:'Prayers',msP5:'☾ All 5 prayers today — Alhamdulillah!',msP7:'☾ 7 days in a row with all prayers!',statsDays:'days active',statsDone:'mastered',ms7:'☾ 7 days in a row — keep it up!',msAll:'🎉 Whole topic mastered!',ms100:'💯 100 items mastered!',installLbl:'App on your phone',installBtn:'Install',installIos:'iPhone/iPad: Share → “Add to Home Screen”'}
 };
 var PL_N={fajr:{pl:'Fajr',en:'Fajr'},sunrise:{pl:'Wschód',en:'Sunrise'},dhuhr:{pl:'Dhuhr',en:'Dhuhr'},asr:{pl:'Asr',en:'Asr'},maghrib:{pl:'Maghrib',en:'Maghrib'},isha:{pl:'Isha',en:'Isha'}};
 function it(k){return IS[ST.lang][k]||k;}
@@ -759,7 +762,10 @@ function openIslamPrayer(){
     document.getElementById(id).textContent=it('pv'+v);
     document.getElementById(id).classList.toggle('on',ST.pvVer===v);
   });
-  ptAsk=null;renderPrayerTracker();
+  ptAsk=null;
+  var ptw=document.getElementById('ptWrap');
+  if(ptw){ptw.classList.remove('open');document.getElementById('ptRow').hidden=true;document.getElementById('ptToggle').setAttribute('aria-expanded','false');}
+  renderPrayerTracker();
   renderPrayerBody();
   showV('vi-prayer');
 }
@@ -781,6 +787,12 @@ document.getElementById('iBackList').addEventListener('click',function(){showV('
 document.getElementById('iBackLetters').addEventListener('click',function(){showV('vi-home');renderIslam();});
 document.getElementById('iBackPrayer').addEventListener('click',function(){showV('vi-home');renderIslam();});
 ['pv2','pv3','pv4'].forEach(function(id){document.getElementById(id).addEventListener('click',function(){ST.pvVer=id.replace('pv','');save();openIslamPrayer();});});
+document.getElementById('ptToggle').addEventListener('click',function(){
+  var wrap=document.getElementById('ptWrap'),row=document.getElementById('ptRow');
+  var open=wrap.classList.toggle('open');
+  row.hidden=!open;
+  this.setAttribute('aria-expanded',open?'true':'false');
+});
 document.getElementById('iSortBtn').addEventListener('click',function(){ST.sortReversed=!ST.sortReversed;save();renderIslam();});
 document.getElementById('iThemeBtn').addEventListener('click',function(){ST.theme=ST.theme==='dark'?'light':'dark';save();applyTheme();});
 document.querySelectorAll('#iSzPill .sz-btn').forEach(function(b){b.addEventListener('click',function(){ST.scale=b.dataset.sc;save();applyScale();});});
@@ -811,10 +823,6 @@ function openSettings(){
   document.getElementById('exportBtn').textContent=it('exportBtn');
   document.getElementById('importBtn').textContent=it('importBtn');
   var note=document.getElementById('setNote');note.textContent=it('setNote');note.style.color='';
-  /* statystyki aktywnosci */
-  var sEl=document.getElementById('setStats');sEl.style.display='';
-  var streak=calcStreak();
-  sEl.innerHTML='☾ <b>'+streak+'</b> '+(streak===1?it('day1'):it('dayN'))+' · <b>'+activeDays()+'</b> '+it('statsDays')+' · <b>'+totalDone()+'</b> '+it('statsDone')+' · 🏆 <b>'+ST.bestStreak+'</b>';
   /* instalacja PWA */
   var iRow=document.getElementById('installRow'),iBtn=document.getElementById('installBtn'),iLbl=document.getElementById('installLbl');
   var standalone=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||window.navigator.standalone===true;
@@ -923,113 +931,6 @@ function et(k){return ES[ST.lang][k]||k;}
      quiz:[{q:{pl,en},opts:[{pl,en}],a:0,why:{pl,en}}]
 ══════════════════════════════ */
 var TOPICS=[
-  {id:'basics',emoji:'🌱',title:{pl:'Od zera — podstawy',en:'From zero — basics'},sub:{pl:'Proste zdania, słowa i zwroty na co dzień',en:'Simple sentences, words and everyday phrases'},
-   b1:[
-    {sec:{pl:'Pierwsze kroki',en:'First steps'},t:{pl:'Czasownik „być” — am / is / are',en:'The verb “to be” — am / is / are'},
-     d:{pl:'To najważniejsze słowo w angielskim — znaczy „być”. Po polsku mówimy: jestem, jesteś, jest… Po angielsku każda osoba ma swoją formę.',en:'The most important word in English. Every person has its own form.'},
-     form:{pl:'I am (ja jestem) · you/we/they are · he/she/it is',en:'I am · you/we/they are · he/she/it is'},
-     ex:['I am happy. — (Jestem szczęśliwy.)','You are my friend. — (Jesteś moim przyjacielem.)','She is a teacher. — (Ona jest nauczycielką.)','We are at home. — (Jesteśmy w domu.)','It is cold today. — (Dziś jest zimno.)','They are from Poland. — (Oni są z Polski.)'],
-     mistakes:[
-      {bad:'I is happy.',good:'I am happy.',why:{pl:'Z „I” zawsze „am”.',en:'With „I” always „am”.'}},
-      {bad:'He are tall.',good:'He is tall.',why:{pl:'Z he/she/it zawsze „is”.',en:'With he/she/it always „is”.'}}],
-     remember:{pl:'W mowie skracamy: I am = I\'m, you are = you\'re, he is = he\'s, she is = she\'s.',en:'Short forms: I\'m, you\'re, he\'s, she\'s.'},
-     quiz:[
-      {q:{pl:'She ___ a doctor.',en:'She ___ a doctor.'},opts:[{pl:'am',en:'am'},{pl:'is',en:'is'},{pl:'are',en:'are'}],a:1,why:{pl:'He/she/it → is.',en:'He/she/it → is.'}},
-      {q:{pl:'They ___ from Poland.',en:'They ___ from Poland.'},opts:[{pl:'is',en:'is'},{pl:'am',en:'am'},{pl:'are',en:'are'}],a:2,why:{pl:'You/we/they → are.',en:'You/we/they → are.'}}]},
-    {t:{pl:'„Być” — pytania i przeczenia',en:'“To be” — questions and negatives'},
-     d:{pl:'Pytanie robimy przez zamianę kolejności: Are you…? Przeczenie — dodajemy „not”: isn\'t, aren\'t.',en:'Questions swap the order: Are you…? Negatives add „not”: isn\'t, aren\'t.'},
-     form:{pl:'Is she…? · Are you…? · I am not · he isn\'t · they aren\'t',en:'Is she…? · Are you…? · I am not · he isn\'t · they aren\'t'},
-     ex:['Are you OK? — (Wszystko w porządku?)','Is she at home? — (Czy ona jest w domu?)','I am not tired. — (Nie jestem zmęczony.)','He isn\'t ready. — (On nie jest gotowy.)','They aren\'t here. — (Ich tu nie ma.)','Is it far? No, it isn\'t. — (Czy to daleko? Nie.)'],
-     mistakes:[
-      {bad:'You are happy?',good:'Are you happy?',why:{pl:'W pytaniu „być” stoi PRZED osobą.',en:'In questions „be” comes BEFORE the person.'}}],
-     remember:{pl:'Krótkie odpowiedzi: Yes, I am. / No, I\'m not. / Yes, she is. / No, she isn\'t.',en:'Short answers: Yes, I am. / No, I\'m not. / Yes, she is. / No, she isn\'t.'},
-     quiz:[{q:{pl:'___ your brother a student?',en:'___ your brother a student?'},opts:[{pl:'Is',en:'Is'},{pl:'Am',en:'Am'},{pl:'Are',en:'Are'}],a:0,why:{pl:'Your brother = he → Is.',en:'Your brother = he → Is.'}}]},
-    {t:{pl:'Kto? — I, you, he, she, it, we, they',en:'Who? — I, you, he, she, it, we, they'},
-     d:{pl:'I — ja, you — ty/wy, he — on, she — ona, it — ono (rzeczy i zwierzęta), we — my, they — oni. This — to (blisko), that — tamto (daleko).',en:'I, you, he, she, it (things and animals), we, they. This — near, that — far.'},
-     ex:['This is my brother. — (To jest mój brat.)','That is my car. — (Tamto jest moje auto.)','He is my father. — (On jest moim ojcem.)','We are a family. — (Jesteśmy rodziną.)','It is a cat. — (To jest kot.)'],
-     remember:{pl:'Do rzeczy i zwierząt mówimy „it”, nie „he” czy „she”.',en:'For things and animals we say „it”, not „he” or „she”.'},
-     quiz:[{q:{pl:'___ is my sister. (ona)',en:'___ is my sister.'},opts:[{pl:'He',en:'He'},{pl:'She',en:'She'},{pl:'It',en:'It'}],a:1,why:{pl:'Siostra = kobieta → she.',en:'Sister = female → she.'}}]},
-    {t:{pl:'have got — mieć',en:'have got — to have'},
-     d:{pl:'„Mieć” w codziennej mowie to „have got”. I/you/we/they have got · he/she/it has got.',en:'Everyday „to have” is „have got”. I/you/we/they have got · he/she/it has got.'},
-     form:{pl:'I have got = I\'ve got · he has got = he\'s got · przeczenie: haven\'t got / hasn\'t got',en:'I have got = I\'ve got · he\'s got · negative: haven\'t got / hasn\'t got'},
-     ex:['I have got a dog. — (Mam psa.)','She has got two children. — (Ona ma dwoje dzieci.)','We have got a small flat. — (Mamy małe mieszkanie.)','Have you got a pen? — (Masz długopis?)','I haven\'t got time. — (Nie mam czasu.)','Has he got a car? — (Czy on ma samochód?)'],
-     mistakes:[
-      {bad:'She have got a bike.',good:'She has got a bike.',why:{pl:'He/she/it → has.',en:'He/she/it → has.'}}],
-     remember:{pl:'Pytanie: Have you got…? / Has he got…?',en:'Question: Have you got…? / Has he got…?'},
-     quiz:[{q:{pl:'She ___ got a new phone.',en:'She ___ got a new phone.'},opts:[{pl:'have',en:'have'},{pl:'has',en:'has'},{pl:'haves',en:'haves'}],a:1,why:{pl:'She → has.',en:'She → has.'}}]},
-    {t:{pl:'Słowa pytające — what, where, when',en:'Question words — what, where, when'},
-     d:{pl:'What — co, where — gdzie, when — kiedy, who — kto, why — dlaczego, how — jak.',en:'What, where, when, who, why, how.'},
-     ex:['What is this? — (Co to jest?)','Where do you live? — (Gdzie mieszkasz?)','When is your birthday? — (Kiedy są twoje urodziny?)','Who is that man? — (Kim jest tamten mężczyzna?)','Why are you sad? — (Dlaczego jesteś smutny?)','How are you? — (Jak się masz?)'],
-     remember:{pl:'„How are you?” to najczęstsze pytanie na świecie. Odpowiedź: I\'m fine, thanks.',en:'„How are you?” is the most common question. Answer: I\'m fine, thanks.'},
-     quiz:[{q:{pl:'___ do you live? (gdzie)',en:'___ do you live?'},opts:[{pl:'What',en:'What'},{pl:'Where',en:'Where'},{pl:'When',en:'When'}],a:1,why:{pl:'Gdzie → where.',en:'„Gdzie” → where.'}}]},
-    {t:{pl:'Do you…? — pytania o czynności',en:'Do you…? — questions about actions'},
-     d:{pl:'Gdy pytamy o czynność (nie o „być”), używamy „do”. Dla he/she/it — „does”. Przeczenie: don\'t / doesn\'t.',en:'For action questions we use „do” (he/she/it → „does”). Negatives: don\'t / doesn\'t.'},
-     form:{pl:'Do you work? · Does he work? · I don\'t know. · She doesn\'t eat meat.',en:'Do you work? · Does he work? · I don\'t know. · She doesn\'t eat meat.'},
-     ex:['Do you speak English? — (Czy mówisz po angielsku?)','Do you like coffee? — (Lubisz kawę?)','Does she work here? — (Czy ona tu pracuje?)','I don\'t understand. — (Nie rozumiem.)','We don\'t watch TV. — (Nie oglądamy telewizji.)','He doesn\'t eat meat. — (On nie je mięsa.)'],
-     mistakes:[
-      {bad:'Does he speaks English?',good:'Does he speak English?',why:{pl:'Po does czasownik bez „s”.',en:'After does the verb has no „s”.'}}],
-     remember:{pl:'Do → I/you/we/they. Does → he/she/it.',en:'Do → I/you/we/they. Does → he/she/it.'},
-     quiz:[{q:{pl:'___ she play tennis?',en:'___ she play tennis?'},opts:[{pl:'Do',en:'Do'},{pl:'Does',en:'Does'},{pl:'Is',en:'Is'}],a:1,why:{pl:'She + czynność → does.',en:'She + action → does.'}}]},
-    {t:{pl:'Liczby i godziny',en:'Numbers and telling the time'},
-     d:{pl:'Liczby: one, two, three, four, five… ten, twenty, thirty, a hundred. Godzina: It\'s + liczba.',en:'Numbers: one… ten, twenty, thirty, a hundred. Time: It\'s + number.'},
-     ex:['It\'s five o\'clock. — (Jest piąta.)','It\'s half past six. — (Jest 6:30, czyli wpół do siódmej.)','It\'s quarter past nine. — (Jest 9:15, kwadrans po dziewiątej.)','It\'s ten to eight. — (Jest 7:50, za dziesięć ósma.)','The shop opens at nine. — (Sklep otwiera się o dziewiątej.)'],
-     remember:{pl:'half past 6 = 6:30 · quarter past 9 = 9:15 · ten to 8 = 7:50.',en:'half past 6 = 6:30 · quarter past 9 = 9:15 · ten to 8 = 7:50.'},
-     quiz:[{q:{pl:'„half past seven” to która godzina?',en:'What time is „half past seven”?'},opts:[{pl:'7:30',en:'7:30'},{pl:'6:30',en:'6:30'},{pl:'7:15',en:'7:15'}],a:0,why:{pl:'half past seven = 7:30.',en:'half past seven = 7:30.'}}]},
-    {t:{pl:'Dni tygodnia i miesiące',en:'Days of the week and months'},
-     d:{pl:'Dni: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday. Miesiące: January, February, March, April, May, June, July, August, September, October, November, December.',en:'Days: Monday…Sunday. Months: January…December.'},
-     ex:['Today is Monday. — (Dziś jest poniedziałek.)','I work from Monday to Friday. — (Pracuję od poniedziałku do piątku.)','My birthday is in May. — (Moje urodziny są w maju.)','See you on Friday! — (Do zobaczenia w piątek!)','The weekend is Saturday and Sunday. — (Weekend to sobota i niedziela.)'],
-     mistakes:[
-      {bad:'I was born on May.',good:'I was born in May.',why:{pl:'Miesiąc z „in”, dzień z „on”.',en:'Months take „in”, days take „on”.'}}],
-     remember:{pl:'on + dzień (on Friday) · in + miesiąc (in May) · at + godzina (at 5 o\'clock). Dni i miesiące zawsze WIELKĄ literą.',en:'on + day (on Friday) · in + month (in May) · at + time (at 5 o\'clock). Days and months take a CAPITAL letter.'},
-     quiz:[{q:{pl:'I was born ___ June.',en:'I was born ___ June.'},opts:[{pl:'on',en:'on'},{pl:'in',en:'in'},{pl:'at',en:'at'}],a:1,why:{pl:'Miesiąc → in.',en:'Month → in.'}}]},
-    {t:{pl:'Przedstawianie się',en:'Introducing yourself'},
-     d:{pl:'Jak powiedzieć, kim jesteś, skąd pochodzisz i ile masz lat.',en:'How to say who you are, where you are from and how old you are.'},
-     ex:['My name is Ahmed. — (Nazywam się Ahmed.)','I\'m from Poland. — (Jestem z Polski.)','I live in Kraków. — (Mieszkam w Krakowie.)','I\'m 25 years old. — (Mam 25 lat.)','I\'m a student. — (Jestem studentem.)','Nice to meet you! — (Miło cię poznać!)'],
-     remember:{pl:'Na „Nice to meet you” odpowiadamy: „Nice to meet you too”.',en:'Reply to „Nice to meet you”: „Nice to meet you too”.'},
-     quiz:[{q:{pl:'Jak powiesz „Nazywam się…”?',en:'How do you say „Nazywam się…”?'},opts:[{pl:'My name is…',en:'My name is…'},{pl:'I have name…',en:'I have name…'},{pl:'Me name…',en:'Me name…'}],a:0,why:{pl:'My name is… — jedyna poprawna forma.',en:'My name is… — the only correct form.'}}]},
-    {t:{pl:'W sklepie i w mieście',en:'In a shop and around town'},
-     d:{pl:'Gotowe zwroty, które działają od razu — wystarczy wstawić nazwę rzeczy.',en:'Ready-made phrases that work right away — just insert the thing you need.'},
-     ex:['I\'d like a coffee, please. — (Poproszę kawę.)','How much is it? — (Ile to kosztuje?)','Can I pay by card? — (Czy mogę zapłacić kartą?)','Where is the toilet? — (Gdzie jest toaleta?)','Excuse me, where is the station? — (Przepraszam, gdzie jest dworzec?)','Can I have the bill, please? — (Poproszę rachunek.)'],
-     remember:{pl:'„Please” na końcu zdania sprawia, że brzmimy uprzejmie. Zawsze warto.',en:'„Please” at the end makes you sound polite. Always worth it.'},
-     quiz:[{q:{pl:'Chcesz zapytać o cenę. Co mówisz?',en:'You want to ask about the price. What do you say?'},opts:[{pl:'How much is it?',en:'How much is it?'},{pl:'How many is it?',en:'How many is it?'},{pl:'What price is?',en:'What price is?'}],a:0,why:{pl:'Cena → How much is it?',en:'Price → How much is it?'}}]}
-   ],
-   b2:[
-    {sec:{pl:'Krok dalej',en:'One step further'},t:{pl:'Przeszłość — was / were',en:'The past — was / were'},
-     d:{pl:'Przeszłość od „być”: I/he/she/it was · you/we/they were.',en:'Past of „to be”: I/he/she/it was · you/we/they were.'},
-     ex:['I was at home yesterday. — (Wczoraj byłem w domu.)','She was happy. — (Ona była szczęśliwa.)','We were tired. — (Byliśmy zmęczeni.)','Was it cold? — (Czy było zimno?)','They weren\'t at school. — (Ich nie było w szkole.)'],
-     remember:{pl:'was → I/he/she/it · were → you/we/they.',en:'was → I/he/she/it · were → you/we/they.'},
-     quiz:[{q:{pl:'They ___ at work yesterday.',en:'They ___ at work yesterday.'},opts:[{pl:'was',en:'was'},{pl:'were',en:'were'},{pl:'are',en:'are'}],a:1,why:{pl:'They → were.',en:'They → were.'}}]},
-    {t:{pl:'Przeszłość — czynności (went, had, saw)',en:'Past actions (went, had, saw)'},
-     d:{pl:'Większość czasowników dostaje końcówkę „-ed” (work → worked). Najważniejsze nieregularne: go → went, have → had, see → saw, eat → ate, buy → bought, come → came.',en:'Most verbs take „-ed” (work → worked). Key irregulars: go → went, have → had, see → saw, eat → ate, buy → bought, come → came.'},
-     ex:['I worked yesterday. — (Wczoraj pracowałem.)','We went to the mosque on Friday. — (W piątek poszliśmy do meczetu.)','She bought some bread. — (Ona kupiła chleb.)','I didn\'t see him. — (Nie widziałem go.)','Did you sleep well? — (Dobrze spałeś?)'],
-     mistakes:[
-      {bad:'Did you went there?',good:'Did you go there?',why:{pl:'Po did wracamy do formy podstawowej.',en:'After did we use the base form.'}}],
-     remember:{pl:'Pytania i przeczenia: did / didn\'t + forma podstawowa.',en:'Questions and negatives: did / didn\'t + base form.'},
-     quiz:[{q:{pl:'They ___ to London last year.',en:'They ___ to London last year.'},opts:[{pl:'go',en:'go'},{pl:'went',en:'went'},{pl:'goed',en:'goed'}],a:1,why:{pl:'go → went (nieregularne).',en:'go → went (irregular).'}}]},
-    {t:{pl:'Przyszłość — will i going to',en:'The future — will and going to'},
-     d:{pl:'Will — decyzja podjęta teraz albo obietnica. Going to — plan, który już mamy.',en:'Will — a decision made now or a promise. Going to — a plan we already have.'},
-     ex:['I will help you. — (Pomogę ci.)','I\'ll call you tomorrow. — (Zadzwonię do ciebie jutro.)','I\'m going to visit my family. — (Zamierzam odwiedzić rodzinę.)','It won\'t rain. — (Nie będzie padać.)','Will you come? — (Przyjdziesz?)'],
-     remember:{pl:'will = „zrobię to” (decyzja teraz) · going to = „mam to w planach”.',en:'will = a decision now · going to = an existing plan.'},
-     quiz:[{q:{pl:'A: The phone is ringing! B: I ___ answer it.',en:'A: The phone is ringing! B: I ___ answer it.'},opts:[{pl:'will',en:'will'},{pl:'\'m going to',en:'\'m going to'},{pl:'don\'t',en:'don\'t'}],a:0,why:{pl:'Decyzja w tej chwili → will.',en:'A decision right now → will.'}}]},
-    {t:{pl:'Co się dzieje teraz — czasownik + -ing',en:'Happening now — verb + -ing'},
-     d:{pl:'am/is/are + czasownik z końcówką -ing: coś robimy w tej chwili.',en:'am/is/are + verb-ing: something is happening right now.'},
-     ex:['I\'m cooking dinner. — (Gotuję obiad.)','She is sleeping. — (Ona śpi.)','They are playing football. — (Oni grają w piłkę.)','What are you doing? — (Co robisz?)','It\'s raining. — (Pada deszcz.)'],
-     remember:{pl:'„What are you doing?” — najważniejsze pytanie tego czasu.',en:'„What are you doing?” — the key question of this tense.'},
-     quiz:[{q:{pl:'Look! It ___.',en:'Look! It ___.'},opts:[{pl:'rains',en:'rains'},{pl:'is raining',en:'is raining'},{pl:'rain',en:'rain'}],a:1,why:{pl:'Dzieje się teraz (Look!) → is raining.',en:'Happening now (Look!) → is raining.'}}]},
-    {t:{pl:'Porównywanie — bigger, the best',en:'Comparing — bigger, the best'},
-     d:{pl:'Krótkie słowo + „-er” = bardziej (cheap → cheaper). „the” + słowo + „-est” = najbardziej (the cheapest). Wyjątki: good → better → the best, bad → worse → the worst. Długie słowa: more / the most (expensive → more expensive).',en:'Short word + „-er” (cheap → cheaper). „the” + word + „-est” (the cheapest). Exceptions: good → better → the best, bad → worse → the worst. Long words: more / the most.'},
-     ex:['My car is older than yours. — (Moje auto jest starsze od twojego.)','This one is cheaper. — (Ten jest tańszy.)','It\'s the best restaurant in town. — (To najlepsza restauracja w mieście.)','Today is hotter than yesterday. — (Dziś jest cieplej niż wczoraj.)','Friday is the busiest day. — (Piątek to najbardziej pracowity dzień.)'],
-     mistakes:[
-      {bad:'This is more cheap.',good:'This is cheaper.',why:{pl:'Krótkie słowa: -er, nie „more”.',en:'Short words: -er, not „more”.'}}],
-     remember:{pl:'than = „niż”: bigger than mine.',en:'than = „niż”: bigger than mine.'},
-     quiz:[{q:{pl:'Gold is ___ than silver.',en:'Gold is ___ than silver.'},opts:[{pl:'expensiver',en:'expensiver'},{pl:'more expensive',en:'more expensive'},{pl:'most expensive',en:'most expensive'}],a:1,why:{pl:'Długie słowo → more expensive.',en:'Long word → more expensive.'}}]},
-    {t:{pl:'Mini-dialogi na co dzień',en:'Everyday mini-dialogues'},
-     d:{pl:'Krótkie rozmówki. Przeczytaj obie kwestie na głos — tak najszybciej się uczysz.',en:'Short dialogues. Read both parts aloud — that\'s the fastest way to learn.'},
-     ex:['A: Hi! How are you? B: I\'m fine, thanks. And you? — (Cześć! Jak się masz? Dobrze, dzięki. A ty?)','A: Can I have a tea, please? B: Sure. Anything else? — (Poproszę herbatę. Jasne. Coś jeszcze?)','A: How much is this? B: It\'s five pounds. — (Ile to kosztuje? Pięć funtów.)','A: Where is the bus stop? B: Over there, on the left. — (Gdzie jest przystanek? Tam, po lewej.)','A: See you tomorrow! B: See you! Take care! — (Do jutra! Do zobaczenia! Trzymaj się!)'],
-     remember:{pl:'Wypowiedz każdą kwestię na głos kilka razy — pamięć pracuje wtedy dużo lepiej.',en:'Say each line aloud a few times — your memory works much better then.'},
-     quiz:[{q:{pl:'Jak odpowiesz na „How are you?”',en:'How do you answer „How are you?”'},opts:[{pl:'I\'m fine, thanks.',en:'I\'m fine, thanks.'},{pl:'I have 30 years.',en:'I have 30 years.'},{pl:'Yes, I am is.',en:'Yes, I am is.'}],a:0,why:{pl:'Standardowa odpowiedź: I\'m fine, thanks.',en:'The standard answer: I\'m fine, thanks.'}}]}
-   ]
-  },
   {id:'grammar',emoji:'⚙️',title:{pl:'Gramatyka',en:'Grammar'},sub:{pl:'Czasy, strona bierna, tryby warunkowe',en:'Tenses, passive voice, conditionals'},
    b1:[
     {sec:{pl:'Czasy teraźniejsze',en:'Present Tenses'},t:{pl:'Present Simple',en:'Present Simple'},
@@ -1388,7 +1289,16 @@ var TOPICS=[
       {h:{pl:'used to + verb',en:'used to + verb'},ex:'I used to drink coffee.',note:{pl:'KIEDYŚ piłem — już nie',en:'I USED TO drink it — not anymore'}},
       {h:{pl:'be used to + -ing',en:'be used to + -ing'},ex:'I\'m used to drinking coffee.',note:{pl:'JESTEM przyzwyczajony do picia',en:'I\'m ACCUSTOMED to drinking it'}}],
      remember:{pl:'used to + czasownik = kiedyś (już nie). be used to + -ing = jestem przyzwyczajony. get used to = przyzwyczajam się.',en:'used to + verb = in the past (not now). be used to + -ing = accustomed. get used to = becoming accustomed.'},
-     quiz:[{q:{pl:'I ___ play the piano, but I stopped years ago.',en:'I ___ play the piano, but I stopped years ago.'},opts:[{pl:'used to',en:'used to'},{pl:'use to',en:'use to'},{pl:'am used to',en:'am used to'}],a:0,why:{pl:'Dawny zwyczaj, którego już nie ma → used to.',en:'A past habit that\'s over → used to.'}}]}
+     quiz:[{q:{pl:'I ___ play the piano, but I stopped years ago.',en:'I ___ play the piano, but I stopped years ago.'},opts:[{pl:'used to',en:'used to'},{pl:'use to',en:'use to'},{pl:'am used to',en:'am used to'}],a:0,why:{pl:'Dawny zwyczaj, którego już nie ma → used to.',en:'A past habit that\'s over → used to.'}}]},
+    {t:{pl:'Pytania na co dzień — do / does / did',en:'Everyday questions — do / does / did'},
+     d:{pl:'Żeby zapytać o czynność, na początku zdania stawiamy „do” (I/you/we/they), „does” (he/she/it) albo „did” (przeszłość). Reszta zdania zostaje bez zmian.',en:'To ask about an action, put "do" (I/you/we/they), "does" (he/she/it) or "did" (past) at the start. The rest of the sentence stays the same.'},
+     form:{pl:'Do you work here? · Does she speak English? · Did you sleep well?',en:'Do you work here? · Does she speak English? · Did you sleep well?'},
+     ex:['Do you like coffee? — (Lubisz kawę?)','Does he work here? — (Czy on tu pracuje?)','What do you do? — (Czym się zajmujesz?)','Where do you live? — (Gdzie mieszkasz?)','Did you see that? — (Widziałeś to?)','When does the bus leave? — (Kiedy odjeżdża autobus?)'],
+     mistakes:[
+      {bad:'You like coffee?',good:'Do you like coffee?',why:{pl:'O czynność pytamy z „do/does/did” na początku.',en:'For actions we ask with "do/does/did" at the start.'}},
+      {bad:'Does she works here?',good:'Does she work here?',why:{pl:'Po does czasownik jest bez „-s” — „does” już je ma.',en:'After does the verb has no "-s" — "does" already carries it.'}}],
+     remember:{pl:'he/she/it → does (czasownik bez -s) · przeszłość → did (czasownik bez -ed).',en:'he/she/it → does (verb without -s) · past → did (verb without -ed).'},
+     quiz:[{q:{pl:'___ your brother live in Kraków?',en:'___ your brother live in Kraków?'},opts:[{pl:'Do',en:'Do'},{pl:'Does',en:'Does'},{pl:'Is',en:'Is'}],a:1,why:{pl:'Your brother = he → does.',en:'Your brother = he → does.'}}]}
    ],
    b2:[
     {sec:{pl:'Zaawansowane tryby warunkowe',en:'Advanced Conditionals'},t:{pl:'Trzeci tryb warunkowy',en:'Third Conditional'},
@@ -1579,7 +1489,17 @@ var TOPICS=[
     {t:{pl:'Rodzina i ludzie',en:'Family & People'},
      d:{pl:'mother — mama, father — tata, parents — rodzice, brother — brat, sister — siostra, son — syn, daughter — córka, husband — mąż, wife — żona, friend — przyjaciel.',en:'mother, father, parents, brother, sister, son, daughter, husband, wife, friend.'},
      ex:['My mother\'s name is Fatima. — (Moja mama ma na imię Fatima.)','I have two brothers. — (Mam dwóch braci.)','Her husband works in a hospital. — (Jej mąż pracuje w szpitalu.)','We visit our parents every week. — (Odwiedzamy rodziców co tydzień.)'],
-     quiz:[{q:{pl:'„siostra” po angielsku to:',en:'„sister” means:'},opts:[{pl:'daughter',en:'daughter'},{pl:'sister',en:'sister'},{pl:'wife',en:'wife'}],a:1,why:{pl:'sister = siostra.',en:'sister = siostra.'}}]}
+     quiz:[{q:{pl:'„siostra” po angielsku to:',en:'„sister” means:'},opts:[{pl:'daughter',en:'daughter'},{pl:'sister',en:'sister'},{pl:'wife',en:'wife'}],a:1,why:{pl:'sister = siostra.',en:'sister = siostra.'}}]},
+    {t:{pl:'Urząd i dokumenty',en:'Office & Documents'},
+     d:{pl:'document — dokument, form — formularz, signature — podpis, ID card — dowód osobisty, passport — paszport, appointment — umówiona wizyta, queue — kolejka, office — urząd.',en:'document, form, signature, ID card, passport, appointment, queue, office.'},
+     ex:['I need to fill in this form. — (Muszę wypełnić ten formularz.)','Sign here, please. — (Proszę się tu podpisać.)','I have an appointment at 10. — (Mam wizytę na 10.)','Can I take a number? — (Czy mogę wziąć numerek?)','How long do I have to wait? — (Jak długo muszę czekać?)'],
+     remember:{pl:'fill in a form = wypełnić formularz · sign = podpisać.',en:'fill in a form · sign.'},
+     quiz:[{q:{pl:'„podpis” po angielsku to:',en:'"signature" means:'},opts:[{pl:'signature',en:'signature'},{pl:'document',en:'document'},{pl:'form',en:'form'}],a:0,why:{pl:'signature = podpis.',en:'signature = podpis.'}}]},
+    {t:{pl:'Na mieście — kierunki',en:'In the City — Directions'},
+     d:{pl:'left — lewo, right — prawo, straight on — prosto, corner — róg, crossroads — skrzyżowanie, bus stop — przystanek, map — mapa, turn — skręcić, lost — zgubiony.',en:'left, right, straight on, corner, crossroads, bus stop, map, turn, lost.'},
+     ex:['Excuse me, where is the bus stop? — (Przepraszam, gdzie jest przystanek?)','Go straight on. — (Idź prosto.)','Turn left at the corner. — (Skręć w lewo na rogu.)','It\'s on the right. — (To jest po prawej.)','I\'m lost. Can you help me? — (Zgubiłem się. Możesz mi pomóc?)'],
+     remember:{pl:'turn left/right = skręć w lewo/prawo · go straight on = idź prosto.',en:'turn left/right · go straight on.'},
+     quiz:[{q:{pl:'„Skręć w prawo” po angielsku to:',en:'"Turn right" means:'},opts:[{pl:'Turn right',en:'Turn right'},{pl:'Go straight on',en:'Go straight on'},{pl:'Turn left',en:'Turn left'}],a:0,why:{pl:'turn right = skręć w prawo.',en:'turn right = skręć w prawo.'}}]}
    ],
    b2:[
     {sec:{pl:'Zaawansowany zakres',en:'Advanced Vocabulary'},t:{pl:'Język abstrakcyjny',en:'Abstract Language'},
@@ -1609,7 +1529,19 @@ var TOPICS=[
      ex:['Why don\'t we meet for coffee this weekend?','What about going to the cinema instead?','How does Saturday sound to you?','I suggest we start with the most urgent tasks first.']},
     {t:{pl:'Opowiadanie historii',en:'Storytelling'},
      d:{pl:'Wstęp: It happened when / Once… Napięcie: Suddenly / To my surprise. Zakończenie: In the end / Eventually.',en:'Opening: It happened when / Once… Tension: Suddenly / To my surprise. Ending: In the end / Eventually.'},
-     ex:['It all started when I got on the wrong train by mistake.','Suddenly, I realised I\'d left my passport at the hotel.','To my surprise, the shop was completely empty.','In the end, we managed to catch the last flight home.']}
+     ex:['It all started when I got on the wrong train by mistake.','Suddenly, I realised I\'d left my passport at the hotel.','To my surprise, the shop was completely empty.','In the end, we managed to catch the last flight home.']},
+    {t:{pl:'Small talk — pogawędka',en:'Small Talk'},
+     d:{pl:'Krótka, miła rozmowa o niczym — przy kawie, w pracy, na imprezie. Kilka gotowych pytań i odpowiedzi wystarczy.',en:'A short, friendly chat about nothing — over coffee, at work, at a party. A few ready-made questions and answers are enough.'},
+     ex:['Hi! How\'s it going? — Not bad, thanks. And you? — (Cześć! Co słychać? — Nieźle, dzięki. A u ciebie?)','What do you do? — I work in a shop. — (Czym się zajmujesz? — Pracuję w sklepie.)','Where are you from? — I\'m from Poland. — (Skąd jesteś? — Z Polski.)','How was your weekend? — It was nice, I was with my family. — (Jak minął weekend? — Fajnie, byłem z rodziną.)','Nice weather today, right? — Yeah, finally! — (Ładna pogoda, prawda? — No, w końcu!)'],
+     remember:{pl:'„How\'s it going?” = „Co słychać?” — odpowiadasz krótko: „Good, thanks. And you?”.',en:'"How\'s it going?" — answer shortly: "Good, thanks. And you?".'},
+     quiz:[{q:{pl:'Ktoś pyta „How\'s it going?”. Co odpowiesz?',en:'Someone asks "How\'s it going?". What do you say?'},opts:[{pl:'Good, thanks. And you?',en:'Good, thanks. And you?'},{pl:'I go to work.',en:'I go to work.'},{pl:'Yes, it is going.',en:'Yes, it is going.'}],a:0,why:{pl:'Standardowa, krótka odpowiedź.',en:'The standard short answer.'}}]},
+    {t:{pl:'W sklepie i restauracji',en:'In Shops & Restaurants'},
+     d:{pl:'Zwroty, których użyjesz niemal codziennie. „Can I have…?” i „I\'d like…” załatwiają 90% spraw.',en:'Phrases you\'ll use almost daily. "Can I have…?" and "I\'d like…" handle 90% of situations.'},
+     ex:['Can I have a coffee, please? — (Poproszę kawę.)','I\'d like a table for two. — (Poproszę stolik dla dwóch osób.)','How much is it? — (Ile to kosztuje?)','Can I pay by card? — (Czy mogę zapłacić kartą?)','The bill, please. — (Rachunek, proszę.)','I\'m just looking, thanks. — (Tylko się rozglądam, dziękuję.)'],
+     mistakes:[
+      {bad:'I want a coffee.',good:'Can I have a coffee, please?',why:{pl:'„I want” brzmi nieuprzejmie. „Can I have…, please?” jest grzeczne.',en:'"I want" sounds rude. "Can I have…, please?" is polite.'}}],
+     remember:{pl:'please = proszę · thanks = dzięki — z tymi dwoma słowami wszystko brzmi lepiej.',en:'please and thanks — with these two words everything sounds better.'},
+     quiz:[{q:{pl:'Jak grzecznie poprosić o rachunek?',en:'How do you politely ask for the bill?'},opts:[{pl:'The bill, please.',en:'The bill, please.'},{pl:'Give me the bill!',en:'Give me the bill!'},{pl:'Bill now!',en:'Bill now!'}],a:0,why:{pl:'Krótko i grzecznie: The bill, please.',en:'Short and polite: The bill, please.'}}]}
    ],
    b2:[
     {sec:{pl:'Zaawansowane techniki',en:'Advanced Techniques'},t:{pl:'Perswazja i argumentowanie',en:'Persuasion & Argumentation'},
@@ -1633,7 +1565,12 @@ var TOPICS=[
      ex:['I am writing to enquire about the position advertised on your website.','I would be grateful if you could provide further information regarding…','Please find attached my CV for your consideration.']},
     {t:{pl:'Esej za/przeciw',en:'For/Against Essay'},
      d:{pl:'Struktura: Wstęp → argumenty za → argumenty przeciw → podsumowanie. Spójniki: However / On the other hand / In conclusion / Furthermore.',en:'Structure: Introduction → arguments for → arguments against → conclusion. Connectives: However / On the other hand / In conclusion / Furthermore.'},
-     ex:['There are several advantages to working from home. Firstly, it saves commuting time.','However, there are also some drawbacks. For instance, it can be hard to concentrate.','In conclusion, while working from home has benefits, it is not for everyone.']}
+     ex:['There are several advantages to working from home. Firstly, it saves commuting time.','However, there are also some drawbacks. For instance, it can be hard to concentrate.','In conclusion, while working from home has benefits, it is not for everyone.']},
+    {t:{pl:'SMS i krótkie wiadomości',en:'Texts & Short Messages'},
+     d:{pl:'Piszemy krótko i po ludzku. Nie musi być idealnie — ma być szybko i jasno.',en:'We write short and naturally. It doesn\'t have to be perfect — it has to be quick and clear.'},
+     ex:['Hi! Are you free tonight? — (Cześć! Masz czas dziś wieczorem?)','Thanks for your help! — (Dzięki za pomoc!)','Sorry, I\'m running late. Be there in 10 minutes. — (Sory, spóźnię się. Będę za 10 minut.)','Can you call me when you have a minute? — (Zadzwonisz, jak będziesz mieć chwilę?)','Happy birthday! Have a great day! — (Wszystkiego najlepszego! Miłego dnia!)','Let me know when you\'re home. — (Daj znać, jak będziesz w domu.)'],
+     remember:{pl:'Let me know = daj znać — używa się tego non stop.',en:'Let me know — people use it all the time.'},
+     quiz:[{q:{pl:'„Daj znać” po angielsku to:',en:'"Let me know" means:'},opts:[{pl:'Let me know',en:'Let me know'},{pl:'Give me know',en:'Give me know'},{pl:'Say to me',en:'Say to me'}],a:0,why:{pl:'let me know = daj znać.',en:'let me know = daj znać.'}}]}
    ],
    b2:[
     {sec:{pl:'Typy tekstów B2',en:'B2 Text Types'},t:{pl:'Esej dyskursywny',en:'Discursive Essay'},
@@ -1654,7 +1591,12 @@ var TOPICS=[
      ex:['When you hear an announcement, focus on: WHERE, WHEN, WHAT — not every word.','If you miss a word, don\'t panic — use context to guess the meaning.','Intonation tells you if someone is certain, surprised, or ironic.']},
     {t:{pl:'Rozumienie ogłoszeń i rozmów',en:'Announcements & Conversations'},
      d:{pl:'Ogłoszenia: wychwytuj WHERE, WHEN, WHAT. Rozmowy telefoniczne: standardowe zwroty.',en:'Announcements: catch WHERE, WHEN, WHAT. Phone calls: standard phrases.'},
-     ex:['Platform 3 for the 14:25 to Warsaw — listen for: number, time, destination.','In a call: "I\'m calling to confirm…" — purpose stated at the start.','If you didn\'t catch it: "I\'m sorry, could you repeat that?" or "Could you speak more slowly?"']}
+     ex:['Platform 3 for the 14:25 to Warsaw — listen for: number, time, destination.','In a call: "I\'m calling to confirm…" — purpose stated at the start.','If you didn\'t catch it: "I\'m sorry, could you repeat that?" or "Could you speak more slowly?"']},
+    {t:{pl:'Pytania, które usłyszysz najczęściej',en:'Questions You\'ll Hear Most'},
+     d:{pl:'Te pytania słychać wszędzie — w sklepie, na lotnisku, w pracy. Jak poznasz je „z ucha”, żadna rozmowa cię nie zaskoczy.',en:'You hear these questions everywhere — in shops, at the airport, at work. Once you recognise them "by ear", no conversation will surprise you.'},
+     ex:['Can I help you? — (Czy mogę pomóc?) — w sklepie','Where are you from? — (Skąd jesteś?)','How long are you staying? — (Jak długo zostajesz?)','What time does it open? — (O której otwierają?)','Anything else? — (Coś jeszcze?) — w sklepie i kawiarni','Cash or card? — (Gotówka czy karta?)'],
+     remember:{pl:'Nie rozumiesz? Spokojnie: „Sorry, can you say that again, please?” — proszę, powtórz.',en:'Don\'t understand? Stay calm: "Sorry, can you say that again, please?"'},
+     quiz:[{q:{pl:'Ktoś mówi „Cash or card?”. O co pyta?',en:'Someone says "Cash or card?". What are they asking?'},opts:[{pl:'Jak chcesz zapłacić',en:'How you want to pay'},{pl:'Ile masz pieniędzy',en:'How much money you have'},{pl:'Gdzie jest bankomat',en:'Where the cash machine is'}],a:0,why:{pl:'cash = gotówka, card = karta.',en:'cash = gotówka, card = karta.'}}]}
    ],
    b2:[
     {sec:{pl:'Poziom B2',en:'B2 Level'},t:{pl:'Autentyczne nagrania',en:'Authentic Recordings'},
@@ -1672,7 +1614,12 @@ var TOPICS=[
      ex:['Skimming: read only the first sentence of each paragraph for the main idea.','Scanning: run your eyes down the text for a specific name, number or date.','Inference: "He slammed the door and left." — infer he was angry (not stated directly).']},
     {t:{pl:'Typy tekstów B1',en:'B1 Text Types'},
      d:{pl:'E-maile i listy, artykuły prasowe na znane tematy, opisy, narracje, instrukcje, fora internetowe.',en:'Emails and letters, newspaper articles on familiar topics, descriptions, narratives, instructions, internet forums.'},
-     ex:['"The hostel is a 5-minute walk from the main station." — understand: location and distance.','"Prices start from €49 per person." — understand: cost information.','Forum post: "Has anyone tried this? tbh it\'s kinda overrated imo" — informal language, abbreviations.']}
+     ex:['"The hostel is a 5-minute walk from the main station." — understand: location and distance.','"Prices start from €49 per person." — understand: cost information.','Forum post: "Has anyone tried this? tbh it\'s kinda overrated imo" — informal language, abbreviations.']},
+    {t:{pl:'Słowa-kleje — but, because, so',en:'Glue Words — but, because, so'},
+     d:{pl:'Te małe słowa łączą zdania. Jak je znasz, rozumiesz tekst, nawet gdy nie znasz wszystkich słów. but — ale, because — bo/ponieważ, so — więc, and — i, or — lub, if — jeśli.',en:'These small words join sentences. If you know them, you understand a text even without knowing every word. but, because, so, and, or, if.'},
+     ex:['I was tired, but I went to work. — (Byłem zmęczony, ale poszedłem do pracy.)','I stayed home because it was raining. — (Zostałem w domu, bo padało.)','It was late, so we took a taxi. — (Było późno, więc wzięliśmy taksówkę.)','Call me if you need anything. — (Zadzwoń, jeśli będziesz czegoś potrzebować.)','Do you want tea or coffee? — (Chcesz herbatę czy kawę?)'],
+     remember:{pl:'because odpowiada na pytanie „dlaczego?”, so mówi „i dlatego…”.',en:'because answers "why?", so means "and that\'s why…".'},
+     quiz:[{q:{pl:'I was hungry, ___ I made a sandwich.',en:'I was hungry, ___ I made a sandwich.'},opts:[{pl:'so',en:'so'},{pl:'but',en:'but'},{pl:'or',en:'or'}],a:0,why:{pl:'Głodny → WIĘC zrobiłem kanapkę.',en:'Hungry → SO I made a sandwich.'}}]}
    ],
    b2:[
     {sec:{pl:'Poziom B2',en:'B2 Level'},t:{pl:'Teksty abstrakcyjne i literackie',en:'Abstract & Literary Texts'},
@@ -1691,7 +1638,12 @@ var TOPICS=[
     {sec:{pl:'Kolokacje',en:'Collocations'},t:{pl:'DO vs MAKE',en:'DO vs MAKE'},
      d:{pl:'DO: homework, dishes, business, damage, exercise, someone a favour. MAKE: decision, effort, progress, mistake, complaint, noise.',en:'DO: homework, dishes, business, damage, exercise, someone a favour. MAKE: decision, effort, progress, mistake, complaint, noise.'},
      ex:['Could you do me a favour? — (wyświadczyć przysługę)','I made a mistake — I sent the wrong file. — (popełniłem błąd)','She\'s making great progress with her English. — (robi postępy)','Please don\'t make so much noise! — (nie hałasuj)'],
-     tip:{pl:'NIE mieszaj: "make homework" → BŁĄD. "do a decision" → BŁĄD. Zapamiętaj całe kolokacje jako jednostki.',en:'Don\'t mix: "make homework" → WRONG. "do a decision" → WRONG. Learn collocations as whole chunks.'}}
+     tip:{pl:'NIE mieszaj: "make homework" → BŁĄD. "do a decision" → BŁĄD. Zapamiętaj całe kolokacje jako jednostki.',en:'Don\'t mix: "make homework" → WRONG. "do a decision" → WRONG. Learn collocations as whole chunks.'}},
+    {t:{pl:'Codzienne czynności — frazale',en:'Daily Routine Phrasals'},
+     d:{pl:'Frazale, których używa się od rana do wieczora. wake up — obudzić się, get up — wstać, put on — założyć (ubranie), take off — zdjąć, turn on/off — włączyć/wyłączyć, go out — wyjść, come back — wrócić.',en:'Phrasals you use from morning to night. wake up, get up, put on, take off, turn on/off, go out, come back.'},
+     ex:['I wake up at 6 and get up at 6:15. — (Budzę się o 6, wstaję o 6:15.)','Put on your jacket — it\'s cold! — (Załóż kurtkę — jest zimno!)','Can you turn off the light? — (Zgasisz światło?)','I\'m going out with friends tonight. — (Wychodzę dziś ze znajomymi.)','When will you come back? — (Kiedy wrócisz?)'],
+     remember:{pl:'put on = zakładać · take off = zdejmować — ubrania, buty, okulary.',en:'put on · take off — clothes, shoes, glasses.'},
+     quiz:[{q:{pl:'„Włącz telewizor” po angielsku to:',en:'"Turn on the TV" means:'},opts:[{pl:'Turn on the TV',en:'Turn on the TV'},{pl:'Turn off the TV',en:'Turn off the TV'},{pl:'Take off the TV',en:'Take off the TV'}],a:0,why:{pl:'turn on = włączyć.',en:'turn on = włączyć.'}}]}
    ],
    b2:[
     {sec:{pl:'Zaawansowane',en:'Advanced'},t:{pl:'Frazale nieoczywiste',en:'Non-obvious Phrasal Verbs'},
@@ -1717,7 +1669,12 @@ var TOPICS=[
      ex:['I\'m gonna call you later. → (going to)','You wanna grab a coffee? → (want to)','I shoulda told her the truth. → (should have)','It\'s kinda complicated to explain. → (kind of)']},
     {t:{pl:'Łączenie słów (Linking)',en:'Linking Words'},
      d:{pl:'Native speakerzy łączą słowa bez przerw. Spółgłoska + samogłoska łączą się naturalnie. "turn it off" → "turnnitoff".',en:'Native speakers link words without pauses. Consonant + vowel link naturally. "turn it off" → "turnnitoff".'},
-     ex:['turn it off → "tur-ni-toff"','not at all → "no-tat-all"','go on → "go-won"','did you → "di-djou"']}
+     ex:['turn it off → "tur-ni-toff"','not at all → "no-tat-all"','go on → "go-won"','did you → "di-djou"']},
+    {t:{pl:'Trudne słowa — jak je powiedzieć',en:'Tricky Words — How to Say Them'},
+     d:{pl:'Te słowa wszyscy wymawiają źle. W nawiasach — jak to mniej więcej brzmi po naszemu.',en:'Everyone mispronounces these words. In brackets — roughly how they sound.'},
+     ex:['comfortable — wygodny → „KAMF-te-bl” (nie „komfort-ajbl”)','Wednesday — środa → „WENZ-dei” (pierwsze „d” jest nieme)','vegetable — warzywo → „WEDŻ-te-bl”','chocolate — czekolada → „CZOK-lit”','clothes — ubrania → „kłołz” (jak „close”)','work — praca → „łörk” · walk — chodzić → „łok” (inaczej!)'],
+     remember:{pl:'work ≠ walk — inny dźwięk w środku: łörk vs łok.',en:'work ≠ walk — a different middle sound.'},
+     quiz:[{q:{pl:'Jak wymawiamy „Wednesday”?',en:'How do we say "Wednesday"?'},opts:[{pl:'„WENZ-dei”',en:'"WENZ-dei"'},{pl:'„Wed-nes-dei”',en:'"Wed-nes-dei"'},{pl:'„Wed-NEZ-dej”',en:'"Wed-NEZ-dej"'}],a:0,why:{pl:'Pierwsze „d” jest nieme.',en:'The first "d" is silent.'}}]}
    ],
    b2:[
     {sec:{pl:'Poziom B2',en:'B2 Level'},t:{pl:'Intonacja zdaniowa',en:'Sentence Intonation'},
@@ -2042,8 +1999,8 @@ function prayerStreak(){ /* kolejne dni z kompletem 5/5 */
 }
 var ptAsk=null,ptAskT=null;
 function renderPrayerTracker(){
-  var tEl=document.getElementById('ptTitle');if(!tEl)return;
-  tEl.textContent=it('ptToday');
+  var tgl=document.getElementById('ptToggle');if(!tgl)return;
+  document.getElementById('ptToggleLbl').textContent=it('ptToggle');
   var list=prayersOn(dKey(new Date()));
   document.getElementById('ptCount').textContent=list.length+'/5';
   var row=document.getElementById('ptRow');row.innerHTML='';
@@ -2156,7 +2113,7 @@ function checkTopicComplete(){
 document.addEventListener('click',function(e){
   if(!navigator.vibrate)return;
   var t=e.target;
-  if(t&&t.closest&&t.closest('.pill button,.sz-btn,.bnav-btn,.prayer-pills button,.sort-btn,.pw-city,.quiz-opt,.city-btn,.pt-chip,.streak-ico'))navigator.vibrate(8);
+  if(t&&t.closest&&t.closest('.pill button,.sz-btn,.bnav-btn,.prayer-pills button,.sort-btn,.pw-city,.quiz-opt,.city-btn,.pt-chip,.pt-toggle,.streak-ico'))navigator.vibrate(8);
 });
 
 /* ── GEST: SWIPE W PRAWO = WSTECZ ── */
