@@ -243,6 +243,38 @@ body.no-scroll{overflow:hidden;}
 .upd-bar{position:fixed;left:50%;bottom:calc(72px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(8px);background:var(--accent);color:#fff;font-family:'Inter',sans-serif;font-size:calc(12px * var(--scale));font-weight:600;padding:8px 9px 8px 15px;border-radius:20px;opacity:0;transition:opacity .25s ease,transform .25s ease;z-index:45;display:flex;align-items:center;gap:10px;box-shadow:0 4px 16px rgba(0,0,0,0.18);max-width:90vw;}
 .upd-bar.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .upd-bar button{background:rgba(255,255,255,0.24);border:none;color:#fff;font:inherit;padding:6px 13px;border-radius:14px;cursor:pointer;}
+/* ── STREAK / HEATMAPA ── */
+.streak-card{margin:10px 16px 0;background:var(--bg-panel);border:1px solid var(--border);border-radius:14px;padding:11px 14px;display:flex;align-items:center;gap:12px;}
+.streak-fire{font-size:24px;line-height:1;}
+.streak-num{font-size:calc(20px * var(--scale));font-weight:700;line-height:1.05;}
+.streak-lbl{font-size:calc(11px * var(--scale));color:var(--text-muted);}
+.streak-heat{margin-left:auto;display:grid;grid-template-columns:repeat(7,9px);gap:3px;}
+.heat-d{width:9px;height:9px;border-radius:3px;background:var(--accent-soft);}
+.heat-d.on{background:var(--accent);opacity:.45;}
+.heat-d.hot{background:var(--accent);}
+/* ── KONFETTI ── */
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden;}
+.confetti i{position:absolute;top:-10px;width:7px;height:7px;border-radius:2px;animation:confFall 1.4s ease-in forwards;}
+@keyframes confFall{to{transform:translateY(105vh) rotate(540deg);opacity:.9;}}
+/* ── PASEK POSTĘPU CZYTANIA ── */
+.pbar{height:3px;background:var(--accent-soft);flex-shrink:0;}
+.pbar i{display:block;height:100%;width:0;background:var(--accent);transition:width .12s linear;}
+/* ── WIGGLE (podpowiedź ustawień) ── */
+@keyframes wig{0%,100%{transform:rotate(0);}20%{transform:rotate(-14deg);}40%{transform:rotate(10deg);}60%{transform:rotate(-7deg);}80%{transform:rotate(5deg);}}
+.icon-btn.wig{animation:wig .8s ease 3;}
+/* ── ONBOARDING ── */
+.ob-panel{text-align:center;}
+.ob-emoji{font-size:44px;margin:10px 0 6px;}
+.ob-title{font-size:calc(19px * var(--scale));font-weight:700;margin-bottom:8px;}
+.ob-text{font-size:calc(13px * var(--scale));color:var(--text-muted);line-height:1.55;margin:0 0 14px;}
+.ob-dots{display:flex;justify-content:center;gap:6px;margin-bottom:14px;}
+.ob-dots i{width:7px;height:7px;border-radius:50%;background:var(--accent-soft);}
+.ob-dots i.on{background:var(--accent);}
+.ob-actions{display:flex;gap:8px;justify-content:center;}
+.ob-actions .set-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+.ob-city{margin-top:10px;width:100%;}
+.set-stats{margin-top:12px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;font-size:calc(12px * var(--scale));color:var(--text-muted);line-height:1.6;}
+.set-stats b{color:var(--text);}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}}
 /* ── DESKTOP ── */
 @media(min-width:760px){#app{border-left:1px solid var(--border);border-right:1px solid var(--border);}}
@@ -281,6 +313,7 @@ body.no-scroll{overflow:hidden;}
     <div class="pw-grid" id="pwGrid"></div>
   </div>
   <div class="mini-bar" id="i-mbHome"></div>
+  <div id="i-streakWrap"></div>
   <div class="list-hdr-row">
     <span class="list-hdr-lbl" id="i-listHdr"></span>
     <button class="sort-btn" id="iSortBtn" aria-label="Odwróć kolejność / Reverse order">↕</button>
@@ -319,6 +352,7 @@ body.no-scroll{overflow:hidden;}
     <button class="back-btn" id="iBackPrayer" aria-label="Wstecz / Back">‹</button>
     <span class="sub-ttl" id="i-prayerTopTtl"></span>
   </div>
+  <div class="pbar"><i id="pbarPrayer"></i></div>
   <div class="mini-bar" id="i-mbPrayer"></div>
   <div class="prayer-pills">
     <button id="pv2"></button><button id="pv3"></button><button id="pv4"></button>
@@ -376,6 +410,7 @@ body.no-scroll{overflow:hidden;}
     <button class="back-btn" id="eBackItem" aria-label="Wstecz / Back">‹</button>
     <span class="sub-ttl" id="e-itemTopTtl"></span>
   </div>
+  <div class="pbar"><i id="pbarItem"></i></div>
   <div class="id-scroll" id="e-itemScroll"></div>
 </div>
 
@@ -420,7 +455,27 @@ body.no-scroll{overflow:hidden;}
       <button class="set-btn" id="importBtn"></button>
       <input type="file" id="importFile" accept="application/json,.json" style="display:none">
     </div>
+    <div class="set-stats" id="setStats" style="display:none"></div>
+    <div class="set-row" id="installRow" style="display:none;margin-top:12px">
+      <span class="set-lbl" id="installLbl"></span>
+      <button class="set-btn" id="installBtn"></button>
+    </div>
     <div class="set-note" id="setNote"></div>
+  </div>
+</div>
+
+<!-- Onboarding overlay -->
+<div class="overlay" id="obOv" role="dialog" aria-modal="true">
+  <div class="overlay-panel ob-panel">
+    <div class="ob-emoji" id="obEmoji"></div>
+    <div class="ob-title" id="obTitle"></div>
+    <p class="ob-text" id="obText"></p>
+    <div class="ob-dots" id="obDots"><i></i><i></i><i></i></div>
+    <div class="ob-actions">
+      <button class="set-btn" id="obSkip" type="button"></button>
+      <button class="set-btn primary" id="obNext" type="button"></button>
+    </div>
+    <button class="set-btn ob-city" id="obCity" type="button" style="display:none"></button>
   </div>
 </div>
 
@@ -432,7 +487,7 @@ body.no-scroll{overflow:hidden;}
    STATE & STORAGE (versioned)
 ══════════════════════════════ */
 var LS_KEY='mdv4',LS_LEGACY='mdv3',DATA_VER=1;
-var DEF={v:DATA_VER,sect:'islam',lang:'pl',theme:'light',scale:'1',cityId:'krakow',sortReversed:false,engLevel:'b1',pvVer:'2',done:{},lastEng:null};
+var DEF={v:DATA_VER,sect:'islam',lang:'pl',theme:'light',scale:'1',cityId:'krakow',sortReversed:false,engLevel:'b1',pvVer:'2',done:{},lastEng:null,act:{},bestStreak:0,onboarded:false,seenWiggle:false,milestones:{}};
 function pick(v,allowed,fallback){v=String(v);return allowed.indexOf(v)>-1?v:fallback;}
 function sanitizeState(s){
   s=(s&&typeof s==='object')?s:{};
@@ -446,6 +501,10 @@ function sanitizeState(s){
   if(typeof st.cityId!=='string')st.cityId='krakow';
   if(!st.done||typeof st.done!=='object'||Array.isArray(st.done))st.done={};
   if(!st.lastEng||typeof st.lastEng!=='object')st.lastEng=null;
+  if(!st.act||typeof st.act!=='object'||Array.isArray(st.act))st.act={};
+  if(!st.milestones||typeof st.milestones!=='object'||Array.isArray(st.milestones))st.milestones={};
+  st.bestStreak=(typeof st.bestStreak==='number'&&isFinite(st.bestStreak)&&st.bestStreak>=0)?Math.floor(st.bestStreak):0;
+  st.onboarded=!!st.onboarded;st.seenWiggle=!!st.seenWiggle;
   st.sortReversed=!!st.sortReversed;
   st.v=DATA_VER;
   return st;
@@ -490,7 +549,7 @@ function applyLangChrome(){document.getElementById('bnEngLbl').textContent=ST.la
 
 var toastEl=null,toastT=null;
 function toast(msg){
-  if(!toastEl){toastEl=document.createElement('div');toastEl.className='toast';toastEl.setAttribute('role','status');document.body.appendChild(toastEl);}
+  if(!toastEl){toastEl=document.createElement('div');toastEl.className='toast';toastEl.setAttribute('role','status');toastEl.setAttribute('aria-live','polite');document.body.appendChild(toastEl);}
   toastEl.textContent=msg;toastEl.classList.add('show');
   clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show');},1600);
 }
@@ -529,8 +588,8 @@ function setLang(l){ST.lang=l;save();document.documentElement.setAttribute('lang
    ISLAM — TRANSLATIONS
 ══════════════════════════════ */
 var IS={
-  pl:{appTitle:'Moja Droga',appSub:'Notatnik drogi w islamie',pv2:'2 rakaty',pv3:'3 rakaty',pv4:'4 rakaty',pwMethod:'MWL · przybliżone',changeCity:'Zmień miasto',searchCity:'Szukaj…',now:'Teraz',next:'Następna',between:'między modlitwami',inTime:'za',listHeader:'Twój notatnik',settings:'Ustawienia',dataLbl:'Twoje dane',exportBtn:'Eksportuj dane (JSON)',importBtn:'Importuj dane (JSON)',setNote:'Dane są zapisywane lokalnie w tej przeglądarce. Eksport pozwala przenieść je na inne urządzenie lub zrobić kopię zapasową.',importOk:'Dane zaimportowane pomyślnie.',importErr:'Nieprawidłowy plik — import nie powiódł się.',doneOn:'Oznaczono jako opanowane ✓',doneOff:'Cofnięto oznaczenie'},
-  en:{appTitle:'My Path',appSub:'Notebook of my journey in Islam',pv2:"2 rak'ahs",pv3:"3 rak'ahs",pv4:"4 rak'ahs",pwMethod:'MWL · approximate',changeCity:'Change city',searchCity:'Search…',now:'Now',next:'Next',between:'between prayers',inTime:'in',listHeader:'Your notebook',settings:'Settings',dataLbl:'Your data',exportBtn:'Export data (JSON)',importBtn:'Import data (JSON)',setNote:'Data is stored locally in this browser. Export lets you move it to another device or keep a backup.',importOk:'Data imported successfully.',importErr:'Invalid file — import failed.',doneOn:'Marked as mastered ✓',doneOff:'Mark removed'}
+  pl:{appTitle:'Moja Droga',appSub:'Notatnik drogi w islamie',pv2:'2 rakaty',pv3:'3 rakaty',pv4:'4 rakaty',pwMethod:'MWL · przybliżone',changeCity:'Zmień miasto',searchCity:'Szukaj…',now:'Teraz',next:'Następna',between:'między modlitwami',inTime:'za',listHeader:'Twój notatnik',settings:'Ustawienia',dataLbl:'Twoje dane',exportBtn:'Eksportuj dane (JSON)',importBtn:'Importuj dane (JSON)',setNote:'Dane są zapisywane lokalnie w tej przeglądarce. Eksport pozwala przenieść je na inne urządzenie lub zrobić kopię zapasową.',importOk:'Dane zaimportowane pomyślnie.',importErr:'Nieprawidłowy plik — import nie powiódł się.',doneOn:'Oznaczono jako opanowane ✓',doneOff:'Cofnięto oznaczenie',day1:'dzień z rzędu',dayN:'dni z rzędu',statsDays:'dni z aplikacją',statsDone:'opanowanych',ms7:'🔥 7 dni z rzędu — tak trzymaj!',msAll:'🎉 Cały temat opanowany!',ms100:'💯 100 opanowanych elementów!',installLbl:'Aplikacja na telefonie',installBtn:'Zainstaluj',installIos:'iPhone/iPad: Udostępnij → „Dodaj do ekranu głównego”',ob1t:'Godziny modlitw',ob1x:'Sprawdzaj czasy modlitw dla swojego miasta — offline, bez reklam.',ob2t:'Modlitwa krok po kroku',ob2x:'Przewodnik po modlitwie (2, 3 lub 4 rakaty), wudu, alfabet arabski i adhkar — zawsze pod ręką.',ob3t:'Angielski B1 → B2',ob3x:'Gramatyka, zwroty i słownictwo z mini-ćwiczeniami. Odhaczaj opanowane tematy.',obNext:'Dalej',obSkip:'Pomiń',obStart:'Zacznij',obCity:'Wybierz miasto'},
+  en:{appTitle:'My Path',appSub:'Notebook of my journey in Islam',pv2:"2 rak'ahs",pv3:"3 rak'ahs",pv4:"4 rak'ahs",pwMethod:'MWL · approximate',changeCity:'Change city',searchCity:'Search…',now:'Now',next:'Next',between:'between prayers',inTime:'in',listHeader:'Your notebook',settings:'Settings',dataLbl:'Your data',exportBtn:'Export data (JSON)',importBtn:'Import data (JSON)',setNote:'Data is stored locally in this browser. Export lets you move it to another device or keep a backup.',importOk:'Data imported successfully.',importErr:'Invalid file — import failed.',doneOn:'Marked as mastered ✓',doneOff:'Mark removed',day1:'day streak',dayN:'day streak',statsDays:'days active',statsDone:'mastered',ms7:'🔥 7 days in a row — keep it up!',msAll:'🎉 Whole topic mastered!',ms100:'💯 100 items mastered!',installLbl:'App on your phone',installBtn:'Install',installIos:'iPhone/iPad: Share → “Add to Home Screen”',ob1t:'Prayer times',ob1x:'Check prayer times for your city — offline, no ads.',ob2t:'Prayer step by step',ob2x:'Prayer guide (2, 3 or 4 rak\'ahs), wudu, Arabic alphabet and adhkar — always at hand.',ob3t:'English B1 → B2',ob3x:'Grammar, phrases and vocabulary with mini exercises. Tick off mastered topics.',obNext:'Next',obSkip:'Skip',obStart:'Start',obCity:'Choose city'}
 };
 var PL_N={fajr:{pl:'Fajr',en:'Fajr'},sunrise:{pl:'Wschód',en:'Sunrise'},dhuhr:{pl:'Dhuhr',en:'Dhuhr'},asr:{pl:'Asr',en:'Asr'},maghrib:{pl:'Maghrib',en:'Maghrib'},isha:{pl:'Isha',en:'Isha'}};
 function it(k){return IS[ST.lang][k]||k;}
@@ -630,8 +689,9 @@ function renderIslam(){
     row.addEventListener('click',function(){openIslamEntry(entry);});
     list.appendChild(row);
   });
+  renderStreak();
 }
-function openIslamEntry(e){if(e.type==='list')openIslamList(e);else if(e.type==='letters')openIslamLetters();else if(e.type==='prayer')openIslamPrayer();}
+function openIslamEntry(e){touchAct();if(e.type==='list')openIslamList(e);else if(e.type==='letters')openIslamLetters();else if(e.type==='prayer')openIslamPrayer();}
 function openIslamList(entry){
   curIslamEntry=entry;
   document.getElementById('i-listTopTtl').textContent=entry.title[ST.lang];
@@ -684,6 +744,7 @@ function openIslamPrayer(){
 }
 function renderPrayerBody(){
   var scroll=document.getElementById('i-prayerScroll');scroll.innerHTML='';
+  var pb=document.getElementById('pbarPrayer');if(pb)pb.style.width='0%';
   psets[ST.pvVer].forEach(function(sec){
     var block=document.createElement('div');block.className='sec-block'+(sec.hl?' hl':'');
     var hdr=document.createElement('div');hdr.className='sec-head';hdr.textContent=ST.lang==='pl'?sec.lp:sec.le;
@@ -729,6 +790,20 @@ function openSettings(){
   document.getElementById('exportBtn').textContent=it('exportBtn');
   document.getElementById('importBtn').textContent=it('importBtn');
   var note=document.getElementById('setNote');note.textContent=it('setNote');note.style.color='';
+  /* statystyki aktywnosci */
+  var sEl=document.getElementById('setStats');sEl.style.display='';
+  var streak=calcStreak();
+  sEl.innerHTML='🔥 <b>'+streak+'</b> '+(streak===1?it('day1'):it('dayN'))+' · <b>'+activeDays()+'</b> '+it('statsDays')+' · <b>'+totalDone()+'</b> '+it('statsDone')+' · 🏆 <b>'+ST.bestStreak+'</b>';
+  /* instalacja PWA */
+  var iRow=document.getElementById('installRow'),iBtn=document.getElementById('installBtn'),iLbl=document.getElementById('installLbl');
+  var standalone=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||window.navigator.standalone===true;
+  var isIos=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  iBtn.style.display='';
+  if(deferredInstall){iRow.style.display='';iLbl.textContent=it('installLbl');iBtn.textContent=it('installBtn');}
+  else if(isIos&&!standalone){iRow.style.display='';iLbl.textContent=it('installIos');iBtn.style.display='none';}
+  else{iRow.style.display='none';}
+  /* koniec podpowiedzi wiggle */
+  if(!ST.seenWiggle){ST.seenWiggle=true;save();document.getElementById('iSettingsBtn').classList.remove('wig');document.getElementById('eSettingsBtn').classList.remove('wig');}
   document.getElementById('setOv').classList.add('open');
 }
 document.getElementById('iSettingsBtn').addEventListener('click',openSettings);
@@ -738,8 +813,33 @@ document.getElementById('setOv').addEventListener('click',function(e){if(e.targe
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){document.querySelectorAll('.overlay.open').forEach(function(o){o.classList.remove('open');});}
 });
-/* blokada przewijania tla, gdy otwarty jest overlay */
-var ovLockObs=new MutationObserver(function(){document.body.classList.toggle('no-scroll',!!document.querySelector('.overlay.open'));});
+/* pulapka fokusu (Tab) w otwartym overlayu */
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Tab')return;
+  var o=document.querySelector('.overlay.open');if(!o)return;
+  var f=o.querySelectorAll('button,input,[tabindex]');if(!f.length)return;
+  var first=f[0],last=f[f.length-1];
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+  else if(!o.contains(document.activeElement)){e.preventDefault();first.focus();}
+});
+/* blokada przewijania tla + zarzadzanie fokusem, gdy otwarty jest overlay */
+var ovLockObs=new MutationObserver(function(muts){
+  document.body.classList.toggle('no-scroll',!!document.querySelector('.overlay.open'));
+  muts.forEach(function(mu){
+    var o=mu.target;
+    if(o.classList.contains('open')){
+      o._prevFocus=document.activeElement;
+      setTimeout(function(){
+        var f=o.querySelector('button,input');
+        if(f&&!o.contains(document.activeElement))f.focus();
+      },70);
+    }else if(o._prevFocus&&o._prevFocus.focus){
+      try{o._prevFocus.focus();}catch(err){}
+      o._prevFocus=null;
+    }
+  });
+});
 document.querySelectorAll('.overlay').forEach(function(o){ovLockObs.observe(o,{attributes:true,attributeFilter:['class']});});
 /* export */
 document.getElementById('exportBtn').addEventListener('click',function(){
@@ -1627,6 +1727,7 @@ function renderEngItems(){
         ST.done[ky2]=!ST.done[ky2];save();if(navigator.vibrate)navigator.vibrate(10);
         chkEl.className='i-chk'+(ST.done[ky2]?' done':'');chkEl.textContent=ST.done[ky2]?'✓':'';
         toast(ST.done[ky2]?it('doneOn'):it('doneOff'));
+        touchAct();if(ST.done[ky2]){checkDoneMilestones();checkTopicComplete();}
       });
       row.addEventListener('click',function(){engListScroll=list.scrollTop;openEngItem(item2,ky2);});
     })(ky,chk,item);
@@ -1635,10 +1736,12 @@ function renderEngItems(){
 }
 
 function openEngItem(item,ky){
+  touchAct();
   curEngItemData={item:item,key:ky};
   if(curEngTopic){ST.lastEng={t:curEngTopic.id,lv:ST.engLevel,k:ky};save();}
   document.getElementById('e-itemTopTtl').textContent=eT(item);
   var scroll=document.getElementById('e-itemScroll');scroll.innerHTML='';scroll.scrollTop=0;
+  var pbI=document.getElementById('pbarItem');if(pbI)pbI.style.width='0%';
   function hdr(txt){var h=document.createElement('div');h.className='id-shdr';h.textContent=txt;scroll.appendChild(h);}
   // Title
   var ttEl=document.createElement('div');ttEl.className='id-title';ttEl.textContent=eT(item);
@@ -1735,6 +1838,7 @@ function openEngItem(item,ky){
     ST.done[ky]=!ST.done[ky];save();if(navigator.vibrate)navigator.vibrate(10);
     dChk.className='i-chk'+(ST.done[ky]?' done':'');dChk.textContent=ST.done[ky]?'✓':'';
     toast(ST.done[ky]?it('doneOn'):it('doneOff'));
+    touchAct();if(ST.done[ky]){checkDoneMilestones();checkTopicComplete();}
     var lChk=document.querySelector('#e-itemList [data-k="'+ky+'"]');
     if(lChk){lChk.className='i-chk'+(ST.done[ky]?' done':'');lChk.textContent=ST.done[ky]?'✓':'';}
   });
@@ -1766,6 +1870,146 @@ document.getElementById('bnEng').addEventListener('click',function(){
 });
 
 /* ══════════════════════════════
+   AKTYWNOSC, SERIA, KAMIENIE MILOWE
+══════════════════════════════ */
+function dKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function calcStreak(){
+  var d=new Date(),s=0;
+  if(!ST.act[dKey(d)])d.setDate(d.getDate()-1); /* seria liczona od dzis lub wczoraj */
+  while(ST.act[dKey(d)]){s++;d.setDate(d.getDate()-1);}
+  return s;
+}
+function activeDays(){return Object.keys(ST.act).length;}
+function totalDone(){var n=0;for(var k in ST.done){if(ST.done[k])n++;}return n;}
+function touchAct(){
+  var k=dKey(new Date());ST.act[k]=(ST.act[k]||0)+1;
+  var st=calcStreak();if(st>ST.bestStreak)ST.bestStreak=st;
+  save();
+  var w=document.getElementById('i-streakWrap');if(w&&w.firstChild)renderStreak();
+  if(st>=7&&!ST.milestones.s7){ST.milestones.s7=1;save();toast(it('ms7'));confetti();}
+}
+function renderStreak(){
+  var w=document.getElementById('i-streakWrap');if(!w)return;w.innerHTML='';
+  var st=calcStreak();
+  var card=document.createElement('div');card.className='streak-card';
+  var fire=document.createElement('span');fire.className='streak-fire';fire.textContent=st>0?'🔥':'🌱';
+  var mid=document.createElement('div');
+  var num=document.createElement('div');num.className='streak-num';num.textContent=st;
+  var lb=document.createElement('div');lb.className='streak-lbl';lb.textContent=st===1?it('day1'):it('dayN');
+  mid.appendChild(num);mid.appendChild(lb);
+  var heat=document.createElement('div');heat.className='streak-heat';heat.setAttribute('aria-hidden','true');
+  for(var i=34;i>=0;i--){
+    var d=new Date();d.setDate(d.getDate()-i);
+    var c=ST.act[dKey(d)]||0;
+    var cell=document.createElement('i');
+    cell.className='heat-d'+(c>=3?' hot':c>0?' on':'');
+    heat.appendChild(cell);
+  }
+  card.appendChild(fire);card.appendChild(mid);card.appendChild(heat);
+  w.appendChild(card);
+}
+function reducedMotion(){return !!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);}
+function confetti(){
+  if(reducedMotion())return;
+  var box=document.createElement('div');box.className='confetti';box.setAttribute('aria-hidden','true');
+  var colors=['#A9762F','#C9A24B','#3E8E5A','#3A6FC2','#B4452F'];
+  for(var i=0;i<26;i++){
+    var p=document.createElement('i');
+    p.style.left=(Math.random()*100)+'vw';
+    p.style.background=colors[i%colors.length];
+    p.style.animationDelay=(Math.random()*0.35)+'s';
+    p.style.animationDuration=(1.1+Math.random()*0.7)+'s';
+    box.appendChild(p);
+  }
+  document.body.appendChild(box);
+  setTimeout(function(){box.remove();},2400);
+}
+function checkDoneMilestones(){
+  if(totalDone()>=100&&!ST.milestones.d100){ST.milestones.d100=1;save();toast(it('ms100'));confetti();}
+}
+function checkTopicComplete(){
+  if(!curEngTopic)return;
+  var lv=ST.engLevel,items=lv==='b1'?curEngTopic.b1:curEngTopic.b2;
+  if(!items||!items.length)return;
+  var all=true;
+  for(var i=0;i<items.length;i++){if(!ST.done[eKey(curEngTopic.id,lv,items[i])]){all=false;break;}}
+  var mk='tc_'+curEngTopic.id+'_'+lv;
+  if(all&&!ST.milestones[mk]){ST.milestones[mk]=1;save();toast(it('msAll'));confetti();}
+}
+
+/* ── HAPTYKA PRZELACZNIKOW ── */
+document.addEventListener('click',function(e){
+  if(!navigator.vibrate)return;
+  var t=e.target;
+  if(t&&t.closest&&t.closest('.pill button,.sz-btn,.bnav-btn,.prayer-pills button,.sort-btn,.pw-city,.quiz-opt,.city-btn'))navigator.vibrate(8);
+});
+
+/* ── GEST: SWIPE W PRAWO = WSTECZ ── */
+(function(){
+  var sx=0,sy=0,trk=false;
+  document.addEventListener('touchstart',function(e){
+    if(document.querySelector('.overlay.open')){trk=false;return;}
+    var t=e.touches[0];
+    if(t.clientX<=28){sx=t.clientX;sy=t.clientY;trk=true;}else trk=false;
+  },{passive:true});
+  document.addEventListener('touchend',function(e){
+    if(!trk)return;trk=false;
+    var t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;
+    if(dx>64&&Math.abs(dy)<60){
+      var b=document.querySelector('.view.active .back-btn');
+      if(b){if(navigator.vibrate)navigator.vibrate(8);b.click();}
+    }
+  },{passive:true});
+})();
+
+/* ── PASEK POSTEPU CZYTANIA ── */
+function bindPbar(scrollId,barId){
+  var sc=document.getElementById(scrollId),bar=document.getElementById(barId);
+  if(!sc||!bar)return;
+  sc.addEventListener('scroll',function(){
+    var max=sc.scrollHeight-sc.clientHeight;
+    bar.style.width=(max>0?Math.min(100,Math.round(sc.scrollTop/max*100)):0)+'%';
+  },{passive:true});
+}
+bindPbar('i-prayerScroll','pbarPrayer');
+bindPbar('e-itemScroll','pbarItem');
+
+/* ── ONBOARDING ── */
+var OB_SLIDES=[{e:'🕌',t:'ob1t',x:'ob1x',city:true},{e:'📿',t:'ob2t',x:'ob2x'},{e:'🇬🇧',t:'ob3t',x:'ob3x'}];
+var obIdx=0;
+function obRender(){
+  var s=OB_SLIDES[obIdx],last=obIdx===OB_SLIDES.length-1;
+  document.getElementById('obEmoji').textContent=s.e;
+  document.getElementById('obTitle').textContent=it(s.t);
+  document.getElementById('obText').textContent=it(s.x);
+  document.getElementById('obNext').textContent=it(last?'obStart':'obNext');
+  var sk=document.getElementById('obSkip');sk.textContent=it('obSkip');sk.style.display=last?'none':'';
+  var c=document.getElementById('obCity');c.style.display=s.city?'':'none';c.textContent=it('obCity');
+  var dots=document.getElementById('obDots').children;
+  for(var i=0;i<dots.length;i++)dots[i].className=i===obIdx?'on':'';
+}
+function obFinish(openCity){
+  ST.onboarded=true;save();
+  document.getElementById('obOv').classList.remove('open');
+  if(openCity)document.getElementById('pwCityBtn').click();
+}
+document.getElementById('obNext').addEventListener('click',function(){
+  if(obIdx<OB_SLIDES.length-1){obIdx++;obRender();}else obFinish(false);
+});
+document.getElementById('obSkip').addEventListener('click',function(){obFinish(false);});
+document.getElementById('obCity').addEventListener('click',function(){obFinish(true);});
+
+/* ── INSTALL PROMPT ── */
+var deferredInstall=null;
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredInstall=e;});
+document.getElementById('installBtn').addEventListener('click',function(){
+  if(!deferredInstall)return;
+  var p=deferredInstall;deferredInstall=null;
+  p.prompt();
+  document.getElementById('setOv').classList.remove('open');
+});
+
+/* ══════════════════════════════
    INIT
 ══════════════════════════════ */
 (function init(){
@@ -1783,6 +2027,21 @@ document.getElementById('bnEng').addEventListener('click',function(){
   /* odswiezanie wyrownane do pelnej minuty + natychmiast po powrocie do karty */
   (function tick(){refreshP();setTimeout(tick,60000-(Date.now()%60000)+60);})();
   document.addEventListener('visibilitychange',function(){if(!document.hidden)refreshP();});
+  /* skroty z manifestu / linki ?go= */
+  try{
+    var go=new URLSearchParams(location.search).get('go');
+    if(go==='eng')document.getElementById('bnEng').click();
+    else if(go==='prayer')openIslamPrayer();
+  }catch(e){}
+  /* onboarding przy pierwszym uruchomieniu */
+  if(!ST.onboarded){obIdx=0;obRender();setTimeout(function(){document.getElementById('obOv').classList.add('open');},450);}
+  /* podpowiedz ustawien (wiggle) — tylko gdy onboarding juz zalatwiony */
+  if(!ST.seenWiggle&&ST.onboarded){
+    setTimeout(function(){
+      document.getElementById('iSettingsBtn').classList.add('wig');
+      document.getElementById('eSettingsBtn').classList.add('wig');
+    },2000);
+  }
 })();
 
 })();
