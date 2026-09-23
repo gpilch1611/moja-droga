@@ -1,9 +1,17 @@
 /* Moja Droga — Service Worker (auto-update, offline) */
-const CACHE = 'moja-droga-v12';
+const CACHE = 'moja-droga-v13';
 const CORE = [
   './',
   './index.html',
   './manifest.webmanifest',
+  './css/style.css',
+  './js/state.js',
+  './js/islam-data.js',
+  './js/islam.js',
+  './js/eng-data.js',
+  './js/eng.js',
+  './js/progress.js',
+  './js/app.js',
   './icon-192.png',
   './icon-512.png',
   './icon-512-maskable.png'
