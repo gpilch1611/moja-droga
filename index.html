@@ -1957,16 +1957,19 @@ document.getElementById('eThemeBtn').addEventListener('click',function(){ST.them
 document.querySelectorAll('#eSzPill .sz-btn').forEach(function(b){b.addEventListener('click',function(){ST.scale=b.dataset.sc;save();applyScale();});});
 
 /* ── BOTTOM NAV ── */
+/* Klik w tab = zawsze powrót na początek sekcji (widok główny + scroll na górę) */
 document.getElementById('bnIslam').addEventListener('click',function(){
   ST.sect='islam';save();applySect();
-  var alive=document.querySelector('#vi-home.active,#vi-list.active,#vi-letters.active,#vi-prayer.active');
-  if(!alive){showV('vi-home');}
+  delete VIEW_SCROLL['vi-home'];
+  showV('vi-home');
+  var sc=viewScroller('vi-home');if(sc)sc.scrollTop=0;
   renderIslam();refreshP();
 });
 document.getElementById('bnEng').addEventListener('click',function(){
   ST.sect='eng';save();applySect();
-  var alive=document.querySelector('#ve-home.active,#ve-topic.active,#ve-item.active');
-  if(!alive){showV('ve-home');}
+  delete VIEW_SCROLL['ve-home'];
+  showV('ve-home');
+  var sc=viewScroller('ve-home');if(sc)sc.scrollTop=0;
   renderEngHome();
 });
 
