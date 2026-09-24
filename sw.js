@@ -1,5 +1,5 @@
 /* Moja Droga — Service Worker (auto-update, offline) */
-const CACHE = 'moja-droga-v19';
+const CACHE = 'moja-droga-v20';
 const CORE = [
   './',
   './index.html',

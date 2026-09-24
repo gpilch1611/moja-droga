@@ -35,13 +35,6 @@ function renderPrayerTracker(){
   var list=prayersList();
   var cnt=document.getElementById('ptCount');
   if(cnt)cnt.textContent=list.length+'/5';
-  var empty=document.getElementById('ptEmpty');
-  if(empty){
-    if(!list.length){
-      empty.hidden=false;
-      empty.textContent=tr('ptEmpty')||'Jeszcze dziś nic nie odnotowano — dotknij +, gdy odmówisz modlitwę.';
-    }else empty.hidden=true;
-  }
   var dots=document.getElementById('ptDots');
   if(dots){
     dots.innerHTML='';
