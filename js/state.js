@@ -133,11 +133,11 @@ function rerender(){
 function setLang(l){ST.lang=l;save();document.documentElement.setAttribute('lang',l);rerender();}
 function toggleLang(){setLang(ST.lang==='pl'?'en':'pl');}
 function syncLangBtns(){
-  var next=ST.lang==='pl'?'EN':'PL';
+  var cur=ST.lang==='pl'?'PL':'EN';
   ['iLangBtn','eLangBtn'].forEach(function(id){
     var b=document.getElementById(id);
     if(!b)return;
-    b.textContent=next;
+    b.textContent=cur;
     b.classList.toggle('en',ST.lang==='en');
   });
 }

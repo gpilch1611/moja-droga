@@ -29,11 +29,6 @@ function prayerStreak(){ /* kolejne dni z kompletem 5/5 */
   return s;
 }
 var ptUndoAsk=false,ptUndoT=null;
-function ptNextId(){
-  var list=prayersList();
-  for(var i=0;i<PR5.length;i++){if(list.indexOf(PR5[i])===-1)return PR5[i];}
-  return null;
-}
 function renderPrayerTracker(){
   var lbl=document.getElementById('ptToggleLbl');if(!lbl)return;
   lbl.textContent=it('ptToggle');
@@ -49,11 +44,6 @@ function renderPrayerTracker(){
       dots.appendChild(dt);
     }
   }
-  var nx=document.getElementById('ptNext');
-  if(nx){
-    var nid=ptNextId();
-    nx.textContent=nid?('· '+PL_N[nid][ST.lang]):'✓';
-  }
   var dec=document.getElementById('ptDec'),inc=document.getElementById('ptInc');
   if(dec){
     dec.disabled=!list.length;
@@ -62,16 +52,21 @@ function renderPrayerTracker(){
   }
   if(inc)inc.disabled=list.length>=5;
 }
+function ptNextMissing(){
+  var list=prayersList();
+  for(var i=0;i<PR5.length;i++){if(list.indexOf(PR5[i])===-1)return PR5[i];}
+  return null;
+}
 function ptAddOne(){
   var list=prayersList();
   if(list.length>=5)return;
-  var nid=ptNextId();
+  var nid=ptNextMissing();
   if(!nid)return;
   if(navigator.vibrate)navigator.vibrate(8);
   ptUndoAsk=false;clearTimeout(ptUndoT);
   var k=dKey(new Date()),arr=ST.prayers[k]||(ST.prayers[k]=[]);
   if(arr.indexOf(nid)===-1)arr.push(nid);
-  save();toast(it('ptOn')+' — '+PL_N[nid][ST.lang],'ok');touchAct();
+  save();toast(it('ptOn'),'ok');touchAct();
   if(arr.length===5&&!ST.milestones.p5){ST.milestones.p5=1;save();toast(it('msP5'),'ok');confetti();}
   else if(arr.length===5&&prayerStreak()>=7&&!ST.milestones.p7){ST.milestones.p7=1;save();toast(it('msP7'),'ok');confetti();}
   renderPrayerTracker();
@@ -88,11 +83,9 @@ function ptRemoveOne(){
   }
   clearTimeout(ptUndoT);ptUndoAsk=false;
   var k=dKey(new Date()),arr=ST.prayers[k]||[];
-  var last=list[list.length-1];
-  var ix=arr.indexOf(last);
-  if(ix>-1)arr.splice(ix,1);
+  arr.pop();
   if(!arr.length)delete ST.prayers[k];
-  save();toast(it('ptOff')+' — '+PL_N[last][ST.lang]);
+  save();toast(it('ptOff'));
   renderPrayerTracker();
   if(document.getElementById('profOv').classList.contains('open'))renderProfile();
 }

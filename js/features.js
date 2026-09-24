@@ -98,8 +98,8 @@ if(navigator.share){
   var shareRow=document.getElementById('shareRow');
   if(shareRow){
     shareRow.style.display='';
-    document.getElementById('shareLbl').textContent=featureIt('shareLbl','Udostępnij postęp');
-    document.getElementById('shareBtn').textContent=featureIt('shareBtn','Udostępnij');
+    document.getElementById('shareLbl').textContent=tr('shareLbl')||'Udostępnij postęp';
+    document.getElementById('shareBtn').textContent=tr('shareBtn')||'Udostępnij';
     document.getElementById('shareBtn').addEventListener('click',function(){
       var txt=it('shareText').replace('{st}',calcStreak()).replace('{done}',totalDone());
       navigator.share({title:it('appTitle'),text:txt}).catch(function(){});
@@ -158,13 +158,20 @@ document.getElementById('resetBtn').addEventListener('click',function(){
   toast(it('resetDone'),'ok');
   setTimeout(function(){location.reload();},700);
 });
-/* synchronizacja nowych sekcji ustawien przy kazdym otwarciu overlayu */
+/* ── USTAWIENIA: fallback w HTML, zeby nigdy nie bylo surowych kluczy ── */
+function tr(key){
+  try{
+    var v=it(key);
+    if(v&&v!==key)return v;
+  }catch(e){}
+  return null;
+}
 function syncSettingsExtras(){
   syncWake();syncBackup();syncAbout();
-  var lbl=document.getElementById('aboutLbl');if(lbl)lbl.textContent=featureIt('aboutLbl','O aplikacji');
-  var dl=document.getElementById('dangerLbl');if(dl)dl.textContent=featureIt('dangerLbl','Strefa ryzyka');
-  var wl=document.getElementById('wakeLbl');if(wl)wl.textContent=featureIt('wakeLbl','Nie gaś ekranu w widoku modlitwy');
-  var rb=document.getElementById('resetBtn');if(rb&&!rb.dataset.ask)rb.textContent=it('resetBtn');
+  var lbl=document.getElementById('aboutLbl');if(lbl)lbl.textContent=tr('aboutLbl')||'O aplikacji';
+  var dl=document.getElementById('dangerLbl');if(dl)dl.textContent=tr('dangerLbl')||'Strefa ryzyka';
+  var wl=document.getElementById('wakeLbl');if(wl)wl.textContent=tr('wakeLbl')||'Nie gaś ekranu w widoku modlitwy';
+  var rb=document.getElementById('resetBtn');if(rb&&!rb.dataset.ask)rb.textContent=tr('resetBtn')||'Wyczyść wszystkie dane';
 }
 document.getElementById('iSettingsBtn').addEventListener('click',syncSettingsExtras);
 document.getElementById('eSettingsBtn').addEventListener('click',syncSettingsExtras);
