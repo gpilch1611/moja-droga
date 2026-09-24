@@ -1,60 +1,7 @@
-/* Moja Droga — funkcje dodatkowe: cel dzienny, przypomnienia, wake lock, kopiowanie,
+/* Moja Droga — funkcje dodatkowe: przypomnienia, wake lock, kopiowanie,
    udostepnianie postepu, kopia zapasowa, strefa ryzyka, o aplikacji, tryb offline,
    skroty klawiaturowe i glebsze linki (?go=eng&topic=...) */
 'use strict';
-
-/* ══════════════════════════════
-   CEL DZIENNY (aktywnosci)
-   Zabezpieczenie przed mieszanym zestawem plikow po aktualizacji PWA.
-   Funkcje dodatkowe nie moga zalezec od nowego slownika/stanu.
-   ══════════════════════════════ */
-function featureIt(key,fallback){
-  var v=typeof it==='function'?it(key):'';
-  return (v&&v!==key)?v:fallback;
-}
-function featureGoal(){
-  var g=Number(ST&&ST.dailyGoal);
-  return isFinite(g)&&g>=1&&g<=5?Math.round(g):3;
-}
-function featureN(){
-  var n=Number(ST&&ST.act&&dKey(new Date())&&ST.act[dKey(new Date())]);
-  return isFinite(n)&&n>0?n:0;
-}
-
-function goalToday(){return featureN();}
-function renderGoal(){
-  var fill=document.getElementById('i-goalFill');
-  if(!fill)return;
-  var n=goalToday(),g=featureGoal();
-  fill.style.width=Math.min(100,Math.round(n/g*100))+'%';
-  var txt=document.getElementById('i-goalTxt');
-  if(txt)txt.textContent=featureIt('goalToday','Dziś')+': '+n+'/'+g+(n>=g?' ✓':'');
-}
-function checkGoal(){
-  var n=goalToday();
-  if(n<featureGoal())return;
-  var mk='goal_'+dKey(new Date());
-  if(ST.milestones[mk])return;
-  ST.milestones[mk]=1;save();
-  toast(it('goalDone'),'ok');confetti();
-}
-function syncGoalPill(){
-  var lbl=document.getElementById('goalLbl');if(!lbl)return;
-  lbl.textContent=featureIt('goalLbl','Cel dzienny (aktywności)');
-  document.querySelectorAll('#goalPill button').forEach(function(b){
-    b.classList.toggle('on',+b.dataset.g===featureGoal());
-  });
-}
-document.querySelectorAll('#goalPill button').forEach(function(b){
-  b.addEventListener('click',function(){
-    ST.dailyGoal=+b.dataset.g;save();syncGoalPill();renderGoal();
-    if(goalToday()>=featureGoal())checkGoal();
-  });
-});
-/* kazda aktywnosc od razu odswieza cel (opakowanie istniejacego touchAct) */
-var _touchAct=touchAct;
-touchAct=function(){_touchAct.apply(null,arguments);renderGoal();checkGoal();};
-
 
 /* ══════════════════════════════
    PRZYPOMNIENIA (modlitwa + seria)
@@ -74,7 +21,7 @@ setInterval(function(){
 setInterval(function(){
   var k=dKey(new Date());
   if(new Date().getHours()<20)return;
-  if(ST.saverDay===k||goalToday()>=2)return;
+  if(ST.saverDay===k||(ST.act[k]||0)>=2)return;
   if(calcStreak()<=0)return;
   ST.saverDay=k;save();
   toast(it('streakWarn'),'err');
@@ -213,7 +160,7 @@ document.getElementById('resetBtn').addEventListener('click',function(){
 });
 /* synchronizacja nowych sekcji ustawien przy kazdym otwarciu overlayu */
 function syncSettingsExtras(){
-  syncGoalPill();syncWake();syncBackup();syncAbout();
+  syncWake();syncBackup();syncAbout();
   var lbl=document.getElementById('aboutLbl');if(lbl)lbl.textContent=featureIt('aboutLbl','O aplikacji');
   var dl=document.getElementById('dangerLbl');if(dl)dl.textContent=featureIt('dangerLbl','Strefa ryzyka');
   var wl=document.getElementById('wakeLbl');if(wl)wl.textContent=featureIt('wakeLbl','Nie gaś ekranu w widoku modlitwy');
@@ -272,5 +219,4 @@ document.addEventListener('keydown',function(e){
 /* ══════════════════════════════
    SYNCHRONIZACJA CYKLICZNA
 ══════════════════════════════ */
-setInterval(function(){renderGoal();checkGoal();wlApply();},30000);
-renderGoal();
+setInterval(function(){wlApply();},30000);

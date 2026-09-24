@@ -29,9 +29,7 @@
 ════════════════════════════ -->
 <div class="view active" id="vi-home">
   <div class="top-bar">
-    <div class="pill" id="iLangPill">
-      <button data-lang="pl">PL</button><button data-lang="en">EN</button>
-    </div>
+    <button class="lang-btn" id="iLangBtn" type="button">EN</button>
     <div class="tb-right">
       <div class="pill" id="iSzPill">
         <button class="sz-btn" data-sc="0.85">A</button>
@@ -57,10 +55,6 @@
     <div class="pw-grid" id="pwGrid"></div>
   </div>
   <div class="mini-bar" id="i-mbHome"></div>
-  <div class="goal-row" id="i-goalRow">
-    <div class="goal-bar" aria-hidden="true"><i id="i-goalFill"></i></div>
-    <span class="goal-txt" id="i-goalTxt"></span>
-  </div>
   <div class="list-hdr-row">
     <span class="list-hdr-lbl" id="i-listHdr"></span>
     <button class="sort-btn" id="iSortBtn" aria-label="Odwróć kolejność / Reverse order">↕</button>
@@ -102,8 +96,18 @@
   <div class="pbar"><i id="pbarPrayer"></i></div>
   <div class="mini-bar" id="i-mbPrayer"></div>
   <div class="ptrack" id="ptWrap">
-    <button class="pt-toggle" id="ptToggle" aria-expanded="false"><span id="ptToggleLbl"></span><b id="ptCount"></b><span class="pt-chev">▾</span></button>
-    <div class="ptrack-row" id="ptRow" hidden></div>
+    <div class="pt-step" role="group" aria-label="Modlitwy / Prayers">
+      <div class="pt-info">
+        <span id="ptToggleLbl"></span>
+        <b id="ptCount"></b>
+        <span class="pt-next" id="ptNext"></span>
+      </div>
+      <div class="pt-dots" id="ptDots" aria-hidden="true"></div>
+      <div class="pt-actions">
+        <button class="pt-step-btn" id="ptDec" type="button">−</button>
+        <button class="pt-step-btn pt-plus" id="ptInc" type="button">+</button>
+      </div>
+    </div>
   </div>
   <div class="prayer-pills">
     <button id="pv2"></button><button id="pv3"></button><button id="pv4"></button>
@@ -116,9 +120,7 @@
 ════════════════════════════ -->
 <div class="view" id="ve-home">
   <div class="top-bar">
-    <div class="pill" id="eLangPill">
-      <button data-lang="pl">PL</button><button data-lang="en">EN</button>
-    </div>
+    <button class="lang-btn" id="eLangBtn" type="button">EN</button>
     <div class="tb-right">
       <div class="pill" id="eSzPill">
         <button class="sz-btn" data-sc="0.85">A</button>
@@ -209,12 +211,6 @@
     <div class="set-row" id="installRow" style="display:none;margin-top:12px">
       <span class="set-lbl" id="installLbl"></span>
       <button class="set-btn" id="installBtn"></button>
-    </div>
-    <div class="set-row">
-      <span class="set-lbl" id="goalLbl"></span>
-      <div class="pill" id="goalPill">
-        <button data-g="1">1</button><button data-g="2">2</button><button data-g="3">3</button><button data-g="4">4</button><button data-g="5">5</button>
-      </div>
     </div>
     <div class="set-row">
       <span class="set-lbl" id="wakeLbl"></span>

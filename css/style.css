@@ -21,6 +21,8 @@ html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--text);
 .top-bar{display:flex;align-items:center;justify-content:space-between;padding:11px 16px 9px;gap:8px;border-bottom:1px solid var(--border);background:var(--bg-panel);flex-shrink:0;}
 .tb-title{font-size:calc(13px * var(--scale));font-weight:700;}
 .tb-right{display:flex;align-items:center;gap:5px;}
+.lang-btn{border:1px solid var(--border);background:none;border-radius:4px;padding:5px 10px;cursor:pointer;color:var(--text);font-family:'Inter',sans-serif;font-weight:700;font-size:11px;min-height:28px;}
+.lang-btn:active{background:var(--accent-soft);color:var(--accent);}
 .pill{display:flex;border:1px solid var(--border);border-radius:4px;overflow:hidden;}
 .pill button{background:none;border:none;border-right:1px solid var(--border);padding:5px 9px;cursor:pointer;color:var(--text-muted);font-family:'Inter',sans-serif;font-weight:600;font-size:11px;}
 .pill button:last-child{border-right:none;}
@@ -203,11 +205,6 @@ button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);ou
 /* ── PASEK OFFLINE (fixed – nie rozpycha ukladu) ── */
 .off-bar{position:fixed;left:50%;bottom:calc(64px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#B4452F;color:#fff;font-family:'Inter',sans-serif;font-size:calc(11px * var(--scale));font-weight:600;padding:5px 13px;border-radius:14px;z-index:55;max-width:88vw;text-align:center;box-shadow:0 3px 12px rgba(0,0,0,0.18);}
 .off-bar[hidden]{display:none;}
-/* ── CEL DZIENNY (pasek pod widgetem modlitw) ── */
-.goal-row{display:flex;align-items:center;gap:8px;margin:2px 18px 0;flex-shrink:0;}
-.goal-bar{flex:1;height:4px;border-radius:2px;background:var(--accent-soft);overflow:hidden;}
-.goal-bar i{display:block;height:100%;width:0;background:var(--accent);border-radius:2px;transition:width .4s cubic-bezier(.22,.61,.36,1);}
-.goal-txt{font-size:calc(10px * var(--scale));color:var(--text-muted);font-weight:600;white-space:nowrap;}
 /* dluzsze ustawienia przewijaja sie w panelu (overlaye z wlasnym scrollem zostaja bez zmian) */
 #setOv .overlay-panel{overflow-y:auto;padding-bottom:env(safe-area-inset-bottom,0px);}
 /* ── POLISH: MOTION & UX ── */
@@ -292,22 +289,21 @@ body.no-scroll{overflow:hidden;}
 .prof-heat{display:grid;grid-template-columns:repeat(7,11px);gap:3px;justify-content:center;margin:8px 0 6px;}
 .prof-legend{display:flex;align-items:center;gap:3px;justify-content:flex-end;font-size:calc(9.5px * var(--scale));color:var(--text-muted);}
 .prof-legend i{width:9px;height:9px;border-radius:3px;}
-/* ── TRACKER MODLITW (Pomodlilem sie) ── */
-.ptrack{margin:6px 16px 2px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;}
-.pt-toggle{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--bg-panel);border-radius:16px;padding:5px 10px;font-family:'Inter',sans-serif;font-size:calc(11px * var(--scale));color:var(--text-muted);cursor:pointer;line-height:1;}
-.pt-toggle:active{color:var(--accent);}
-.pt-toggle b{color:var(--accent);font-size:calc(11.5px * var(--scale));}
-.pt-chev{font-size:calc(9px * var(--scale));transition:transform .15s ease;}
-.ptrack.open .pt-chev{transform:rotate(180deg);}
-.ptrack-row{display:flex;gap:5px;width:100%;}
-.pt-chip{flex:1;border:1px solid var(--border);background:transparent;border-radius:10px;padding:7px 2px;font-family:'Inter',sans-serif;color:var(--text);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:transform .1s ease;}
-.pt-chip .pt-n{font-weight:600;font-size:calc(10.5px * var(--scale));}
-.pt-chip .pt-s{color:var(--text-muted);font-size:calc(9px * var(--scale));min-height:12px;}
-.pt-chip.done{border-color:var(--accent);background:var(--accent-soft);}
-.pt-chip.done .pt-s{color:var(--accent);font-weight:700;}
-.pt-chip.ask{border-color:#B4452F;background:rgba(180,69,47,.08);}
-.pt-chip.ask .pt-s{color:#B4452F;font-weight:700;}
-.pt-chip:active{transform:scale(.94);}
+/* ── TRACKER MODLITW (subtelny pasek +/− pod mini-barem) ── */
+.ptrack{margin:6px 18px 2px;flex-shrink:0;}
+.pt-step{display:flex;align-items:center;gap:10px;border:1px solid var(--border);background:transparent;border-radius:12px;padding:6px 8px 6px 12px;}
+.pt-info{display:flex;align-items:baseline;gap:6px;flex:1;min-width:0;font-size:calc(10.5px * var(--scale));color:var(--text-muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pt-info b{color:var(--accent);font-size:calc(11.5px * var(--scale));}
+.pt-next{font-weight:500;overflow:hidden;text-overflow:ellipsis;}
+.pt-dots{display:flex;gap:4px;flex-shrink:0;}
+.pt-dots i{width:8px;height:8px;border-radius:50%;background:var(--accent-soft);}
+.pt-dots i.on{background:var(--accent);}
+.pt-actions{display:flex;gap:6px;flex-shrink:0;}
+.pt-step-btn{width:34px;height:34px;border-radius:10px;border:1px solid var(--border);background:none;color:var(--text-muted);font-size:17px;font-weight:700;cursor:pointer;line-height:1;}
+.pt-step-btn:active{background:var(--accent-soft);color:var(--accent);}
+.pt-step-btn.pt-plus{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);}
+.pt-step-btn.ask{border-color:#B4452F;color:#B4452F;background:rgba(180,69,47,.08);font-size:calc(10px * var(--scale));width:auto;padding:0 10px;}
+.pt-step-btn:disabled{opacity:.35;cursor:default;}
 /* ── KONFETTI ── */
 .confetti{position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden;}
 .confetti i{position:absolute;top:-10px;width:7px;height:7px;border-radius:2px;animation:confFall 1.4s ease-in forwards;}

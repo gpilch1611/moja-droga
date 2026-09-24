@@ -64,7 +64,7 @@ function miniH(d){
   }
   return it('now')+': <b>'+c+'</b> · '+it('next')+': <b>'+PL_N[d.next][ST.lang]+' '+fmtT(d.nextD,d.city.tz)+'</b> · '+it('inTime')+' '+cd;
 }
-function refreshP(){var d=renderPW(),h=miniH(d);['i-mbHome','i-mbList','i-mbLetters','i-mbPrayer'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=h;});if(typeof renderGoal==='function')renderGoal();}
+function refreshP(){var d=renderPW(),h=miniH(d);['i-mbHome','i-mbList','i-mbLetters','i-mbPrayer'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=h;});}
 /* odswiezanie co sekunde: w ostatniej godzinie tylko mini-bar (bez migania siatki) */
 var pdCache=null,pdCacheT=0;
 function pdCached(){ /* cache wyliczen (Intl/trygonometria) na 30 s */
@@ -84,7 +84,7 @@ function pdCached(){ /* cache wyliczen (Intl/trygonometria) na 30 s */
 
 /* ── ISLAM RENDER MENU ── */
 function renderIslam(){
-  document.querySelectorAll('#iLangPill button').forEach(function(b){b.classList.toggle('on',b.dataset.lang===ST.lang);});
+  syncLangBtns();
   document.getElementById('i-appTitle').textContent=it('appTitle');
   document.getElementById('i-appSub').textContent=it('appSub');
   document.getElementById('i-listHdr').textContent=it('listHeader');
@@ -154,9 +154,7 @@ function openIslamPrayer(){
     document.getElementById(id).textContent=it('pv'+v);
     document.getElementById(id).classList.toggle('on',ST.pvVer===v);
   });
-  ptAsk=null;
-  var ptw=document.getElementById('ptWrap');
-  if(ptw){ptw.classList.remove('open');document.getElementById('ptRow').hidden=true;document.getElementById('ptToggle').setAttribute('aria-expanded','false');}
+  ptUndoAsk=false;clearTimeout(ptUndoT);
   renderPrayerTracker();
   renderPrayerBody();
   showV('vi-prayer','fwd');
@@ -174,19 +172,15 @@ function renderPrayerBody(){
 }
 
 /* ── ISLAM EVENTS ── */
-document.querySelectorAll('#iLangPill button').forEach(function(b){b.addEventListener('click',function(){setLang(b.dataset.lang);});});
+document.getElementById('iLangBtn').addEventListener('click',toggleLang);
 document.getElementById('iBackList').addEventListener('click',function(){showV('vi-home','back');renderIslam();});
 document.getElementById('iBackLetters').addEventListener('click',function(){showV('vi-home','back');renderIslam();});
 document.getElementById('iBackPrayer').addEventListener('click',function(){showV('vi-home','back');renderIslam();});
 ['pv2','pv3','pv4'].forEach(function(id){document.getElementById(id).addEventListener('click',function(){ST.pvVer=id.replace('pv','');save();openIslamPrayer();});});
-document.getElementById('ptToggle').addEventListener('click',function(){
-  var wrap=document.getElementById('ptWrap'),row=document.getElementById('ptRow');
-  var open=wrap.classList.toggle('open');
-  row.hidden=!open;
-  this.setAttribute('aria-expanded',open?'true':'false');
-});
+document.getElementById('ptInc').addEventListener('click',function(){ptAddOne();});
+document.getElementById('ptDec').addEventListener('click',function(){ptRemoveOne();});
 document.getElementById('iSortBtn').addEventListener('click',function(){ST.sortReversed=!ST.sortReversed;save();renderIslam();});
-document.getElementById('iThemeBtn').addEventListener('click',function(){ST.theme=ST.theme==='light'?'dark':ST.theme==='dark'?'auto':'light';save();applyTheme();});
+document.getElementById('iThemeBtn').addEventListener('click',function(){ST.theme=ST.theme==='dark'?'light':'dark';save();applyTheme();});
 document.querySelectorAll('#iSzPill .sz-btn').forEach(function(b){b.addEventListener('click',function(){ST.scale=b.dataset.sc;save();applyScale();});});
 /* city */
 document.getElementById('pwCityBtn').addEventListener('click',function(){

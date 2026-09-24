@@ -17,55 +17,86 @@ function calcStreak(){
 function heatLv(c){return c>=6?4:c>=4?3:c>=2?2:c>=1?1:0;}
 function activeDays(){return Object.keys(ST.act).length;}
 function totalDone(){var n=0;for(var k in ST.done){if(ST.done[k])n++;}return n;}
-/* ── MODLITWY (odnotowywanie "Pomodlilem sie") ── */
+/* ── MODLITWY (subtelny licznik +/− zamiast 5 duzych chipow) ── */
 var PR5=['fajr','dhuhr','asr','maghrib','isha'];
-function prayersOn(k){return ST.prayers[k]||[];}
-function prayersToday(){return prayersOn(dKey(new Date())).length;}
+function prayersList(){return (ST.prayers[dKey(new Date())]||[]).slice().sort(function(a,b){return PR5.indexOf(a)-PR5.indexOf(b);});}
+function prayersToday(){return prayersList().length;}
 function prayersMonth(){var p=dKey(new Date()).slice(0,7),n=0;for(var k in ST.prayers){if(k.slice(0,7)===p)n+=ST.prayers[k].length;}return n;}
 function prayerStreak(){ /* kolejne dni z kompletem 5/5 */
   var d=new Date(),s=0;
-  if(prayersOn(dKey(d)).length<5)d.setDate(d.getDate()-1);
-  while(prayersOn(dKey(d)).length>=5){s++;d.setDate(d.getDate()-1);}
+  if((ST.prayers[dKey(d)]||[]).length<5)d.setDate(d.getDate()-1);
+  while((ST.prayers[dKey(d)]||[]).length>=5){s++;d.setDate(d.getDate()-1);}
   return s;
 }
-var ptAsk=null,ptAskT=null;
-function renderPrayerTracker(){
-  var tgl=document.getElementById('ptToggle');if(!tgl)return;
-  document.getElementById('ptToggleLbl').textContent=it('ptToggle');
-  var list=prayersOn(dKey(new Date()));
-  document.getElementById('ptCount').textContent=list.length+'/5';
-  var row=document.getElementById('ptRow');row.innerHTML='';
-  PR5.forEach(function(pid){
-    var done=list.indexOf(pid)>-1,ask=ptAsk===pid;
-    var b=document.createElement('button');b.type='button';
-    b.className='pt-chip'+(done?' done':'')+(ask?' ask':'');
-    var n=document.createElement('span');n.className='pt-n';n.textContent=PL_N[pid][ST.lang];
-    var s=document.createElement('span');s.className='pt-s';
-    s.textContent=ask?(done?it('ptUndo'):it('ptSure')):(done?'✓':it('ptBtn'));
-    b.appendChild(n);b.appendChild(s);
-    b.addEventListener('click',function(){ptChipClick(pid);});
-    row.appendChild(b);
-  });
+var ptUndoAsk=false,ptUndoT=null;
+function ptNextId(){
+  var list=prayersList();
+  for(var i=0;i<PR5.length;i++){if(list.indexOf(PR5[i])===-1)return PR5[i];}
+  return null;
 }
-function ptChipClick(pid){
+function renderPrayerTracker(){
+  var lbl=document.getElementById('ptToggleLbl');if(!lbl)return;
+  lbl.textContent=it('ptToggle');
+  var list=prayersList();
+  var cnt=document.getElementById('ptCount');
+  if(cnt)cnt.textContent=list.length+'/5';
+  var dots=document.getElementById('ptDots');
+  if(dots){
+    dots.innerHTML='';
+    for(var i=0;i<5;i++){
+      var dt=document.createElement('i');
+      if(i<list.length)dt.className='on';
+      dots.appendChild(dt);
+    }
+  }
+  var nx=document.getElementById('ptNext');
+  if(nx){
+    var nid=ptNextId();
+    nx.textContent=nid?('· '+PL_N[nid][ST.lang]):'✓';
+  }
+  var dec=document.getElementById('ptDec'),inc=document.getElementById('ptInc');
+  if(dec){
+    dec.disabled=!list.length;
+    dec.textContent=!list.length?'−':(ptUndoAsk?it('ptUndo'):'−');
+    dec.classList.toggle('ask',ptUndoAsk&&!!list.length);
+  }
+  if(inc)inc.disabled=list.length>=5;
+}
+function ptAddOne(){
+  var list=prayersList();
+  if(list.length>=5)return;
+  var nid=ptNextId();
+  if(!nid)return;
   if(navigator.vibrate)navigator.vibrate(8);
-  if(ptAsk!==pid){ /* pierwszy dotyk = tylko pytanie o potwierdzenie */
-    ptAsk=pid;renderPrayerTracker();
-    clearTimeout(ptAskT);ptAskT=setTimeout(function(){ptAsk=null;renderPrayerTracker();},3500);
-    return;
-  }
-  clearTimeout(ptAskT);ptAsk=null;
+  ptUndoAsk=false;clearTimeout(ptUndoT);
   var k=dKey(new Date()),arr=ST.prayers[k]||(ST.prayers[k]=[]);
-  var ix=arr.indexOf(pid);
-  if(ix>-1){arr.splice(ix,1);if(!arr.length)delete ST.prayers[k];save();toast(it('ptOff'));}
-  else{
-    arr.push(pid);toast(it('ptOn'),'ok');touchAct();
-    if(arr.length===5&&!ST.milestones.p5){ST.milestones.p5=1;save();toast(it('msP5'),'ok');confetti();}
-    else if(arr.length===5&&prayerStreak()>=7&&!ST.milestones.p7){ST.milestones.p7=1;save();toast(it('msP7'),'ok');confetti();}
-  }
+  if(arr.indexOf(nid)===-1)arr.push(nid);
+  save();toast(it('ptOn')+' — '+PL_N[nid][ST.lang],'ok');touchAct();
+  if(arr.length===5&&!ST.milestones.p5){ST.milestones.p5=1;save();toast(it('msP5'),'ok');confetti();}
+  else if(arr.length===5&&prayerStreak()>=7&&!ST.milestones.p7){ST.milestones.p7=1;save();toast(it('msP7'),'ok');confetti();}
   renderPrayerTracker();
   if(document.getElementById('profOv').classList.contains('open'))renderProfile();
 }
+function ptRemoveOne(){
+  var list=prayersList();
+  if(!list.length)return;
+  if(navigator.vibrate)navigator.vibrate(8);
+  if(!ptUndoAsk){
+    ptUndoAsk=true;renderPrayerTracker();
+    clearTimeout(ptUndoT);ptUndoT=setTimeout(function(){ptUndoAsk=false;renderPrayerTracker();},3500);
+    return;
+  }
+  clearTimeout(ptUndoT);ptUndoAsk=false;
+  var k=dKey(new Date()),arr=ST.prayers[k]||[];
+  var last=list[list.length-1];
+  var ix=arr.indexOf(last);
+  if(ix>-1)arr.splice(ix,1);
+  if(!arr.length)delete ST.prayers[k];
+  save();toast(it('ptOff')+' — '+PL_N[last][ST.lang]);
+  renderPrayerTracker();
+  if(document.getElementById('profOv').classList.contains('open'))renderProfile();
+}
+
 function touchAct(){
   var k=dKey(new Date());ST.act[k]=(ST.act[k]||0)+1;
   var st=calcStreak();if(st>ST.bestStreak)ST.bestStreak=st;
@@ -179,7 +210,7 @@ function checkTopicComplete(){
 document.addEventListener('click',function(e){
   if(!navigator.vibrate)return;
   var t=e.target;
-  if(t&&t.closest&&t.closest('.pill button,.sz-btn,.bnav-btn,.prayer-pills button,.sort-btn,.pw-city,.quiz-opt,.city-btn,.pt-chip,.pt-toggle,.streak-ico'))navigator.vibrate(8);
+  if(t&&t.closest&&t.closest('.pill button,.lang-btn,.sz-btn,.bnav-btn,.prayer-pills button,.sort-btn,.pw-city,.quiz-opt,.city-btn,.pt-step-btn,.streak-ico'))navigator.vibrate(8);
 });
 
 /* ── GEST: SWIPE W PRAWO = WSTECZ ── */

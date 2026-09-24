@@ -76,11 +76,12 @@ windowObj.globalThis = windowObj;
 
 let errors = 0;
 console.log('test/load.js — ladowanie js/ na atrapach DOM');
+const ctx = vm.createContext(windowObj);
 scripts.forEach(rel => {
   const p = path.join(ROOT, rel);
   const code = fs.readFileSync(p, 'utf8');
   try {
-    vm.runInNewContext(code, windowObj, { filename: rel });
+    vm.runInContext(code, ctx, { filename: rel });
     console.log('  ✓ ' + rel + ' — wykonany bez bledow');
   } catch (e) {
     errors++;
