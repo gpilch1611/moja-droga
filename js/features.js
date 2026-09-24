@@ -5,18 +5,34 @@
 
 /* ══════════════════════════════
    CEL DZIENNY (aktywnosci)
-══════════════════════════════ */
-function goalToday(){return (ST.act[dKey(new Date())]||0);}
+   Zabezpieczenie przed mieszanym zestawem plikow po aktualizacji PWA.
+   Funkcje dodatkowe nie moga zalezec od nowego slownika/stanu.
+   ══════════════════════════════ */
+function featureIt(key,fallback){
+  var v=typeof it==='function'?it(key):'';
+  return (v&&v!==key)?v:fallback;
+}
+function featureGoal(){
+  var g=Number(ST&&ST.dailyGoal);
+  return isFinite(g)&&g>=1&&g<=5?Math.round(g):3;
+}
+function featureN(){
+  var n=Number(ST&&ST.act&&dKey(new Date())&&ST.act[dKey(new Date())]);
+  return isFinite(n)&&n>0?n:0;
+}
+
+function goalToday(){return featureN();}
 function renderGoal(){
   var fill=document.getElementById('i-goalFill');
   if(!fill)return;
-  var n=goalToday(),g=ST.dailyGoal;
+  var n=goalToday(),g=featureGoal();
   fill.style.width=Math.min(100,Math.round(n/g*100))+'%';
-  document.getElementById('i-goalTxt').textContent=it('goalToday')+': '+n+'/'+g+(n>=g?' ✓':'');
+  var txt=document.getElementById('i-goalTxt');
+  if(txt)txt.textContent=featureIt('goalToday','Dziś')+': '+n+'/'+g+(n>=g?' ✓':'');
 }
 function checkGoal(){
   var n=goalToday();
-  if(n<ST.dailyGoal)return;
+  if(n<featureGoal())return;
   var mk='goal_'+dKey(new Date());
   if(ST.milestones[mk])return;
   ST.milestones[mk]=1;save();
@@ -24,15 +40,15 @@ function checkGoal(){
 }
 function syncGoalPill(){
   var lbl=document.getElementById('goalLbl');if(!lbl)return;
-  lbl.textContent=it('goalLbl');
+  lbl.textContent=featureIt('goalLbl','Cel dzienny (aktywności)');
   document.querySelectorAll('#goalPill button').forEach(function(b){
-    b.classList.toggle('on',+b.dataset.g===ST.dailyGoal);
+    b.classList.toggle('on',+b.dataset.g===featureGoal());
   });
 }
 document.querySelectorAll('#goalPill button').forEach(function(b){
   b.addEventListener('click',function(){
     ST.dailyGoal=+b.dataset.g;save();syncGoalPill();renderGoal();
-    if(goalToday()>=ST.dailyGoal)checkGoal();
+    if(goalToday()>=featureGoal())checkGoal();
   });
 });
 /* kazda aktywnosc od razu odswieza cel (opakowanie istniejacego touchAct) */
@@ -135,8 +151,8 @@ if(navigator.share){
   var shareRow=document.getElementById('shareRow');
   if(shareRow){
     shareRow.style.display='';
-    document.getElementById('shareLbl').textContent=it('shareLbl');
-    document.getElementById('shareBtn').textContent=it('shareBtn');
+    document.getElementById('shareLbl').textContent=featureIt('shareLbl','Udostępnij postęp');
+    document.getElementById('shareBtn').textContent=featureIt('shareBtn','Udostępnij');
     document.getElementById('shareBtn').addEventListener('click',function(){
       var txt=it('shareText').replace('{st}',calcStreak()).replace('{done}',totalDone());
       navigator.share({title:it('appTitle'),text:txt}).catch(function(){});
@@ -198,9 +214,9 @@ document.getElementById('resetBtn').addEventListener('click',function(){
 /* synchronizacja nowych sekcji ustawien przy kazdym otwarciu overlayu */
 function syncSettingsExtras(){
   syncGoalPill();syncWake();syncBackup();syncAbout();
-  var lbl=document.getElementById('aboutLbl');if(lbl)lbl.textContent=it('aboutLbl');
-  var dl=document.getElementById('dangerLbl');if(dl)dl.textContent=it('dangerLbl');
-  var wl=document.getElementById('wakeLbl');if(wl)wl.textContent=it('wakeLbl');
+  var lbl=document.getElementById('aboutLbl');if(lbl)lbl.textContent=featureIt('aboutLbl','O aplikacji');
+  var dl=document.getElementById('dangerLbl');if(dl)dl.textContent=featureIt('dangerLbl','Strefa ryzyka');
+  var wl=document.getElementById('wakeLbl');if(wl)wl.textContent=featureIt('wakeLbl','Nie gaś ekranu w widoku modlitwy');
   var rb=document.getElementById('resetBtn');if(rb&&!rb.dataset.ask)rb.textContent=it('resetBtn');
 }
 document.getElementById('iSettingsBtn').addEventListener('click',syncSettingsExtras);
