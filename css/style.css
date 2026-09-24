@@ -1,5 +1,4 @@
 /* Moja Droga — style aplikacji (wydzielone z index.html) */
-'use strict';
 
 /* ── SECTION-SPECIFIC PALETTE (light) ── */
 :root[data-sect="islam"]{--bg:#F4EFE6;--bg-panel:#FDFAF5;--accent:#A9762F;--accent-soft:rgba(169,118,47,0.11);}

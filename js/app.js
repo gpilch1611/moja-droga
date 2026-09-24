@@ -5,6 +5,13 @@
    INIT
 ══════════════════════════════ */
 (function init(){
+  /* globalny handler bledow — toast max raz na 10 s */
+  var lastErrToast=0;
+  window.addEventListener('error',function(){
+    var now=Date.now();
+    if(now-lastErrToast<10000)return;
+    lastErrToast=now;toast(it('errGeneric'));
+  });
   document.documentElement.setAttribute('lang',ST.lang);
   applySect();
   applyLangChrome();
@@ -17,8 +24,8 @@
     refreshP();
   }
   /* odswiezanie wyrownane do pelnej minuty + natychmiast po powrocie do karty */
-  (function tick(){refreshP();setTimeout(tick,60000-(Date.now()%60000)+60);})();
-  document.addEventListener('visibilitychange',function(){if(!document.hidden)refreshP();});
+  (function tick(){if(ST.sect==='islam')refreshP();setTimeout(tick,60000-(Date.now()%60000)+60);})();
+  document.addEventListener('visibilitychange',function(){if(!document.hidden&&ST.sect==='islam')refreshP();});
   /* skroty z manifestu / linki ?go= */
   try{
     var go=new URLSearchParams(location.search).get('go');

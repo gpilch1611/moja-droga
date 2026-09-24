@@ -11,7 +11,7 @@ function sanitizeState(s){
   s=(s&&typeof s==='object')?s:{};
   var st=Object.assign({},DEF,s);
   st.lang=pick(st.lang,['pl','en'],'pl');
-  st.theme=pick(st.theme,['light','dark'],'light');
+  st.theme=pick(st.theme,['light','dark','auto'],'light');
   st.scale=pick(st.scale,['0.85','1','1.2'],'1');
   st.engLevel=pick(st.engLevel,['b1','b2'],'b1');
   st.pvVer=pick(st.pvVer,['2','3','4'],'2');
@@ -40,13 +40,17 @@ function loadState(){
   return sanitizeState(parsed);
 }
 var ST=loadState();
-function save(){try{localStorage.setItem(LS_KEY,JSON.stringify(ST));}catch(e){}}
+var saveErrShown=false;
+function save(){try{localStorage.setItem(LS_KEY,JSON.stringify(ST));}catch(e){if(!saveErrShown){saveErrShown=true;if(typeof it==='function')toast(it('saveErr'));}}}
 
 var APP=document.getElementById('app');
 
-function applyMeta(){var d=ST.theme==='dark',m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',ST.sect==='eng'?(d?'#0D1117':'#F5F8FD'):(d?'#0E1C18':'#F4EFE6'));}
-function applyTheme(){document.documentElement.setAttribute('data-theme',ST.theme);applyMeta();}
+function resolvedTheme(){return (ST.theme==='dark'||(ST.theme==='auto'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';}
+function applyMeta(){var d=resolvedTheme()==='dark',m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',ST.sect==='eng'?(d?'#0D1117':'#F5F8FD'):(d?'#0E1C18':'#F4EFE6'));}
+function updateThemeBtns(){var ico=ST.theme==='light'?'☀':ST.theme==='dark'?'🌙':'🌓';var ib=document.getElementById('iThemeBtn'),eb=document.getElementById('eThemeBtn');if(ib)ib.textContent=ico;if(eb)eb.textContent=ico;}
+function applyTheme(){document.documentElement.setAttribute('data-theme',resolvedTheme());applyMeta();updateThemeBtns();}
 applyTheme();
+if(window.matchMedia){window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){if(ST.theme==='auto')applyTheme();});}
 
 function applyScale(){
   document.documentElement.style.setProperty('--scale',ST.scale);

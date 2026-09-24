@@ -265,7 +265,7 @@ document.getElementById('tabB2').addEventListener('click',function(){ST.engLevel
 document.getElementById('eBackTopic').addEventListener('click',function(){showV('ve-home');renderEngHome();});
 document.getElementById('eBackItem').addEventListener('click',function(){showV('ve-topic');renderEngItems();document.getElementById('e-itemList').scrollTop=engListScroll;});
 document.querySelectorAll('#eLangPill button').forEach(function(b){b.addEventListener('click',function(){setLang(b.dataset.lang);});});
-document.getElementById('eThemeBtn').addEventListener('click',function(){ST.theme=ST.theme==='dark'?'light':'dark';save();applyTheme();});
+document.getElementById('eThemeBtn').addEventListener('click',function(){ST.theme=ST.theme==='light'?'dark':ST.theme==='dark'?'auto':'light';save();applyTheme();});
 document.querySelectorAll('#eSzPill .sz-btn').forEach(function(b){b.addEventListener('click',function(){ST.scale=b.dataset.sc;save();applyScale();});});
 
 /* ── BOTTOM NAV ── */

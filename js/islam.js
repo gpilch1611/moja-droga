@@ -93,7 +93,7 @@ function openIslamLetters(){
   var body=document.getElementById('i-lettersBody');body.innerHTML='';
   arLetters.forEach(function(lt){
     var row=document.createElement('div');row.className='letter-row';
-    var ar=document.createElement('div');ar.className='letter-ar';ar.textContent=lt.ar;
+    var ar=document.createElement('div');ar.className='letter-ar';ar.setAttribute('dir','rtl');ar.setAttribute('lang','ar');ar.textContent=lt.ar;
     var lat=document.createElement('div');lat.className='letter-lat';lat.textContent=lt.l[ST.lang];
     row.appendChild(ar);row.appendChild(lat);body.appendChild(row);
   });
@@ -140,7 +140,7 @@ document.getElementById('ptToggle').addEventListener('click',function(){
   this.setAttribute('aria-expanded',open?'true':'false');
 });
 document.getElementById('iSortBtn').addEventListener('click',function(){ST.sortReversed=!ST.sortReversed;save();renderIslam();});
-document.getElementById('iThemeBtn').addEventListener('click',function(){ST.theme=ST.theme==='dark'?'light':'dark';save();applyTheme();});
+document.getElementById('iThemeBtn').addEventListener('click',function(){ST.theme=ST.theme==='light'?'dark':ST.theme==='dark'?'auto':'light';save();applyTheme();});
 document.querySelectorAll('#iSzPill .sz-btn').forEach(function(b){b.addEventListener('click',function(){ST.scale=b.dataset.sc;save();applyScale();});});
 /* city */
 document.getElementById('pwCityBtn').addEventListener('click',function(){
@@ -237,6 +237,7 @@ document.getElementById('importFile').addEventListener('change',function(){
       if(!parsed||typeof parsed!=='object'||Array.isArray(parsed)||(parsed.v===undefined&&parsed.done===undefined&&parsed.sect===undefined)){
         throw new Error('not a Moja Droga backup');
       }
+      if(!confirm(it('importConfirm')))return;
       ST=sanitizeState(parsed);
       migrateDoneKeys();
       save();

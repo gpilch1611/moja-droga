@@ -115,7 +115,7 @@ function reducedMotion(){return !!(window.matchMedia&&window.matchMedia('(prefer
 function confetti(){
   if(reducedMotion())return;
   var box=document.createElement('div');box.className='confetti';box.setAttribute('aria-hidden','true');
-  var colors=['#A9762F','#C9A24B','#3E8E5A','#3A6FC2','#B4452F'];
+  var colors=ST.sect==='eng'?['#3A6FC2','#6B9ED4','#6B4AC2','#9F82D8','#3E8E5A']:['#A9762F','#C9A24B','#3E8E5A','#C79A46','#8A6D3B'];
   for(var i=0;i<26;i++){
     var p=document.createElement('i');
     p.style.left=(Math.random()*100)+'vw';
