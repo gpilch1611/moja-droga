@@ -25,16 +25,56 @@ function renderPW(){
   var d=getPD();
   document.getElementById('pwCityBtn').textContent=d.city.name;
   document.getElementById('pwMethod').textContent=it('pwMethod');
-  var grid=document.getElementById('pwGrid');grid.innerHTML='';
+  var grid=document.getElementById('pwGrid');
+  /* luk slonca: kontener wstawiany raz, przed siatka godzin */
+  var sun=document.getElementById('pwSun');
+  if(!sun){
+    sun=document.createElement('div');sun.className='sun-arc';sun.id='pwSun';sun.setAttribute('aria-hidden','true');
+    grid.parentNode.insertBefore(sun,grid);
+  }
+  renderSunArc(sun,d);
+  grid.innerHTML='';
   ['fajr','sunrise','dhuhr','asr','maghrib','isha'].forEach(function(k){
     var el=document.createElement('div');el.className='pw-cell'+(k!=='sunrise'&&k===d.cur?' on':'')+(k===d.next?' next':'')+(k==='sunrise'?' dim':'');
     el.innerHTML='<div class="pw-l">'+PL_N[k][ST.lang]+'</div><div class="pw-v">'+fmtT(d.times[k],d.city.tz)+'</div>';
     grid.appendChild(el);
   });
+  var pw=document.querySelector('.pw');
+  if(pw)pw.classList.toggle('soon',d.nextD-new Date()<600000);
   return d;
 }
-function miniH(d){var c=d.cur?PL_N[d.cur][ST.lang]:it('between');var ms=d.nextD-new Date(),mn=Math.max(0,Math.round(ms/60000)),hh=Math.floor(mn/60),mm=mn%60,cd=hh>0?hh+' h '+mm+' min':mm+' min';return it('now')+': <b>'+c+'</b> · '+it('next')+': <b>'+PL_N[d.next][ST.lang]+' '+fmtT(d.nextD,d.city.tz)+'</b> · '+it('inTime')+' '+cd;}
+/* luk slonca: kropka wedruje od wschodu do zachodu, po zmroku gasnie na krancu */
+function renderSunArc(box,d){
+  var now=new Date(),ms=(d.times.maghrib-d.times.sunrise),t=ms>0?(now-d.times.sunrise)/ms:.5,night=false;
+  if(!isFinite(t))t=.5;
+  if(t<0){t=0;night=true;}else if(t>1){t=1;night=true;}
+  var x=240-220*Math.cos(Math.PI*t),y=22-20*Math.sin(Math.PI*t);
+  box.innerHTML='<svg viewBox="0 0 480 26" aria-hidden="true">'+
+    '<path class="arc" d="M20 22 A220 20 0 0 1 460 22"/>'+
+    '<line class="horizon" x1="0" y1="22" x2="480" y2="22"/>'+
+    '<circle class="sun'+(night?' night':'')+'" cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="4"/></svg>';
+}
+function miniH(d){
+  var c=d.cur?PL_N[d.cur][ST.lang]:it('between'),ms=Math.max(0,d.nextD-new Date()),mn=Math.floor(ms/60000),cd;
+  if(ms<3600000){ /* ponizej godziny: odliczanie z sekundami */
+    var ss=Math.ceil(ms/1000);
+    cd='<span class="cd-tick">'+String(Math.floor(ss/60)).padStart(2,'0')+':'+String(ss%60).padStart(2,'0')+'</span>';
+  }else{
+    var hh=Math.floor(mn/60),mm=mn%60;cd=hh+' h '+mm+' min';
+  }
+  return it('now')+': <b>'+c+'</b> · '+it('next')+': <b>'+PL_N[d.next][ST.lang]+' '+fmtT(d.nextD,d.city.tz)+'</b> · '+it('inTime')+' '+cd;
+}
 function refreshP(){var d=renderPW(),h=miniH(d);['i-mbHome','i-mbList','i-mbLetters','i-mbPrayer'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=h;});}
+/* odswiezanie co sekunde: w ostatniej godzinie tylko mini-bar (bez migania siatki) */
+(function(){
+  setInterval(function(){
+    if(ST.sect!=='islam')return;
+    var d=getPD(),ms=d.nextD-new Date();
+    if(ms>=3600000)return; /* pelny refresh robi tick z js/app.js raz na minute */
+    var h=miniH(d);
+    ['i-mbHome','i-mbList','i-mbLetters','i-mbPrayer'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=h;});
+  },1000);
+})();
 
 /* ── ISLAM RENDER MENU ── */
 function renderIslam(){
@@ -82,7 +122,7 @@ function openIslamList(entry){
     }
     body.appendChild(row);
   });
-  showV('vi-list');
+  showV('vi-list','fwd');
 }
 function openIslamLetters(){
   curIslamEntry=findEntry('alfabet');
@@ -97,7 +137,7 @@ function openIslamLetters(){
     var lat=document.createElement('div');lat.className='letter-lat';lat.textContent=lt.l[ST.lang];
     row.appendChild(ar);row.appendChild(lat);body.appendChild(row);
   });
-  showV('vi-letters');
+  showV('vi-letters','fwd');
 }
 function openIslamPrayer(){
   var pe=findEntry('modlitwa');
@@ -113,7 +153,7 @@ function openIslamPrayer(){
   if(ptw){ptw.classList.remove('open');document.getElementById('ptRow').hidden=true;document.getElementById('ptToggle').setAttribute('aria-expanded','false');}
   renderPrayerTracker();
   renderPrayerBody();
-  showV('vi-prayer');
+  showV('vi-prayer','fwd');
 }
 function renderPrayerBody(){
   var scroll=document.getElementById('i-prayerScroll');scroll.innerHTML='';
@@ -129,9 +169,9 @@ function renderPrayerBody(){
 
 /* ── ISLAM EVENTS ── */
 document.querySelectorAll('#iLangPill button').forEach(function(b){b.addEventListener('click',function(){setLang(b.dataset.lang);});});
-document.getElementById('iBackList').addEventListener('click',function(){showV('vi-home');renderIslam();});
-document.getElementById('iBackLetters').addEventListener('click',function(){showV('vi-home');renderIslam();});
-document.getElementById('iBackPrayer').addEventListener('click',function(){showV('vi-home');renderIslam();});
+document.getElementById('iBackList').addEventListener('click',function(){showV('vi-home','back');renderIslam();});
+document.getElementById('iBackLetters').addEventListener('click',function(){showV('vi-home','back');renderIslam();});
+document.getElementById('iBackPrayer').addEventListener('click',function(){showV('vi-home','back');renderIslam();});
 ['pv2','pv3','pv4'].forEach(function(id){document.getElementById(id).addEventListener('click',function(){ST.pvVer=id.replace('pv','');save();openIslamPrayer();});});
 document.getElementById('ptToggle').addEventListener('click',function(){
   var wrap=document.getElementById('ptWrap'),row=document.getElementById('ptRow');
@@ -245,9 +285,9 @@ document.getElementById('importFile').addEventListener('change',function(){
       document.documentElement.setAttribute('lang',ST.lang);
       showV(ST.sect==='eng'?'ve-home':'vi-home');
       rerender();
-      note.textContent=it('importOk');note.style.color='#3E8E5A';
+      note.textContent=it('importOk');note.style.color='#3E8E5A';toast(it('importOk'),'ok');
     }catch(err){
-      note.textContent=it('importErr');note.style.color='#B4452F';
+      note.textContent=it('importErr');note.style.color='#B4452F';toast(it('importErr'),'err');
     }
   };
   reader.onerror=function(){note.textContent=it('importErr');note.style.color='#B4452F';};
