@@ -30,11 +30,18 @@ function prayerStreak(){ /* kolejne dni z kompletem 5/5 */
 }
 var ptUndoAsk=false,ptUndoT=null;
 function renderPrayerTracker(){
-  var lbl=document.getElementById('ptToggleLbl');if(!lbl)return;
-  lbl.textContent=it('ptToggle');
+  var lbl=document.getElementById('ptToggleLbl');
+  if(lbl)lbl.textContent=tr('ptToggle')||'Modlitwy';
   var list=prayersList();
   var cnt=document.getElementById('ptCount');
   if(cnt)cnt.textContent=list.length+'/5';
+  var empty=document.getElementById('ptEmpty');
+  if(empty){
+    if(!list.length){
+      empty.hidden=false;
+      empty.textContent=tr('ptEmpty')||'Jeszcze dziś nic nie odnotowano — dotknij +, gdy odmówisz modlitwę.';
+    }else empty.hidden=true;
+  }
   var dots=document.getElementById('ptDots');
   if(dots){
     dots.innerHTML='';

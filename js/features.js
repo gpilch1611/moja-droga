@@ -4,28 +4,37 @@
 'use strict';
 
 /* ══════════════════════════════
-   PRZYPOMNIENIA (modlitwa + seria)
-══════════════════════════════ */
+   JEDNO DZIENNE PRZYPOMNIENIE (zamiast kilku toastow)
+   Priorytet: modlitwa <10 min > seria wygasajaca wieczorem.
+   Maksymalnie jeden taki komunikat dziennie.
+   ══════════════════════════════ */
 var lastRemindKey='';
+function dayReminderShown(kind){
+  var k='rem_'+dKey(new Date())+'_'+kind;
+  if(ST.milestones[k])return true;
+  ST.milestones[k]=1;save();
+  return false;
+}
 setInterval(function(){
   if(ST.sect!=='islam')return;
   var d=getPD(),ms=d.nextD-new Date();
-  if(ms>600000)return;
-  var k=dKey(new Date())+'_'+d.next;
-  if(lastRemindKey===k)return;
-  lastRemindKey=k;
-  toast(it('remindPray')+' — '+PL_N[d.next][ST.lang]+' '+fmtT(d.nextD,d.city.tz),'ok');
-  if(navigator.vibrate)navigator.vibrate([12,40,12]);
-},20000);
-/* przypomnienie o serii wieczorem, gdy brakuje aktywnosci */
-setInterval(function(){
-  var k=dKey(new Date());
+  if(ms<=600000){
+    var k=dKey(new Date())+'_'+d.next;
+    if(lastRemindKey===k)return;
+    lastRemindKey=k;
+    if(!dayReminderShown('pray'))return;
+    toast(it('remindPray')+' — '+PL_N[d.next][ST.lang]+' '+fmtT(d.nextD,d.city.tz),'ok');
+    if(navigator.vibrate)navigator.vibrate([12,40,12]);
+    return;
+  }
+  var dk=dKey(new Date());
   if(new Date().getHours()<20)return;
-  if(ST.saverDay===k||(ST.act[k]||0)>=2)return;
+  if(ST.saverDay===dk||(ST.act[dk]||0)>=2)return;
   if(calcStreak()<=0)return;
-  ST.saverDay=k;save();
+  if(!dayReminderShown('streak'))return;
+  ST.saverDay=dk;save();
   toast(it('streakWarn'),'err');
-},300000);
+},30000);
 
 /* ══════════════════════════════
    WAKE LOCK (widok modlitwy krok po kroku)
@@ -166,15 +175,19 @@ function tr(key){
   }catch(e){}
   return null;
 }
+function renderPrayerTrackerSafe(){try{renderPrayerTracker();}catch(e){}}
 function syncSettingsExtras(){
   syncWake();syncBackup();syncAbout();
+  var t=document.getElementById('setOvTitle');if(t)t.textContent=tr('settings')||'Ustawienia';
+  var ah=document.getElementById('setAppH');if(ah)ah.textContent=tr('setAppH')||'Aplikacja';
+  var dh=document.getElementById('setDataH');if(dh)dh.textContent=tr('setDataH')||'Dane i kopie';
+  var ih=document.getElementById('setInfoH');if(ih)ih.textContent=tr('setInfoH')||'Informacje';
   var lbl=document.getElementById('aboutLbl');if(lbl)lbl.textContent=tr('aboutLbl')||'O aplikacji';
   var dl=document.getElementById('dangerLbl');if(dl)dl.textContent=tr('dangerLbl')||'Strefa ryzyka';
   var wl=document.getElementById('wakeLbl');if(wl)wl.textContent=tr('wakeLbl')||'Nie gaś ekranu w widoku modlitwy';
   var rb=document.getElementById('resetBtn');if(rb&&!rb.dataset.ask)rb.textContent=tr('resetBtn')||'Wyczyść wszystkie dane';
 }
-document.getElementById('iSettingsBtn').addEventListener('click',syncSettingsExtras);
-document.getElementById('eSettingsBtn').addEventListener('click',syncSettingsExtras);
+
 
 /* ══════════════════════════════
    TRYB OFFLINE

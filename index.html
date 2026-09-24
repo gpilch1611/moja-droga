@@ -98,15 +98,16 @@
   <div class="ptrack" id="ptWrap">
     <div class="pt-step" role="group" aria-label="Modlitwy / Prayers">
       <div class="pt-info">
-        <span id="ptToggleLbl"></span>
+        <span id="ptToggleLbl">Modlitwy</span>
         <b id="ptCount"></b>
       </div>
       <div class="pt-dots" id="ptDots" aria-hidden="true"></div>
       <div class="pt-actions">
-        <button class="pt-step-btn" id="ptDec" type="button">−</button>
-        <button class="pt-step-btn pt-plus" id="ptInc" type="button">+</button>
+        <button class="pt-step-btn" id="ptDec" type="button" aria-label="Cofnij modlitwę / Undo prayer">−</button>
+        <button class="pt-step-btn pt-plus" id="ptInc" type="button" aria-label="Dodaj modlitwę / Add prayer">+</button>
       </div>
     </div>
+    <div class="pt-empty" id="ptEmpty" hidden></div>
   </div>
   <div class="prayer-pills">
     <button id="pv2"></button><button id="pv3"></button><button id="pv4"></button>
@@ -201,16 +202,7 @@
       <span id="setOvTitle">Ustawienia</span>
       <button class="icon-btn" id="closeSetBtn" aria-label="Zamknij / Close">✕</button>
     </div>
-    <div class="set-row">
-      <span class="set-lbl" id="setDataLbl">Twoje dane</span>
-      <button class="set-btn" id="exportBtn"></button>
-      <button class="set-btn" id="importBtn"></button>
-      <input type="file" id="importFile" accept="application/json,.json" style="display:none">
-    </div>
-    <div class="set-row" id="installRow" style="display:none;margin-top:12px">
-      <span class="set-lbl" id="installLbl"></span>
-      <button class="set-btn" id="installBtn"></button>
-    </div>
+    <div class="set-sec"><span id="setAppH">Aplikacja</span></div>
     <div class="set-row">
       <span class="set-lbl" id="wakeLbl">Nie gaś ekranu w widoku modlitwy</span>
       <button class="set-btn" id="wakeBtn"></button>
@@ -218,6 +210,20 @@
     <div class="set-row" id="shareRow" style="display:none">
       <span class="set-lbl" id="shareLbl">Udostępnij postęp</span>
       <button class="set-btn" id="shareBtn"></button>
+    </div>
+    <div class="set-sec"><span id="setDataH">Dane i kopie</span></div>
+    <div class="set-row">
+      <span class="set-lbl" id="setDataLbl">Twoje dane</span>
+      <button class="set-btn" id="exportBtn"></button>
+      <button class="set-btn" id="importBtn"></button>
+      <input type="file" id="importFile" accept="application/json,.json" style="display:none">
+    </div>
+    <div class="set-note" id="backupNote"></div>
+    <div class="set-note" id="setNote"></div>
+    <div class="set-sec"><span id="setInfoH">Informacje</span></div>
+    <div class="set-row" id="installRow" style="display:none;margin-top:0">
+      <span class="set-lbl" id="installLbl"></span>
+      <button class="set-btn" id="installBtn"></button>
     </div>
     <div class="set-row">
       <span class="set-lbl" id="aboutLbl">O aplikacji</span>
@@ -227,8 +233,6 @@
       <span class="set-lbl" id="dangerLbl">Strefa ryzyka</span>
       <button class="set-btn set-danger" id="resetBtn"></button>
     </div>
-    <div class="set-note" id="backupNote"></div>
-    <div class="set-note" id="setNote"></div>
   </div>
 </div>
 
