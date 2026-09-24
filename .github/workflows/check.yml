@@ -12,3 +12,5 @@ jobs:
         run: node --check sw.js
       - name: Smoke test
         run: node test/smoke.js
+      - name: Load test (JS na atrapach DOM)
+        run: node test/load.js
