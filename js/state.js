@@ -5,7 +5,7 @@
    STATE & STORAGE (versioned)
 ══════════════════════════════ */
 var LS_KEY='mdv4',LS_LEGACY='mdv3',DATA_VER=1;
-var DEF={v:DATA_VER,sect:'islam',lang:'pl',theme:'light',scale:'1',cityId:'krakow',sortReversed:false,engLevel:'b1',pvVer:'2',done:{},lastEng:null,act:{},bestStreak:0,prayers:{},seenWiggle:false,milestones:{}};
+var DEF={v:DATA_VER,sect:'islam',lang:'pl',theme:'light',scale:'1',cityId:'krakow',sortReversed:false,engLevel:'b1',pvVer:'2',done:{},lastEng:null,act:{},bestStreak:0,prayers:{},seenWiggle:false,milestones:{},dailyGoal:3,lastExport:0,wakeLock:false,saverDay:''};
 function pick(v,allowed,fallback){v=String(v);return allowed.indexOf(v)>-1?v:fallback;}
 function sanitizeState(s){
   s=(s&&typeof s==='object')?s:{};
@@ -29,6 +29,10 @@ function sanitizeState(s){
     if(pa.length)st.prayers[pk]=pa.slice(0,5);else delete st.prayers[pk];
   }
   st.sortReversed=!!st.sortReversed;
+  st.dailyGoal=(typeof st.dailyGoal==='number'&&isFinite(st.dailyGoal))?Math.min(5,Math.max(1,Math.round(st.dailyGoal))):3;
+  st.lastExport=(typeof st.lastExport==='number'&&isFinite(st.lastExport)&&st.lastExport>0)?st.lastExport:0;
+  st.wakeLock=!!st.wakeLock;
+  if(typeof st.saverDay!=='string')st.saverDay='';
   st.v=DATA_VER;
   return st;
 }

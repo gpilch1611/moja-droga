@@ -64,12 +64,18 @@ function miniH(d){
   }
   return it('now')+': <b>'+c+'</b> · '+it('next')+': <b>'+PL_N[d.next][ST.lang]+' '+fmtT(d.nextD,d.city.tz)+'</b> · '+it('inTime')+' '+cd;
 }
-function refreshP(){var d=renderPW(),h=miniH(d);['i-mbHome','i-mbList','i-mbLetters','i-mbPrayer'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=h;});}
+function refreshP(){var d=renderPW(),h=miniH(d);['i-mbHome','i-mbList','i-mbLetters','i-mbPrayer'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=h;});if(typeof renderGoal==='function')renderGoal();}
 /* odswiezanie co sekunde: w ostatniej godzinie tylko mini-bar (bez migania siatki) */
+var pdCache=null,pdCacheT=0;
+function pdCached(){ /* cache wyliczen (Intl/trygonometria) na 30 s */
+  var n=Date.now();
+  if(!pdCache||n-pdCacheT>30000||pdCache.nextD-n<0){pdCache=getPD();pdCacheT=n;}
+  return pdCache;
+}
 (function(){
   setInterval(function(){
     if(ST.sect!=='islam')return;
-    var d=getPD(),ms=d.nextD-new Date();
+    var d=pdCached(),ms=d.nextD-Date.now();
     if(ms>=3600000)return; /* pelny refresh robi tick z js/app.js raz na minute */
     var h=miniH(d);
     ['i-mbHome','i-mbList','i-mbLetters','i-mbPrayer'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=h;});

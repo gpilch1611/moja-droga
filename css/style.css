@@ -196,6 +196,20 @@ button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);ou
 .set-btn{border:1px solid var(--border);background:none;color:var(--text);font-family:'Inter',sans-serif;font-weight:600;font-size:calc(12px * var(--scale));padding:10px 12px;border-radius:5px;cursor:pointer;text-align:left;min-height:40px;}
 .set-btn:active{background:var(--accent-soft);}
 .set-note{font-size:calc(10.5px * var(--scale));color:var(--text-muted);line-height:1.5;padding:10px 16px;}
+.set-row .pill{align-self:flex-start;font-weight:700;}
+.set-btn.set-danger{border-color:#B4452F;color:#B4452F;}
+.set-btn.set-danger.ask{background:#B4452F;color:#fff;border-color:#B4452F;}
+.about-link{display:inline-block;margin-top:4px;color:var(--accent);font-weight:600;text-decoration:none;}
+/* ── PASEK OFFLINE (fixed – nie rozpycha ukladu) ── */
+.off-bar{position:fixed;left:50%;bottom:calc(64px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#B4452F;color:#fff;font-family:'Inter',sans-serif;font-size:calc(11px * var(--scale));font-weight:600;padding:5px 13px;border-radius:14px;z-index:55;max-width:88vw;text-align:center;box-shadow:0 3px 12px rgba(0,0,0,0.18);}
+.off-bar[hidden]{display:none;}
+/* ── CEL DZIENNY (pasek pod widgetem modlitw) ── */
+.goal-row{display:flex;align-items:center;gap:8px;margin:2px 18px 0;flex-shrink:0;}
+.goal-bar{flex:1;height:4px;border-radius:2px;background:var(--accent-soft);overflow:hidden;}
+.goal-bar i{display:block;height:100%;width:0;background:var(--accent);border-radius:2px;transition:width .4s cubic-bezier(.22,.61,.36,1);}
+.goal-txt{font-size:calc(10px * var(--scale));color:var(--text-muted);font-weight:600;white-space:nowrap;}
+/* dluzsze ustawienia przewijaja sie w panelu (overlaye z wlasnym scrollem zostaja bez zmian) */
+#setOv .overlay-panel{overflow-y:auto;padding-bottom:env(safe-area-inset-bottom,0px);}
 /* ── POLISH: MOTION & UX ── */
 html,body{transition:background-color .3s ease,color .3s ease;}
 #app,.top-bar,.bnav,.sub-top,.stats-bar,.pw,.cont-card,.quiz,.overlay-panel{transition:background-color .3s ease,border-color .3s ease;}

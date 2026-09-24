@@ -21,6 +21,7 @@
 </head>
 <body>
 <noscript><div style="max-width:520px;margin:40px auto;padding:20px;font-family:system-ui,sans-serif;text-align:center;border:1px solid #ccc;border-radius:8px;"><p>Ta aplikacja wymaga włączonego JavaScriptu.</p><p lang="en" dir="ltr">This application requires JavaScript to be enabled.</p></div></noscript>
+<div id="offBar" class="off-bar" role="status" aria-live="polite" hidden></div>
 <div id="app" data-sect="islam">
 
 <!-- ════════════════════════════
@@ -56,6 +57,10 @@
     <div class="pw-grid" id="pwGrid"></div>
   </div>
   <div class="mini-bar" id="i-mbHome"></div>
+  <div class="goal-row" id="i-goalRow">
+    <div class="goal-bar" aria-hidden="true"><i id="i-goalFill"></i></div>
+    <span class="goal-txt" id="i-goalTxt"></span>
+  </div>
   <div class="list-hdr-row">
     <span class="list-hdr-lbl" id="i-listHdr"></span>
     <button class="sort-btn" id="iSortBtn" aria-label="Odwróć kolejność / Reverse order">↕</button>
@@ -205,6 +210,29 @@
       <span class="set-lbl" id="installLbl"></span>
       <button class="set-btn" id="installBtn"></button>
     </div>
+    <div class="set-row">
+      <span class="set-lbl" id="goalLbl"></span>
+      <div class="pill" id="goalPill">
+        <button data-g="1">1</button><button data-g="2">2</button><button data-g="3">3</button><button data-g="4">4</button><button data-g="5">5</button>
+      </div>
+    </div>
+    <div class="set-row">
+      <span class="set-lbl" id="wakeLbl"></span>
+      <button class="set-btn" id="wakeBtn"></button>
+    </div>
+    <div class="set-row" id="shareRow" style="display:none">
+      <span class="set-lbl" id="shareLbl"></span>
+      <button class="set-btn" id="shareBtn"></button>
+    </div>
+    <div class="set-row">
+      <span class="set-lbl" id="aboutLbl"></span>
+      <div class="set-note" id="aboutNote"></div>
+    </div>
+    <div class="set-row">
+      <span class="set-lbl" id="dangerLbl"></span>
+      <button class="set-btn set-danger" id="resetBtn"></button>
+    </div>
+    <div class="set-note" id="backupNote"></div>
     <div class="set-note" id="setNote"></div>
   </div>
 </div>
@@ -226,6 +254,7 @@
 <script src="js/eng-data.js"></script>
 <script src="js/eng.js"></script>
 <script src="js/progress.js"></script>
+<script src="js/features.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
