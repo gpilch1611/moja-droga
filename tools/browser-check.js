@@ -51,14 +51,9 @@ const server = http.createServer((req, res) => {
   await p.ev('document.getElementById("bnWed").click()'); await sleep(700);
   eq('aktywny widok', await p.ev('document.querySelector(".view.active").id'), 'vw-home');
   eq('tlo rozane', await p.ev('getComputedStyle(document.body).backgroundColor'), 'rgb(253, 240, 245)');
-  eq('kartki (zdanie + tlumaczenia + wskazowka)', await p.ev('document.querySelectorAll("#w-scroll .wed-card,#w-scroll .wed-note,#w-scroll .wed-tip").length'), 4);
+  eq('kartki (zdanie + tlumaczenie + wskazowka)', await p.ev('document.querySelectorAll("#w-scroll .wed-card,#w-scroll .wed-note,#w-scroll .wed-tip").length'), 3);
   eq('zdanie indonezyjskie', await p.ev('document.querySelector(".wed-phrase").textContent'), '💖 ' + (await p.ev('WED.phrase')) + ' 💖');
-  eq('lista przygotowan', await p.ev('document.querySelectorAll("#w-scroll .wed-check .item-row").length'), 6);
-  eq('przewijanie dziala', await p.ev('(function(){var s=document.getElementById("w-scroll");s.scrollTop=300;return s.scrollTop>0;})()'), 'true');
-  eq('stan listy przed', await p.ev('document.querySelector(".wed-count").textContent'), '0/6 opanowanych');
-  await p.ev('document.querySelectorAll("#w-scroll .wed-check .item-row")[0].click()'); await sleep(500);
-  eq('stan listy po kliknieciu', await p.ev('document.querySelector(".wed-count").textContent'), '1/6 opanowanych');
-  eq('zapis w localStorage', await p.ev('!!JSON.parse(localStorage.getItem("mdv4")).done.wed_0'), 'true');
+  eq('tlumaczenie polskie', await p.ev('document.querySelector("#w-scroll .wed-note .wed-tr").textContent'), await p.ev('WED.pl.trTxt'));
   eq('przyciski wymowy/kopiowania', await p.ev('document.querySelectorAll("#w-scroll .wed-btn").length'), 3);
   return phase2(p, browser);
 
@@ -66,6 +61,7 @@ async function phase2(p, browser) {
   console.log('· jezyk i motyw');
   await p.ev('document.getElementById("wLangBtn").click()'); await sleep(600);
   eq('po EN naglowek', await p.ev('document.querySelector(".wed-lbl").textContent'), 'Sentence to say (Indonesian)');
+  eq('po EN tlumaczenie', await p.ev('document.querySelector("#w-scroll .wed-note .wed-tr").textContent'), await p.ev('WED.en.trTxt'));
   eq('po EN zdanie ID bez zmian', await p.ev('document.querySelector(".wed-phrase").textContent.indexOf("Saya terima nikah")>0'), 'true');
   await p.ev('document.getElementById("wLangBtn").click()'); await sleep(400);
   await p.ev('document.getElementById("wThemeBtn").click()'); await sleep(400);
@@ -86,7 +82,7 @@ async function phase2(p, browser) {
   await p.ev('document.getElementById("bnWed").click()'); await sleep(400);
   await p.goto(PAGE); await sleep(3500);
   eq('po przeladowaniu wraca na Wedding', await p.ev('document.querySelector(".view.active").id'), 'vw-home');
-  eq('postep listy zachowany', await p.ev('document.querySelector(".wed-count").textContent'), '1/6 opanowanych');
+  eq('kartki po przeladowaniu', await p.ev('document.querySelectorAll("#w-scroll .wed-card,#w-scroll .wed-note,#w-scroll .wed-tip").length'), 3);
 
   const errs = p.errors();
   if (errs.length) errs.forEach(e => fail('blad konsoli: ' + e)); else ok('brak bledow w konsoli');

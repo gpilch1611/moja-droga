@@ -78,7 +78,7 @@ function rmWorktree() {
   await p.ev('document.getElementById("bnWed") && document.getElementById("bnWed").click()');
   await sleep(800);
   const kartki = await p.ev('document.querySelectorAll("#w-scroll .wed-card,#w-scroll .wed-note,#w-scroll .wed-tip").length');
-  if (String(kartki) === '4') ok('nowa zakladka dziala (4 kartki)');
+  if (String(kartki) === '3') ok('nowa zakladka dziala (3 kartki)');
   else fail('nowa zakladka nie dziala (kartki: ' + kartki + ')');
   if (await p.ev('document.querySelector(".view.active").id') === 'vw-home') ok('aktywny widok Wedding');
   else fail('nie udalo sie przejsc do widoku Wedding');

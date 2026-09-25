@@ -165,10 +165,6 @@ html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--text);
 .wed-btn{border:1px solid var(--accent);background:var(--accent);color:#fff;font-family:'Inter',sans-serif;font-weight:700;font-size:calc(12px * var(--scale));padding:9px 14px;border-radius:20px;cursor:pointer;min-height:40px;}
 .wed-btn:active{opacity:.85;}
 .wed-btn.wed-ghost{background:transparent;color:var(--accent);}
-.wed-check-hdr{display:flex;align-items:center;justify-content:space-between;margin:18px 0 4px;font-size:calc(12px * var(--scale));font-weight:700;color:var(--accent);}
-.wed-count{font-weight:600;color:var(--text-muted);font-size:calc(10.5px * var(--scale));}
-.wed-check{border:1px solid var(--border);border-radius:12px;background:var(--bg-panel);overflow:hidden;}
-.wed-check .item-row:last-child{border-bottom:none;}
 /* ── CITY OVERLAY ── */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);opacity:0;visibility:hidden;pointer-events:none;z-index:20;transition:opacity .2s ease,visibility 0s linear .2s;}
 .overlay.open{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .2s ease;}

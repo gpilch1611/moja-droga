@@ -13,14 +13,10 @@ var WED={
     reading:'Odtwarzanie…',
     slow:'Wolno',
     copy:'Kopiuj zdanie',
-    plLbl:'Tłumaczenie polskie',
-    plTxt:'Przyjmuję jej małżeństwo z Putri Nabila Arofah, córką Achmada Efendiego, z tym posagiem (mahr) zapłaconym w gotówce.',
-    enLbl:'English translation',
-    enTxt:'I accept her marriage to Putri Nabila Arofah, daughter of Achmad Efendi, with this dowry (mahr) paid in cash.',
+    trLbl:'Tłumaczenie',
+    trTxt:'Przyjmuję jej małżeństwo z Putri Nabila Arofah, córką Achmada Efendiego, z tym posagiem (mahr) zapłaconym w gotówce.',
     tip:'Wskazówka',
-    tipTxt:'Powiedz to zdanie jednym, spokojnym zdaniem — bez przerw i bez dodawania własnych słów. Przećwicz na głos kilka razy, najlepiej z odsłuchem wymowy.',
-    checkT:'Lista przygotowań',
-    mastered:'opanowanych'
+    tipTxt:'Powiedz to zdanie jednym, spokojnym zdaniem — bez przerw i bez dodawania własnych słów. Przećwicz na głos kilka razy, najlepiej z odsłuchem wymowy.'
   },
   en:{
     title:'Wedding',
@@ -31,23 +27,15 @@ var WED={
     reading:'Playing…',
     slow:'Slow',
     copy:'Copy sentence',
-    plLbl:'Polish translation',
-    plTxt:'I accept her marriage to Putri Nabila Arofah, daughter of Achmad Efendi, with this dowry (mahr) paid in cash.',
-    enLbl:'English translation',
-    enTxt:'I accept her marriage to Putri Nabila Arofah, daughter of Achmad Efendi, with this dowry (mahr) paid in cash.',
+    trLbl:'Translation',
+    trTxt:'I accept her marriage to Putri Nabila Arofah, daughter of Achmad Efendi, with this dowry (mahr) paid in cash.',
     tip:'Tip',
-    tipTxt:'Say this sentence as one calm sentence — no pauses, no extra words. Practise it out loud a few times, ideally with the pronunciation playback.',
-    checkT:'Preparation checklist',
-    mastered:'done'
+    tipTxt:'Say this sentence as one calm sentence — no pauses, no extra words. Practise it out loud a few times, ideally with the pronunciation playback.'
   }
 };
-var WED_ITEMS_PL=['Zdanie opanowane na pamięć','Wymowa przećwiczona na głos','Posag (mahr) ustalony i gotowy','Termin i miejsce ceremonii potwierdzone','Świadkowie (saksi) potwierdzeni','Dokumenty gotowe'];
-var WED_ITEMS_EN=['Sentence memorised','Pronunciation practised out loud','Dowry (mahr) agreed and ready','Date and venue confirmed','Witnesses (saksi) confirmed','Documents ready'];
 function wt(k){return (WED[ST.lang]&&WED[ST.lang][k]!==undefined)?WED[ST.lang][k]:WED.pl[k];}
-function wItems(){return ST.lang==='en'?WED_ITEMS_EN:WED_ITEMS_PL;}
 
 /* ── WEDDING — RENDER ── */
-function wedSetChk(el,on){el.classList.toggle('done',!!on);el.innerHTML=on?'<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.5 4.8 9 10 3"/></svg>':'';}
 function renderWedding(){
   var sc=document.getElementById('w-scroll');
   if(!sc)return; /* HTML z cache bez widoku Wedding — nic nie rob */
@@ -67,42 +55,14 @@ function renderWedding(){
   var copyB=document.createElement('button');copyB.type='button';copyB.className='wed-btn wed-ghost';copyB.textContent='📋 '+wt('copy');
   btnRow.appendChild(readB);btnRow.appendChild(slowB);btnRow.appendChild(copyB);card.appendChild(btnRow);
   sc.appendChild(card);
-  var pl=document.createElement('section');pl.className='wed-note';
-  var plH=document.createElement('div');plH.className='wed-lbl';plH.textContent=wt('plLbl');pl.appendChild(plH);
-  var plP=document.createElement('p');plP.className='wed-tr';plP.setAttribute('lang','pl');plP.textContent=wt('plTxt');pl.appendChild(plP);
-  sc.appendChild(pl);
-  var en=document.createElement('section');en.className='wed-note';
-  var enH=document.createElement('div');enH.className='wed-lbl';enH.textContent=wt('enLbl');en.appendChild(enH);
-  var enP=document.createElement('p');enP.className='wed-tr';enP.setAttribute('lang','en');enP.textContent=wt('enTxt');en.appendChild(enP);
-  sc.appendChild(en);
+  var note=document.createElement('section');note.className='wed-note';
+  var noteH=document.createElement('div');noteH.className='wed-lbl';noteH.textContent=wt('trLbl');note.appendChild(noteH);
+  var noteP=document.createElement('p');noteP.className='wed-tr';noteP.setAttribute('lang',ST.lang==='en'?'en':'pl');noteP.textContent=wt('trTxt');note.appendChild(noteP);
+  sc.appendChild(note);
   var tip=document.createElement('section');tip.className='wed-tip';
   var tipH=document.createElement('div');tipH.className='wed-lbl';tipH.textContent='💡 '+wt('tip');tip.appendChild(tipH);
   var tipP=document.createElement('p');tipP.className='wed-tr';tipP.textContent=wt('tipTxt');tip.appendChild(tipP);
   sc.appendChild(tip);
-  var items=wItems();
-  var doneCount=0;items.forEach(function(_,i){if(ST.done['wed_'+i])doneCount++;});
-  var chT=document.createElement('div');chT.className='wed-check-hdr';
-  var chL=document.createElement('span');chL.textContent='✓ '+wt('checkT');chT.appendChild(chL);
-  var chC=document.createElement('span');chC.className='wed-count';chC.textContent=doneCount+'/'+items.length+' '+wt('mastered');chT.appendChild(chC);
-  sc.appendChild(chT);
-  var list=document.createElement('div');list.className='wed-check';
-  items.forEach(function(t,i){
-    var k='wed_'+i,isDone=!!ST.done[k];
-    var row=document.createElement('div');row.className='item-row';
-    var chk=document.createElement('div');chk.className='i-chk';wedSetChk(chk,isDone);
-    var body=document.createElement('div');body.className='i-body';
-    var ttl=document.createElement('div');ttl.className='i-ttl';ttl.textContent=t;
-    body.appendChild(ttl);row.appendChild(chk);row.appendChild(body);
-    row.addEventListener('click',function(){
-      ST.done[k]=!ST.done[k];save();if(navigator.vibrate)navigator.vibrate(10);
-      wedSetChk(chk,ST.done[k]);
-      toast(ST.done[k]?it('doneOn'):it('doneOff'),ST.done[k]?'ok':null);
-      touchAct();if(ST.done[k]){checkDoneMilestones();}
-      renderWedding();
-    });
-    list.appendChild(row);
-  });
-  sc.appendChild(list);
   readB.addEventListener('click',function(){speakWed(false,this);});
   slowB.addEventListener('click',function(){speakWed(true,this);});
   copyB.addEventListener('click',function(){copyTxt(WED.phrase);});
