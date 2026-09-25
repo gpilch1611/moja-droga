@@ -1,6 +1,6 @@
 ﻿# Moja Droga
 
-Notatnik drogi w islamie + nauka angielskiego B1-B2. Aplikacja PWA (dziala offline i aktualizuje sie automatycznie).
+Notatnik drogi w islamie + nauka angielskiego B1-B2 + przygotowania do wesela (Wedding). Aplikacja PWA (dziala offline i aktualizuje sie automatycznie).
 
 **Strona:** https://gpilch1611.github.io/Moja-Droga/
 
@@ -37,6 +37,6 @@ Po zmianach w js/ warto podbic wersje cache (i od razu uruchomic testy):
 
 ## Skroty i glebsze linki
 
-- index.html?go=prayers — czas modlitw, ?go=prayer — modlitwa krok po kroku, ?go=eng — angielski
+- index.html?go=prayers — czas modlitw, ?go=prayer — modlitwa krok po kroku, ?go=eng — angielski, ?go=wed — wedding
 - index.html?go=eng&topic=<id>&lv=b1|b2 — bezposrednie wejscie w temat angielskiego
-- Na komputerze: 1 — sekcja Islam, 2 — Angielski, ArrowLeft — wstecz, Esc — zamknij overlay
+- Na komputerze: 1 — sekcja Islam, 2 — Angielski, 3 — Wedding, ArrowLeft — wstecz, Esc — zamknij overlay

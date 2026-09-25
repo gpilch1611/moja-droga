@@ -15,7 +15,7 @@ function sanitizeState(s){
   st.scale=pick(st.scale,['0.85','1','1.2'],'1');
   st.engLevel=pick(st.engLevel,['b1','b2'],'b1');
   st.pvVer=pick(st.pvVer,['2','3','4'],'2');
-  st.sect=pick(st.sect,['islam','eng'],'islam');
+  st.sect=pick(st.sect,['islam','eng','wed'],'islam');
   if(typeof st.cityId!=='string')st.cityId='krakow';
   if(!st.done||typeof st.done!=='object'||Array.isArray(st.done))st.done={};
   if(!st.lastEng||typeof st.lastEng!=='object')st.lastEng=null;
@@ -49,8 +49,8 @@ function save(){try{localStorage.setItem(LS_KEY,JSON.stringify(ST));}catch(e){if
 var APP=document.getElementById('app');
 
 function resolvedTheme(){return ST.theme==='dark'?'dark':'light';}
-function applyMeta(){var d=resolvedTheme()==='dark',m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',ST.sect==='eng'?(d?'#0D1117':'#F5F8FD'):(d?'#0E1C18':'#F4EFE6'));}
-function updateThemeBtns(){var ico=ST.theme==='dark'?'🌙':'☀';var ib=document.getElementById('iThemeBtn'),eb=document.getElementById('eThemeBtn');if(ib)ib.textContent=ico;if(eb)eb.textContent=ico;}
+function applyMeta(){var d=resolvedTheme()==='dark',m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',ST.sect==='eng'?(d?'#0D1117':'#F5F8FD'):ST.sect==='wed'?(d?'#1E1018':'#FDF0F5'):(d?'#0E1C18':'#F4EFE6'));}
+function updateThemeBtns(){var ico=ST.theme==='dark'?'🌙':'☀';var ib=document.getElementById('iThemeBtn'),eb=document.getElementById('eThemeBtn'),wb=document.getElementById('wThemeBtn');if(ib)ib.textContent=ico;if(eb)eb.textContent=ico;if(wb)wb.textContent=ico;}
 function applyTheme(){document.documentElement.setAttribute('data-theme',resolvedTheme());applyMeta();updateThemeBtns();}
 applyTheme();
 
@@ -69,8 +69,10 @@ function applySect(){
   applyMeta();
   document.getElementById('bnIslam').classList.toggle('on',ST.sect==='islam');
   document.getElementById('bnEng').classList.toggle('on',ST.sect==='eng');
+  document.getElementById('bnWed').classList.toggle('on',ST.sect==='wed');
   document.getElementById('bnIslam').setAttribute('aria-current',ST.sect==='islam'?'page':'false');
   document.getElementById('bnEng').setAttribute('aria-current',ST.sect==='eng'?'page':'false');
+  document.getElementById('bnWed').setAttribute('aria-current',ST.sect==='wed'?'page':'false');
 }
 applySect();
 
@@ -94,10 +96,10 @@ function toast(msg,type){
   clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show');},1600);
 }
 
-var VIEWS=['vi-home','vi-list','vi-letters','vi-prayer','ve-home','ve-topic','ve-item'];
+var VIEWS=['vi-home','vi-list','vi-letters','vi-prayer','ve-home','ve-topic','ve-item','vw-home'];
 var VIEW_SCROLL={};
-var RESTORE_VIEWS={'vi-home':1,'ve-home':1,'ve-topic':1};
-function viewScroller(id){var v=document.getElementById(id);return v?v.querySelector('.entry-list,.detail-scroll,.pscroll,.id-scroll'):null;}
+var RESTORE_VIEWS={'vi-home':1,'ve-home':1,'ve-topic':1,'vw-home':1};
+function viewScroller(id){var v=document.getElementById(id);return v?v.querySelector('.entry-list,.detail-scroll,.pscroll,.id-scroll,.wed-scroll'):null;}
 var raf=(typeof requestAnimationFrame==='function')?requestAnimationFrame:function(f){return setTimeout(f,0);};
 /* dir: 'fwd' = w glab (wsuwa z prawej), 'back' = powrot (wsuwa z lewej), brak = fade z dolu */
 function showV(id,dir){
@@ -129,12 +131,13 @@ function rerender(){
   else if(v==='ve-home'){renderEngHome();}
   else if(v==='ve-topic'){if(curEngTopic)openEngTopic(curEngTopic.id);}
   else if(v==='ve-item'){if(curEngItemData)openEngItem(curEngItemData.item,curEngItemData.key);}
+  else if(v==='vw-home'){if(typeof renderWedding==='function')renderWedding();}
 }
 function setLang(l){ST.lang=l;save();document.documentElement.setAttribute('lang',l);rerender();}
 function toggleLang(){setLang(ST.lang==='pl'?'en':'pl');}
 function syncLangBtns(){
   var cur=ST.lang==='pl'?'PL':'EN';
-  ['iLangBtn','eLangBtn'].forEach(function(id){
+  ['iLangBtn','eLangBtn','wLangBtn'].forEach(function(id){
     var b=document.getElementById(id);
     if(!b)return;
     b.textContent=cur;

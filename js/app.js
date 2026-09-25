@@ -18,6 +18,9 @@
   if(ST.sect==='eng'){
     showV('ve-home');
     renderEngHome();
+  } else if(ST.sect==='wed'){
+    showV('vw-home');
+    renderWedding();
   } else {
     showV('vi-home');
     renderIslam();
@@ -30,6 +33,7 @@
   try{
     var go=new URLSearchParams(location.search).get('go');
     if(go==='eng')document.getElementById('bnEng').click();
+    else if(go==='wed')document.getElementById('bnWed').click();
     else if(go==='prayer')openIslamPrayer();
     else if(go==='prayers')document.getElementById('bnIslam').click();
   }catch(e){}
@@ -38,6 +42,7 @@
     setTimeout(function(){
       document.getElementById('iSettingsBtn').classList.add('wig');
       document.getElementById('eSettingsBtn').classList.add('wig');
+      document.getElementById('wSettingsBtn').classList.add('wig');
     },2000);
   }
 })();

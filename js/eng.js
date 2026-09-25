@@ -281,20 +281,5 @@ document.getElementById('eLangBtn').addEventListener('click',toggleLang);
 document.getElementById('eThemeBtn').addEventListener('click',function(){ST.theme=ST.theme==='dark'?'light':'dark';save();applyTheme();});
 document.querySelectorAll('#eSzPill .sz-btn').forEach(function(b){b.addEventListener('click',function(){ST.scale=b.dataset.sc;save();applyScale();});});
 
-/* ── BOTTOM NAV ── */
-/* Klik w tab = zawsze powrót na początek sekcji (widok główny + scroll na górę) */
-document.getElementById('bnIslam').addEventListener('click',function(){
-  ST.sect='islam';save();applySect();
-  delete VIEW_SCROLL['vi-home'];
-  showV('vi-home');
-  var sc=viewScroller('vi-home');if(sc)sc.scrollTop=0;
-  renderIslam();refreshP();
-});
-document.getElementById('bnEng').addEventListener('click',function(){
-  ST.sect='eng';save();applySect();
-  delete VIEW_SCROLL['ve-home'];
-  showV('ve-home');
-  var sc=viewScroller('ve-home');if(sc)sc.scrollTop=0;
-  renderEngHome();
-});
+/* ── BOTTOM NAV (wszystkie sekcje: centralnie w js/wedding.js) ── */
 

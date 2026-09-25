@@ -212,6 +212,7 @@ document.addEventListener('keydown',function(e){
   if(t&&/^(input|textarea|select)$/i.test(t.tagName))return;
   if(e.key==='1'){document.getElementById('bnIslam').click();}
   else if(e.key==='2'){document.getElementById('bnEng').click();}
+  else if(e.key==='3'){document.getElementById('bnWed').click();}
   else if(e.key==='ArrowLeft'){
     var b=document.querySelector('.view.active .back-btn');
     if(b){e.preventDefault();b.click();}

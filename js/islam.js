@@ -218,7 +218,7 @@ function openSettingsBase(){
   else if(isIos&&!standalone){iRow.style.display='';iLbl.textContent=it('installIos');iBtn.style.display='none';}
   else{iRow.style.display='none';}
   /* koniec podpowiedzi wiggle */
-  if(!ST.seenWiggle){ST.seenWiggle=true;save();document.getElementById('iSettingsBtn').classList.remove('wig');document.getElementById('eSettingsBtn').classList.remove('wig');}
+  if(!ST.seenWiggle){ST.seenWiggle=true;save();document.getElementById('iSettingsBtn').classList.remove('wig');document.getElementById('eSettingsBtn').classList.remove('wig');document.getElementById('wSettingsBtn').classList.remove('wig');}
   if(typeof syncSettingsExtras==='function')syncSettingsExtras();
   document.getElementById('setOv').classList.add('open');
 }
@@ -226,6 +226,7 @@ document.getElementById('iSettingsBtn').addEventListener('click',openSettingsBas
 document.getElementById('eSettingsBtn').addEventListener('click',openSettingsBase);
 document.getElementById('closeSetBtn').addEventListener('click',function(){document.getElementById('setOv').classList.remove('open');});
 document.getElementById('setOv').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
+document.getElementById('wSettingsBtn').addEventListener('click',openSettingsBase);
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){document.querySelectorAll('.overlay.open').forEach(function(o){o.classList.remove('open');});}
 });

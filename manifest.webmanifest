@@ -19,6 +19,7 @@
   "shortcuts": [
     { "name": "Czas modlitw", "short_name": "Modlitwy", "url": "./index.html?go=prayers", "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }] },
     { "name": "Modlitwa krok po kroku", "short_name": "Modlitwa", "url": "./index.html?go=prayer", "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }] },
-    { "name": "Angielski B1–B2", "short_name": "Angielski", "url": "./index.html?go=eng", "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }] }
+    { "name": "Angielski B1–B2", "short_name": "Angielski", "url": "./index.html?go=eng", "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "Wedding", "short_name": "Wedding", "url": "./index.html?go=wed", "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }] }
   ]
 }
