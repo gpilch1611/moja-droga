@@ -14,3 +14,6 @@ jobs:
         run: node test/smoke.js
       - name: Load test (JS na atrapach DOM)
         run: node test/load.js
+      - name: Compat test (brak nowych wezlow DOM)
+        run: node test/compat.js
+

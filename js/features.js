@@ -185,6 +185,9 @@ function syncSettingsExtras(){
   var lbl=document.getElementById('aboutLbl');if(lbl)lbl.textContent=tr('aboutLbl')||'O aplikacji';
   var dl=document.getElementById('dangerLbl');if(dl)dl.textContent=tr('dangerLbl')||'Strefa ryzyka';
   var wl=document.getElementById('wakeLbl');if(wl)wl.textContent=tr('wakeLbl')||'Nie gaś ekranu w widoku modlitwy';
+  var ul=document.getElementById('updateLbl');if(ul)ul.textContent=tr('updateLbl')||'Aktualizacja aplikacji';
+  var un=document.getElementById('updateNote');if(un)un.textContent=tr('updateNote')||'';
+  var ub=document.getElementById('updateBtn');if(ub&&!ub.disabled)ub.textContent=tr('updateBtn')||'Wymuś aktualizację';
   var rb=document.getElementById('resetBtn');if(rb&&!rb.dataset.ask)rb.textContent=tr('resetBtn')||'Wyczyść wszystkie dane';
 }
 
@@ -212,7 +215,7 @@ document.addEventListener('keydown',function(e){
   if(t&&/^(input|textarea|select)$/i.test(t.tagName))return;
   if(e.key==='1'){document.getElementById('bnIslam').click();}
   else if(e.key==='2'){document.getElementById('bnEng').click();}
-  else if(e.key==='3'){document.getElementById('bnWed').click();}
+  else if(e.key==='3'){var bw=document.getElementById('bnWed');if(bw)bw.click();}
   else if(e.key==='ArrowLeft'){
     var b=document.querySelector('.view.active .back-btn');
     if(b){e.preventDefault();b.click();}
@@ -229,7 +232,8 @@ document.addEventListener('keydown',function(e){
     var lv=String(q.get('lv')||'').toLowerCase();
     if(lv==='b1'||lv==='b2'){ST.engLevel=lv;save();}
     setTimeout(function(){
-      document.getElementById('bnEng').click();
+      var be=document.getElementById('bnEng');
+      if(be)be.click();
       var found=null;
       TOPICS.forEach(function(t){if(t.id===tp)found=t;});
       if(found&&typeof openEngTopic==='function')openEngTopic(found.id);
@@ -241,3 +245,34 @@ document.addEventListener('keydown',function(e){
    SYNCHRONIZACJA CYKLICZNA
 ══════════════════════════════ */
 setInterval(function(){wlApply();},30000);
+
+/* ══════════════════════════════
+   WYMUŚ AKTUALIZACJĘ (ratunek, gdy przegladarka trzyma stara wersje z cache)
+   Odrejestrowuje Service Workera, czysci cache i wraca z nowym adresem (?u=).
+   ══════════════════════════════ */
+function forceUpdate(){
+  var b=document.getElementById('updateBtn');
+  if(b){b.disabled=true;b.textContent=tr('updateWait')||'Aktualizuję…';}
+  var jobs=[];
+  try{
+    if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations){
+      jobs.push(navigator.serviceWorker.getRegistrations().then(function(rs){
+        return Promise.all(rs.map(function(r){return r.unregister();}));
+      }));
+    }
+  }catch(e){}
+  try{
+    if(window.caches&&window.caches.keys){
+      jobs.push(window.caches.keys().then(function(ks){
+        return Promise.all(ks.map(function(k){return window.caches.delete(k);}));
+      }));
+    }
+  }catch(e){}
+  Promise.all(jobs).catch(function(){}).then(function(){
+    location.replace(location.href.split('?')[0]+'?u='+Date.now());
+  });
+}
+(function(){
+  var b=document.getElementById('updateBtn');
+  if(b)b.addEventListener('click',forceUpdate);
+})();

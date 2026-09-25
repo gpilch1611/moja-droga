@@ -49,11 +49,14 @@ function wItems(){return ST.lang==='en'?WED_ITEMS_EN:WED_ITEMS_PL;}
 /* ── WEDDING — RENDER ── */
 function wedSetChk(el,on){el.classList.toggle('done',!!on);el.innerHTML=on?'<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.5 4.8 9 10 3"/></svg>':'';}
 function renderWedding(){
+  var sc=document.getElementById('w-scroll');
+  if(!sc)return; /* HTML z cache bez widoku Wedding — nic nie rob */
   syncLangBtns();
   document.querySelectorAll('#wSzPill .sz-btn').forEach(function(b){b.classList.toggle('on',b.dataset.sc===ST.scale);b.style.fontSize=b.dataset.sc==='0.85'?'10px':b.dataset.sc==='1'?'12px':'14px';});
-  document.getElementById('w-homeTitle').textContent=wt('title');
-  document.getElementById('w-homeSub').textContent=wt('sub');
-  var sc=document.getElementById('w-scroll');sc.innerHTML='';
+  var ttl=document.getElementById('w-homeTitle'),sub=document.getElementById('w-homeSub');
+  if(ttl)ttl.textContent=wt('title');
+  if(sub)sub.textContent=wt('sub');
+  sc.innerHTML='';
   var badge=document.createElement('div');badge.className='wed-badge';badge.textContent='💍 '+wt('badge');sc.appendChild(badge);
   var card=document.createElement('section');card.className='wed-card';card.setAttribute('aria-label',wt('idLbl'));
   var lbl=document.createElement('div');lbl.className='wed-lbl';lbl.textContent=wt('idLbl');card.appendChild(lbl);
@@ -126,32 +129,15 @@ function speakWed(slow,btn){
   }catch(e){toast(it('errGeneric'),'err');}
 }
 
-/* ── WEDDING — EVENTS ── */
-document.getElementById('wLangBtn').addEventListener('click',toggleLang);
-document.getElementById('wThemeBtn').addEventListener('click',function(){ST.theme=ST.theme==='dark'?'light':'dark';save();applyTheme();});
-document.querySelectorAll('#wSzPill .sz-btn').forEach(function(b){b.addEventListener('click',function(){ST.scale=b.dataset.sc;save();applyScale();});});
-/* ── BOTTOM NAV (wszystkie sekcje centralnie tutaj) ── */
-/* Klik w tab = zawsze powrót na początek sekcji (widok główny + scroll na górę) */
-document.getElementById('bnIslam').addEventListener('click',function(){
-  ST.sect='islam';save();applySect();
-  delete VIEW_SCROLL['vi-home'];
-  showV('vi-home');
-  var sc=viewScroller('vi-home');if(sc)sc.scrollTop=0;
-  renderIslam();refreshP();
-});
-document.getElementById('bnEng').addEventListener('click',function(){
-  ST.sect='eng';save();applySect();
-  delete VIEW_SCROLL['ve-home'];
-  showV('ve-home');
-  var sc=viewScroller('ve-home');if(sc)sc.scrollTop=0;
-  renderEngHome();
-});
-document.getElementById('bnWed').addEventListener('click',function(){
-  ST.sect='wed';save();applySect();
-  delete VIEW_SCROLL['vw-home'];
-  showV('vw-home');
-  var sc=viewScroller('vw-home');if(sc)sc.scrollTop=0;
-  renderWedding();
-});
+/* ── WEDDING — EVENTS (zabezpieczone: starszy HTML z cache nie moze wywalic aplikacji) ── */
+(function(){
+  var lb=document.getElementById('wLangBtn');if(lb)lb.addEventListener('click',toggleLang);
+  var tb=document.getElementById('wThemeBtn');
+  if(tb)tb.addEventListener('click',function(){ST.theme=ST.theme==='dark'?'light':'dark';save();applyTheme();});
+  var pill=document.getElementById('wSzPill');
+  if(pill)pill.querySelectorAll('.sz-btn').forEach(function(b){b.addEventListener('click',function(){ST.scale=b.dataset.sc;save();applyScale();});});
+})();
+/* Dolna nawigacja (Islam / Angielski / Wedding) podlaczana jest w js/app.js — wireNav(). */
+
 
 

@@ -67,12 +67,12 @@ function applySect(){
   APP.setAttribute('data-sect',ST.sect);
   document.documentElement.setAttribute('data-sect',ST.sect);
   applyMeta();
-  document.getElementById('bnIslam').classList.toggle('on',ST.sect==='islam');
-  document.getElementById('bnEng').classList.toggle('on',ST.sect==='eng');
-  document.getElementById('bnWed').classList.toggle('on',ST.sect==='wed');
-  document.getElementById('bnIslam').setAttribute('aria-current',ST.sect==='islam'?'page':'false');
-  document.getElementById('bnEng').setAttribute('aria-current',ST.sect==='eng'?'page':'false');
-  document.getElementById('bnWed').setAttribute('aria-current',ST.sect==='wed'?'page':'false');
+  /* guard: gdy HTML pochodzi ze starszej wersji (cache), elementy moga nie istniec */
+  [['bnIslam','islam'],['bnEng','eng'],['bnWed','wed']].forEach(function(p){
+    var b=document.getElementById(p[0]);if(!b)return;
+    b.classList.toggle('on',ST.sect===p[1]);
+    b.setAttribute('aria-current',ST.sect===p[1]?'page':'false');
+  });
 }
 applySect();
 
@@ -105,8 +105,12 @@ var raf=(typeof requestAnimationFrame==='function')?requestAnimationFrame:functi
 function showV(id,dir){
   var cur=currentView();
   if(cur&&cur!==id){var sc=viewScroller(cur);if(sc)VIEW_SCROLL[cur]=sc.scrollTop;}
+  if(!document.getElementById(id)){ /* widok z nowszej wersji, a HTML z cache — nie wywalaj aplikacji */
+    id=document.getElementById('vi-home')?'vi-home':(document.getElementById('ve-home')?'ve-home':id);
+  }
   VIEWS.forEach(function(v){
     var el=document.getElementById(v),on=v===id;
+    if(!el)return;
     el.classList.remove('v-fwd','v-back');
     el.classList.toggle('active',on);
     if(on&&dir==='fwd')el.classList.add('v-fwd');

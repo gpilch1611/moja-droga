@@ -1,5 +1,5 @@
 /* Moja Droga — Service Worker (auto-update, offline) */
-const CACHE = 'moja-droga-v21';
+const CACHE = 'moja-droga-v22';
 const CORE = [
   './',
   './index.html',
@@ -20,6 +20,9 @@ const CORE = [
 ];
 
 self.addEventListener('install', e => {
+  /* Nowa wersja przejmuje kontrole od razu (bez czekania na zamkniecie karty) —
+     dzieki temu po wgraniu nowej wersji aplikacja odswiezy sie sama. */
+  self.skipWaiting();
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)));
 });
 
@@ -40,23 +43,25 @@ self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
 
   if (url.origin === location.origin) {
-    /* Network-first: po wrzuceniu nowej wersji na GitHub aplikacja
-       pobierze świeże pliki automatycznie; offline pada z powrotem do cache. */
+    /* Network-first z pominięciem cache HTTP (cache:'no-cache' wymusza walidację
+       z serwerem). Dzięki temu po wgraniu nowej wersji jedno odświeżenie
+       wystarcza — przeglądarka nie podaje starych plików z własnego cache
+       (GitHub Pages ustawia Cache-Control: max-age=600). Offline: cache SW. */
     e.respondWith(
-      fetch(e.request)
+      fetch(e.request, { cache: 'no-cache' })
         .then(res => {
           const clone = res.clone();
           caches.open(CACHE).then(c => c.put(e.request, clone));
           return res;
         })
         .catch(() =>
-          caches.match(e.request).then(r => r || caches.match('./index.html'))
+          caches.match(e.request, { ignoreSearch: true }).then(r => r || caches.match('./index.html', { ignoreSearch: true }))
         )
     );
   } else {
     /* Zewnętrzne zasoby (np. Google Fonts): cache-first. */
     e.respondWith(
-      caches.match(e.request).then(r =>
+      caches.match(e.request, { ignoreSearch: true }).then(r =>
         r ||
         fetch(e.request).then(res => {
           const clone = res.clone();
